@@ -1,4 +1,6 @@
-const TAGS = ["Corrugated", "Rigid", "Folding Cartons", "Pouches", "Custom Print", "Eco-friendly"];
+import { site } from "@/content/site";
+
+const TAGS = site.marquee;
 
 export default function Marquee() {
   return (
@@ -10,13 +12,13 @@ export default function Marquee() {
       <div className="flex w-max [animation:marquee_32s_linear_infinite]">
         {[0, 1].map((n) => (
           <div key={n} className="flex shrink-0 items-center">
-            {[...TAGS, ...TAGS].map((t, i) => (
+            {TAGS.map((t, i) => (
               <span
                 key={`${n}-${i}`}
-                className="font-display flex items-center whitespace-nowrap px-8 text-3xl font-semibold uppercase tracking-tight text-[var(--fg)]/80 md:text-5xl"
+                className="font-display flex items-center whitespace-nowrap px-6 text-3xl font-semibold uppercase tracking-tight text-[var(--fg)]/80 md:text-5xl"
               >
                 {t}
-                <span className="ml-16 inline-block size-2.5 rotate-45 bg-[var(--accent)]" />
+                <span className="ml-12 inline-block size-2.5 rotate-45 bg-[var(--accent)]" />
               </span>
             ))}
           </div>

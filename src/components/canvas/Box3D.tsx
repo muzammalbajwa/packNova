@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, type RootState } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAppStore } from "@/lib/store";
+import { kraftTexture, kraftBump, logoTexture, labelTexture, shadowTexture, mulberry32 } from "@/lib/textures";
 
 /* ---------- dimensions (world units) ---------- */
 const W = 1.6; // width  (x)
@@ -52,93 +53,6 @@ function computePose(out: Pose, hero: number, story: number) {
   out.side = 1 - 2 * seg(p, 0.28, 0.38) + 2 * seg(p, 0.62, 0.72);
 }
 
-/* ---------- procedural textures (small, generated once) ---------- */
-
-function makeCanvas(w: number, h: number) {
-  const c = document.createElement("canvas");
-  c.width = w;
-  c.height = h;
-  return [c, c.getContext("2d")!] as const;
-}
-
-/** Deterministic PRNG so renders are reproducible and lint-pure. */
-function mulberry32(seed: number) {
-  let a = seed;
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function kraftTexture() {
-  const [c, g] = makeCanvas(256, 256);
-  const rnd = mulberry32(7);
-  g.fillStyle = "#bd9460";
-  g.fillRect(0, 0, 256, 256);
-  for (let y = 0; y < 256; y += 6) {
-    g.fillStyle = y % 12 === 0 ? "rgba(90,60,25,0.10)" : "rgba(255,230,190,0.07)";
-    g.fillRect(0, y, 256, 3);
-  }
-  for (let i = 0; i < 1400; i++) {
-    g.fillStyle = rnd() > 0.5 ? "rgba(70,45,15,0.16)" : "rgba(255,235,200,0.14)";
-    g.fillRect(rnd() * 256, rnd() * 256, 1 + rnd() * 2, 1);
-  }
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.anisotropy = 4;
-  return t;
-}
-
-function logoTexture() {
-  const [c, g] = makeCanvas(1024, 256);
-  g.textAlign = "center";
-  g.textBaseline = "middle";
-  g.fillStyle = "#ff5b2e";
-  g.font = "700 150px system-ui, sans-serif";
-  g.fillText("PackCo", 512, 108);
-  g.fillStyle = "rgba(255,255,255,0.75)";
-  g.font = "500 34px system-ui, sans-serif";
-  g.fillText("PACKAGING, UNBOXED", 512, 212);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
-
-function labelTexture() {
-  const [c, g] = makeCanvas(512, 320);
-  g.fillStyle = "#f4efe6";
-  g.fillRect(0, 0, 512, 320);
-  g.fillStyle = "#111";
-  g.font = "700 40px system-ui, sans-serif";
-  g.fillText("SHIP TO", 28, 62);
-  g.font = "500 28px system-ui, sans-serif";
-  g.fillText("Placeholder Customer", 28, 108);
-  g.fillText("1 Example Street", 28, 146);
-  const rnd = mulberry32(3);
-  for (let x = 28; x < 484; ) {
-    const w = 2 + Math.floor(rnd() * 5);
-    g.fillRect(x, 190, w, 90);
-    x += w + 2 + Math.floor(rnd() * 4);
-  }
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
-
-function shadowTexture() {
-  const [c, g] = makeCanvas(128, 128);
-  const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-  grd.addColorStop(0, "rgba(0,0,0,0.65)");
-  grd.addColorStop(1, "rgba(0,0,0,0)");
-  g.fillStyle = grd;
-  g.fillRect(0, 0, 128, 128);
-  return new THREE.CanvasTexture(c);
-}
-
 /* ---------- shared colors (never allocated per frame) ---------- */
 const KRAFT = new THREE.Color("#ffffff"); // texture carries the kraft color
 const BLUE = new THREE.Color("#4d7cff");
@@ -161,7 +75,8 @@ function buildAssets(detail: 0 | 1 | 2) {
     const labelMap = labelTexture();
     const shadowMap = shadowTexture();
 
-    const board = new THREE.MeshStandardMaterial({ map: kraftMap, roughness: 0.92, metalness: 0 });
+    const bumpMap = kraftBump();
+    const board = new THREE.MeshStandardMaterial({ map: kraftMap, bumpMap, bumpScale: 0.6, roughness: 0.92, metalness: 0 });
     const tapeMat = new THREE.MeshStandardMaterial({ color: ACCENT, roughness: 0.4 });
     const logoMat = new THREE.MeshBasicMaterial({ map: logoMap, transparent: true, opacity: 0, depthWrite: false });
     const labelMat = new THREE.MeshBasicMaterial({ map: labelMap, transparent: true, opacity: 0, depthWrite: false });
@@ -206,7 +121,7 @@ function buildAssets(detail: 0 | 1 | 2) {
 
     const disposables: { dispose(): void }[] = [
       flapFB, flapLR, bottom, wallFB, wallLR, tape, plane, streak,
-      kraftMap, logoMap, labelMap, shadowMap,
+      kraftMap, bumpMap, logoMap, labelMap, shadowMap,
       board, tapeMat, logoMat, labelMat, glowMat, shadowMat, streakMat, lineMat,
       ...(edges ? Object.values(edges) : []),
     ];

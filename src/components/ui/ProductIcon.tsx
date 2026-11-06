@@ -1,4 +1,4 @@
-export type IconKind = "corrugated" | "rigid" | "carton" | "pouch" | "poly" | "courier";
+export type IconKind = "corrugated" | "rigid" | "carton" | "pouch" | "poly" | "courier" | "paper";
 
 const P = (points: string, o: number) => (
   <polygon points={points} fill="currentColor" fillOpacity={o} stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
@@ -53,6 +53,14 @@ export default function ProductIcon({ kind }: { kind: IconKind }) {
           <path d="M26 30h68v72H26z" fill="currentColor" fillOpacity={0.3} stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
           <path d="M26 30l34 24 34-24" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" fill="currentColor" fillOpacity={0.14} />
           <rect x="40" y="62" width="40" height="8" rx="2" fill="var(--accent)" />
+        </>
+      )}
+      {kind === "paper" && (
+        <>
+          <path d="M42 46C42 20 78 20 78 46" stroke="var(--accent)" strokeWidth="3" strokeLinecap="round" />
+          {P("30,44 90,44 94,104 26,104", 0.28)}
+          <path d="M30 44h60" stroke="currentColor" strokeOpacity={0.6} strokeWidth="2" />
+          <path d="M60 44v60" stroke="currentColor" strokeOpacity={0.3} strokeWidth="1.5" />
         </>
       )}
     </svg>

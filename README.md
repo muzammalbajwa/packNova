@@ -1,6 +1,6 @@
-# PackCo: cinematic 3D packaging site
+# PackNova: cinematic 3D packaging site
 
-Scroll-driven 3D marketing site (placeholder brand "PackCo"). Next.js static export, deployable on Cloudflare Pages.
+Scroll-driven 3D marketing site. Brand name, contact details and **all copy** live in `src/content/site.ts` (dummy values: see `CONTENT-TODO.md`). Next.js static export, deployable on Cloudflare Pages.
 
 ## Stack
 
@@ -25,10 +25,16 @@ Append `?tier=low|mid|high|none` to the URL to force a device tier while testing
 ## Structure
 
     src/app/                 layout, page, globals.css (design tokens as CSS variables)
-    src/components/canvas/   Scene (R3F canvas, own chunk), Box3D, Loader, SceneZone, SceneLoader
-    src/components/sections/ Hero, Products, Story, Configurator, Quote, Footer
-    src/components/ui/       Navbar, Marquee, Button
-    src/lib/                 deviceTier.ts, store.ts (zustand), scroll.ts (Lenis + ScrollTrigger)
+    src/content/site.ts      ALL copy + brand/contact values (single place to edit; Urdu-ready)
+    src/components/canvas/   Scene (hero canvas, own chunk), Box3D (animated hero box), PreviewScene,
+                             models/PackModel (carton, folding carton, rigid box, pouch, courier bag, paper bag),
+                             Loader, SceneZone, SceneLoader
+    src/components/sections/ Hero, Products, Story, Process, Configurator, Quote(+Form), Footer
+    src/components/ui/       Navbar, Logo, Marquee, Button, ProductIcon, SpecControls
+    src/lib/                 deviceTier.ts, store.ts (zustand), scroll.ts (Lenis + ScrollTrigger),
+                             textures.ts (procedural canvas textures + PBR materials), configurator.ts
+    src/app/configurator/    live 3D preview page (reads ?type=&l=&w=&h=&m=)
+    CONTENT-TODO.md, CREDITS.md
     public/models, public/textures   compressed GLB / KTX2 (see scripts/optimize-models.md)
     scripts/optimize-models.md       gltf-transform / gltfpack / KTX2 commands
 
@@ -37,7 +43,7 @@ Append `?tier=low|mid|high|none` to the URL to force a device tier while testing
 - The canvas is loaded with `next/dynamic` (`ssr: false`), so three.js is in a separate chunk and the page paints without it.
 - One fixed canvas serves the whole page. Regions that need it are wrapped in `SceneZone`; the canvas stops rendering (`frameloop="never"`) when none is on screen.
 - `deviceTier.ts` classifies the device (low / mid / high / none). Low: dpr <= 1.25, no shadows, no post-processing, `frameloop="demand"`. None (no WebGL): static 2D fallback, all text and the quote path intact.
-- A static poster (`public/textures/hero-poster.svg`) is eager + `fetchpriority=high`; it fades out once the live canvas is ready.
+- A static poster (`public/textures/hero-poster.webp`, rendered from the 3D scene) is eager + `fetchpriority=high`; it fades out once the live canvas is ready.
 - `prefers-reduced-motion`: Lenis off, the box rests in its open pose, CSS animations frozen.
 
 ## Measuring

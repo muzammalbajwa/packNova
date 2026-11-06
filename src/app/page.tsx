@@ -3,6 +3,7 @@ import Configurator from "@/components/sections/Configurator";
 import Footer from "@/components/sections/Footer";
 import Hero from "@/components/sections/Hero";
 import Products from "@/components/sections/Products";
+import Process from "@/components/sections/Process";
 import Story from "@/components/sections/Story";
 import Quote from "@/components/sections/Quote";
 import Marquee from "@/components/ui/Marquee";
@@ -18,6 +19,7 @@ export default function Home() {
         <Marquee />
         <Products />
         <Story />
+        <Process />
         <Configurator />
         <Quote />
       </main>

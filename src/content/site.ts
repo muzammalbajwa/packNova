@@ -1,0 +1,235 @@
+/**
+ * ALL copy and brand values live in this file.
+ * The contact details, brand name and social links below are DUMMY values:
+ * replace them here and they change everywhere on the site (see CONTENT-TODO.md).
+ *
+ * Urdu later: add `const ur: SiteContent = { ... }`, register it in `locales`,
+ * and pick it by route/locale. Every component reads from `site`, never from literals.
+ */
+
+const en = {
+  lang: "en" as const,
+  dir: "ltr" as const,
+
+  brand: {
+    name: "PackNova",
+    tagline: "Packaging that makes your product unforgettable.",
+    description: "Custom boxes, cartons and pouches, designed in 3D and made to order.",
+    /** Used for absolute URLs (Open Graph). Replace with the real domain. */
+    url: "https://example.com",
+  },
+
+  contact: {
+    phone: "+92 300 0000000",
+    phoneHref: "tel:+923000000000",
+    whatsapp: "+92 300 0000000",
+    whatsappHref: "https://wa.me/923000000000",
+    email: "hello@example.com",
+    address: "Plot 00, Industrial Area, Lahore, Pakistan",
+    hours: "Mon to Sat, 9:00 AM to 6:00 PM",
+  },
+
+  social: [
+    { name: "Instagram", href: "#" },
+    { name: "Facebook", href: "#" },
+    { name: "LinkedIn", href: "#" },
+  ],
+
+  seo: {
+    title: "PackNova | Custom 3D-designed packaging, made to order",
+    description:
+      "Custom corrugated boxes, folding cartons, rigid gift boxes, pouches and courier bags. Design your box in 3D, approve the preview, and get a quote from PackNova.",
+    ogImage: "/og.png",
+  },
+
+  nav: {
+    links: [
+      { label: "Products", hash: "products" },
+      { label: "Configurator", href: "/configurator/" },
+      { label: "Quote", hash: "quote" },
+      { label: "Contact", hash: "contact" },
+    ],
+    cta: "Get a quote",
+  },
+
+  hero: {
+    eyebrow: "Custom packaging, made to order",
+    headline: "Packaging with presence.",
+    headlineAccent: "presence.",
+    sub: "Custom boxes, cartons and pouches, designed in 3D and made to order. See your packaging before it exists.",
+    primary: { label: "Design your box", href: "/configurator/" },
+    secondary: { label: "Get a quote", hash: "quote" },
+    scrollHint: "Scroll to open",
+    posterAlt: "A kraft packaging box with its flaps open",
+  },
+
+  marquee: [
+    "Corrugated Boxes",
+    "Folding Cartons",
+    "Rigid Gift Boxes",
+    "Pouches",
+    "Poly & Courier Bags",
+    "Custom Printing",
+    "Eco-friendly",
+    "Made to Order",
+  ],
+
+  products: {
+    eyebrow: "What we make",
+    heading: "Six ways to wrap a product.",
+    bestForLabel: "Best for",
+    items: [
+      {
+        id: "corrugated",
+        name: "Corrugated Shipping Boxes",
+        spec: "3, 5 and 7 ply",
+        description: "Strong boxes that protect products in transit.",
+        bestFor: ["E-commerce", "Export", "Bulk shipping"],
+        icon: "corrugated" as const,
+        model: "carton" as const,
+      },
+      {
+        id: "folding",
+        name: "Folding Cartons",
+        spec: "Printed retail cartons",
+        description: "Printed retail cartons that sit well on a shelf.",
+        bestFor: ["Food", "Cosmetics", "Medicine", "Electronics"],
+        icon: "carton" as const,
+        model: "folding" as const,
+      },
+      {
+        id: "rigid",
+        name: "Rigid Gift Boxes",
+        spec: "Lid and base",
+        description: "Premium boxes with a lid and a luxury feel.",
+        bestFor: ["Jewelry", "Mobiles", "Gifts", "Apparel"],
+        icon: "rigid" as const,
+        model: "rigid" as const,
+      },
+      {
+        id: "pouches",
+        name: "Flexible Pouches",
+        spec: "Stand-up and sachet",
+        description: "Stand-up and sachet pouches for dry and liquid products.",
+        bestFor: ["Snacks", "Spices", "Coffee", "Personal care"],
+        icon: "pouch" as const,
+        model: "pouch" as const,
+      },
+      {
+        id: "courier",
+        name: "Poly & Courier Bags",
+        spec: "Tamper-evident",
+        description: "Light, tamper-evident bags for fast shipping.",
+        bestFor: ["Clothing", "Online stores", "Couriers"],
+        icon: "courier" as const,
+        model: "courier" as const,
+      },
+      {
+        id: "eco",
+        name: "Eco & Paper Packaging",
+        spec: "Kraft and paper",
+        description: "Kraft bags and boxes, paper cups and trays.",
+        bestFor: ["Brands that want a greener option"],
+        icon: "paper" as const,
+        model: "paperbag" as const,
+      },
+    ],
+  },
+
+  story: {
+    eyebrow: "From idea to doorstep",
+    chapters: [
+      {
+        title: "Design",
+        body: "Pick a box, set the size, add your artwork. Watch it come to life in 3D.",
+      },
+      {
+        title: "Print",
+        body: "Sharp colors, clean finishes: lamination, UV, embossing and foil, matched to your brand.",
+      },
+      {
+        title: "Deliver",
+        body: "Packed, palletized and sent to your door. Your packaging arrives ready to impress.",
+      },
+    ],
+  },
+
+  process: {
+    eyebrow: "How it works",
+    heading: "Four steps from brief to box.",
+    steps: [
+      { title: "Tell us what you need", body: "Share your product, size and quantity. Send artwork now or add it later." },
+      { title: "Approve the 3D preview", body: "See your packaging in 3D and ask for changes before anything is cut." },
+      { title: "We print and make it", body: "Your order is printed, finished and assembled to the approved design." },
+      { title: "Delivered to you", body: "Packed, palletized and sent to your address." },
+    ],
+  },
+
+  configurator: {
+    eyebrow: "Configurator",
+    heading: "Your box, your size.",
+    body: "Choose a type, enter length, width and height, pick a material, and preview it live.",
+    cta: "Open the configurator",
+    labels: { type: "Type", size: "Size (cm)", length: "Length", width: "Width", height: "Height", material: "Material" },
+    materials: [
+      { id: "kraft", label: "Kraft" },
+      { id: "white", label: "Matte white" },
+      { id: "black", label: "Gloss black" },
+    ],
+    page: {
+      eyebrow: "Live preview",
+      heading: "Configure your packaging",
+      note: "This is a preview. The full configurator with artwork upload and pricing is coming soon, so for now send us your specs with a quote request.",
+      noWebgl: "Your device can't show the 3D preview, but you can still send us these specs.",
+      sendSpecs: "Request a quote with these specs",
+      back: "Back home",
+    },
+  },
+
+  quote: {
+    eyebrow: "Request a quote",
+    heading: "Tell us what you are packing. We will reply with a quote.",
+    fields: {
+      name: "Your name",
+      phone: "Phone number",
+      product: "What are you packing?",
+      productPlaceholder: "Choose a product",
+      quantity: "Quantity",
+      message: "Anything else we should know?",
+    },
+    submit: "Send request",
+    success: {
+      title: "Request received.",
+      // TODO(backend): this success state is front-end only; no message is sent yet.
+      body: "Thanks. We will reply with a quote.",
+      again: "Send another request",
+    },
+    whatsappCta: "Or message us on WhatsApp",
+  },
+
+  footer: {
+    blurb: "Custom boxes, cartons and pouches, designed in 3D and made to order.",
+    productsTitle: "Products",
+    companyTitle: "Explore",
+    contactTitle: "Contact",
+    rights: "All rights reserved.",
+  },
+
+  loader: {
+    messages: [
+      "Folding the cardboard...",
+      "Cutting the dieline...",
+      "Adding lights...",
+      "Taping the seams...",
+      "Ready to ship.",
+    ],
+  },
+};
+
+export type SiteContent = typeof en;
+export type Locale = "en";
+
+/** Register additional languages here (e.g. `ur`). */
+export const locales: Record<Locale, SiteContent> = { en };
+
+export const site: SiteContent = locales.en;

@@ -1,16 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { site } from "@/content/site";
+import { resolveHref } from "@/lib/links";
 import Button from "./Button";
+import Logo from "./Logo";
 
-const LINKS = [
-  { href: "#products", label: "Products" },
-  { href: "/configurator/", label: "Configurator" },
-  { href: "#quote", label: "Quote" },
-  { href: "#contact", label: "Contact" },
-];
-
-export default function Navbar() {
+export default function Navbar({ fromHome = true }: { fromHome?: boolean }) {
   const bar = useRef<HTMLElement>(null);
 
   // Hide on scroll down, show on scroll up. Direct style mutation, no React state.
@@ -33,22 +29,22 @@ export default function Navbar() {
     >
       <nav
         aria-label="Primary"
-        className="flex w-full max-w-3xl items-center justify-between gap-6 rounded-full border border-[var(--line)] bg-black/55 py-2 pl-6 pr-2 backdrop-blur-xl"
+        className="flex w-full max-w-3xl items-center justify-between gap-4 rounded-full border border-[var(--line)] bg-black/55 py-2 pl-5 pr-2 backdrop-blur-xl"
       >
-        <a href="#top" className="font-display text-xl font-bold tracking-tight">
-          Pack<span className="text-[var(--accent)]">Co</span>
+        <a href={fromHome ? "#top" : "/"} aria-label={`${site.brand.name} home`} className="text-xl">
+          <Logo />
         </a>
-        <ul className="hidden items-center gap-7 text-sm text-[var(--muted)] md:flex">
-          {LINKS.map((l) => (
-            <li key={l.href}>
-              <a href={l.href} className="transition-colors duration-300 hover:text-[var(--fg)]">
+        <ul className="hidden items-center gap-6 text-sm text-[var(--muted)] md:flex">
+          {site.nav.links.map((l) => (
+            <li key={l.label}>
+              <a href={resolveHref(l, fromHome)} className="transition-colors duration-300 hover:text-[var(--fg)]">
                 {l.label}
               </a>
             </li>
           ))}
         </ul>
-        <Button href="#quote" className="!px-5 !py-2.5">
-          Get a Quote
+        <Button href={fromHome ? "#quote" : "/#quote"} className="!px-5 !py-2.5">
+          {site.nav.cta}
         </Button>
       </nav>
     </header>

@@ -1,15 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { site } from "@/content/site";
 import { useAppStore } from "@/lib/store";
 
-const MESSAGES = [
-  "Folding the cardboard...",
-  "Adding lights...",
-  "Taping the seams...",
-  "Printing the finishing touches...",
-  "Ready to ship.",
-];
+const MESSAGES = site.loader.messages;
 
 export default function Loader() {
   const progress = useAppStore((s) => s.progress);

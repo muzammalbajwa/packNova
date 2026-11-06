@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useThree, type RootState } from "@react-three/fiber";
 import { useProgress } from "@react-three/drei";
 import { useAppStore } from "@/lib/store";
 import Box3D from "./Box3D";
@@ -44,6 +44,8 @@ declare global {
   interface Window {
     /** Exposed for performance checks: window.__gl.info.render.calls */
     __gl?: import("three").WebGLRenderer;
+    /** Full R3F state (scene, camera, gl) for tooling such as poster export. */
+    __r3f?: RootState;
   }
 }
 
@@ -63,8 +65,9 @@ export default function Scene() {
       frameloop={frameloop}
       gl={{ antialias: profile.tier !== "low", alpha: true, powerPreference: "high-performance" }}
       camera={{ position: [0, 0.5, 5], fov: 35 }}
-      onCreated={({ gl }) => {
-        window.__gl = gl;
+      onCreated={(state) => {
+        window.__gl = state.gl;
+        window.__r3f = state;
       }}
     >
       <hemisphereLight args={["#fff1dc", "#1a1008", 0.55]} />

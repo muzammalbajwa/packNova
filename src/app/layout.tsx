@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
+import { site } from "@/content/site";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -15,9 +16,22 @@ const instrument = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "PackCo | Custom packaging, engineered to be unboxed",
-  description:
-    "Corrugated boxes, folding cartons, rigid boxes, pouches and courier bags, designed, printed and delivered. Placeholder copy.",
+  metadataBase: new URL(site.brand.url),
+  title: site.seo.title,
+  description: site.seo.description,
+  openGraph: {
+    type: "website",
+    siteName: site.brand.name,
+    title: site.seo.title,
+    description: site.seo.description,
+    images: [{ url: site.seo.ogImage, width: 1200, height: 630, alt: site.brand.tagline }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.seo.title,
+    description: site.seo.description,
+    images: [site.seo.ogImage],
+  },
 };
 
 export const viewport: Viewport = {
@@ -28,7 +42,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${bricolage.variable} ${instrument.variable}`}>
+    <html lang={site.lang} dir={site.dir} className={`${bricolage.variable} ${instrument.variable}`}>
       <body className="min-h-dvh antialiased">{children}</body>
     </html>
   );

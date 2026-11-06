@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { site } from "@/content/site";
+import { resolveHref } from "@/lib/links";
 import SceneZone from "../canvas/SceneZone";
 import Button from "../ui/Button";
 import { trackProgress } from "@/lib/scroll";
@@ -9,6 +11,8 @@ import { useAppStore } from "@/lib/store";
 export default function Hero() {
   const track = useRef<HTMLDivElement>(null);
   const live = useAppStore((s) => s.ready && !!s.profile?.webgl);
+  const { hero } = site;
+  const [before, after] = hero.headline.split(hero.headlineAccent);
 
   useEffect(() => {
     const el = track.current;
@@ -27,8 +31,8 @@ export default function Hero() {
         {/* Static poster: eager + high priority, faded out once the live canvas is ready. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/textures/hero-poster.svg"
-          alt="Kraft packaging box with open flaps"
+          src="/textures/hero-poster.webp"
+          alt={hero.posterAlt}
           width={800}
           height={800}
           fetchPriority="high"
@@ -40,28 +44,24 @@ export default function Hero() {
         />
 
         <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-14 md:justify-center md:pb-0">
-          <p className="eyebrow">
-            Custom packaging / placeholder
-          </p>
-          <h1
-           
-            className="font-display mt-5 max-w-[11ch] text-[clamp(3.1rem,9vw,7.6rem)] font-bold leading-[0.92] tracking-[-0.03em]"
-          >
-            Packaging that earns the <em className="text-[var(--kraft)] not-italic">unboxing.</em>
+          <p className="eyebrow">{hero.eyebrow}</p>
+          <h1 className="font-display mt-5 max-w-[10ch] text-[clamp(3.1rem,9vw,7.6rem)] font-bold leading-[0.92] tracking-[-0.03em]">
+            {before}
+            <em className="text-[var(--kraft)] not-italic">{hero.headlineAccent}</em>
+            {after}
           </h1>
-          <p className="mt-6 max-w-md text-lg leading-relaxed text-[var(--muted)]">
-            Corrugated, rigid and folding cartons, pouches and mailers. Designed, printed and delivered by PackCo.
-          </p>
+          <p className="mt-6 max-w-md text-lg leading-relaxed text-[var(--muted)]">{hero.sub}</p>
           <div className="mt-9 flex flex-wrap gap-3">
-            <Button href="#quote">Get a Quote</Button>
-            <Button href="#products" variant="ghost">
-              Explore Products
+            <Button href={resolveHref(hero.primary)}>{hero.primary.label}</Button>
+            <Button href={resolveHref(hero.secondary)} variant="ghost">
+              {hero.secondary.label}
             </Button>
           </div>
         </div>
 
         <div className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 items-center gap-3 text-xs uppercase tracking-[0.3em] text-[var(--muted)] md:flex">
-          <span className="h-px w-10 bg-[var(--muted)]/50" /> Scroll to open <span className="h-px w-10 bg-[var(--muted)]/50" />
+          <span className="h-px w-10 bg-[var(--muted)]/50" /> {hero.scrollHint}{" "}
+          <span className="h-px w-10 bg-[var(--muted)]/50" />
         </div>
       </div>
     </SceneZone>

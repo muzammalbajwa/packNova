@@ -1,34 +1,23 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { site } from "@/content/site";
 import SceneZone from "../canvas/SceneZone";
 import { trackProgress } from "@/lib/scroll";
 import { useAppStore } from "@/lib/store";
 
-const CHAPTERS = [
-  {
-    n: "01",
-    title: "Design",
-    body: "Dielines, structure and fit are engineered around your product. Watch the box open up on the drawing board.",
-    side: "md:mr-auto",
-    // 2D fallback look for this chapter
-    filter: "hue-rotate(195deg) saturate(0.9) brightness(0.9)",
-  },
-  {
-    n: "02",
-    title: "Print",
-    body: "Offset, foil and soft-touch finishes in your brand colors. Same box, now carrying your logo.",
-    side: "md:ml-auto",
-    filter: "grayscale(1) brightness(0.55) contrast(1.1)",
-  },
-  {
-    n: "03",
-    title: "Deliver",
-    body: "Packed, labelled and on its way. Reliable lead times and tracking from our dock to your door.",
-    side: "md:mr-auto",
-    filter: "grayscale(1) brightness(0.55) contrast(1.1)",
-  },
+// Layout + 2D-fallback styling per chapter. Text comes from content/site.ts.
+const LOOKS = [
+  { side: "md:mr-auto", filter: "hue-rotate(195deg) saturate(0.9) brightness(0.9)" },
+  { side: "md:ml-auto", filter: "grayscale(1) brightness(0.55) contrast(1.1)" },
+  { side: "md:mr-auto", filter: "grayscale(1) brightness(0.55) contrast(1.1)" },
 ] as const;
+
+const CHAPTERS = site.story.chapters.map((c, i) => ({
+  ...c,
+  ...LOOKS[i],
+  n: `0${i + 1}`,
+}));
 
 export default function Story() {
   const track = useRef<HTMLDivElement>(null);
@@ -62,7 +51,7 @@ export default function Story() {
         {/* 2D fallback / pre-canvas poster, restyled per chapter */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/textures/hero-poster.svg"
+          src="/textures/hero-poster.webp"
           alt=""
           width={800}
           height={800}
@@ -75,7 +64,7 @@ export default function Story() {
         />
 
         <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-16 md:justify-center md:pb-0">
-          <p className="eyebrow mb-6">The journey</p>
+          <p className="eyebrow mb-6">{site.story.eyebrow}</p>
           <div className="relative min-h-[15rem] md:min-h-[18rem]">
             {CHAPTERS.map((c, i) => (
               <div
@@ -85,7 +74,7 @@ export default function Story() {
                   i === chapter ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
                 }`}
               >
-                <span className="font-display text-sm tabular-nums text-[var(--accent)]">{c.n} / 03</span>
+                <span className="font-display text-sm tabular-nums text-[var(--accent)]">{c.n} / 0{CHAPTERS.length}</span>
                 <h2 className="font-display mt-2 text-6xl font-bold tracking-[-0.03em] md:text-8xl">{c.title}</h2>
                 <p className="mt-5 text-lg leading-relaxed text-[var(--muted)]">{c.body}</p>
               </div>
