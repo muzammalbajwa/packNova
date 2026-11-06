@@ -6,15 +6,17 @@ import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import type { ArtMap } from "@/lib/artwork";
 import type { Spec } from "@/lib/configurator";
-import { shadowTexture } from "@/lib/textures";
+import { contactShadowTexture } from "@/lib/textures";
 import { useAppStore } from "@/lib/store";
 import PackModel from "./models/PackModel";
+import RoomEnv from "./RoomEnv";
 
 const TARGET = 1.7; // largest dimension in world units
 
-function Shadow() {
+/** Soft footprint shadow, sized from the model footprint (x by z, world units). */
+function Shadow({ fx, fz }: { fx: number; fz: number }) {
   const { geo, mat, tex } = useMemo(() => {
-    const tex = shadowTexture();
+    const tex = contactShadowTexture();
     return {
       tex,
       geo: new THREE.PlaneGeometry(1, 1),
@@ -29,7 +31,7 @@ function Shadow() {
     },
     [geo, mat, tex],
   );
-  return <mesh geometry={geo} material={mat} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.005, 0]} scale={[3.4, 3.4, 1]} />;
+  return <mesh geometry={geo} material={mat} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.005, 0]} scale={[fx * 1.9 + 0.5, fz * 1.9 + 0.5, 1]} />;
 }
 
 /** Single-model preview canvas for the configurator page (drag to rotate). */
@@ -55,12 +57,13 @@ export default function PreviewScene({ spec, art, open }: { spec: Spec; art: Art
         window.__r3f = state;
       }}
     >
-      <hemisphereLight args={["#fff1dc", "#1a1008", 0.6]} />
+      {profile.tier !== "low" && <RoomEnv intensity={0.26} />}
+      <hemisphereLight args={["#fff1dc", "#1a1008", profile.tier === "low" ? 0.6 : 0.4]} />
       <directionalLight position={[3, 5, 3]} intensity={2.4} color="#ffe9cf" />
       <directionalLight position={[-4, 2, -3]} intensity={2} color="#ff5b2e" />
       <group position={[0, -0.55, 0]}>
         <PackModel model={spec.model} material={spec.material} art={art} open={open} detail={profile.detail} l={l} w={w} h={h} />
-        <Shadow />
+        <Shadow fx={l} fz={spec.model === "pouch" ? Math.max(w, 0.12) : w} />
       </group>
       <OrbitControls
         enablePan={false}

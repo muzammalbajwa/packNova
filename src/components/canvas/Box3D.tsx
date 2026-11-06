@@ -4,7 +4,8 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, type RootState } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAppStore } from "@/lib/store";
-import { kraftTexture, kraftNormal, logoTexture, labelTexture, shadowTexture, mulberry32 } from "@/lib/textures";
+import { rbox } from "@/lib/geometry";
+import { kraftTexture, kraftNormal, logoTexture, labelTexture, contactShadowTexture, mulberry32 } from "@/lib/textures";
 
 /* ---------- dimensions (world units) ---------- */
 const W = 1.6; // width  (x)
@@ -61,11 +62,19 @@ const BLUE_GLOW = new THREE.Color("#0c2c9a");
 const ACCENT = new THREE.Color("#ff5b2e");
 
 function buildAssets(detail: 0 | 1 | 2) {
-    const flapFB = new THREE.BoxGeometry(W, T, D / 2).translate(0, 0, D / 4);
-    const flapLR = new THREE.BoxGeometry(W * 0.42, T, D - 2 * T).translate(W * 0.21, 0, 0);
-    const bottom = new THREE.BoxGeometry(W, T, D);
-    const wallFB = new THREE.BoxGeometry(W, H, T);
-    const wallLR = new THREE.BoxGeometry(T, H, D - 2 * T);
+    // Beveled meshes; the blueprint edge lines are traced on the plain boxes (clean outlines).
+    const flapFB = rbox(W, T, D / 2, detail).translate(0, 0, D / 4);
+    const flapLR = rbox(W * 0.42, T, D - 2 * T, detail).translate(W * 0.21, 0, 0);
+    const bottom = rbox(W, T, D, detail);
+    const wallFB = rbox(W, H, T, detail);
+    const wallLR = rbox(T, H, D - 2 * T, detail);
+    const plain = {
+      flapFB: new THREE.BoxGeometry(W, T, D / 2).translate(0, 0, D / 4),
+      flapLR: new THREE.BoxGeometry(W * 0.42, T, D - 2 * T).translate(W * 0.21, 0, 0),
+      bottom: new THREE.BoxGeometry(W, T, D),
+      wallFB: new THREE.BoxGeometry(W, H, T),
+      wallLR: new THREE.BoxGeometry(T, H, D - 2 * T),
+    };
     const tape = new THREE.BoxGeometry(W + 0.02, 0.006, 0.2);
     const plane = new THREE.PlaneGeometry(1, 1);
     const streak = new THREE.PlaneGeometry(0.55, 0.01);
@@ -73,7 +82,7 @@ function buildAssets(detail: 0 | 1 | 2) {
     const kraftMap = kraftTexture();
     const logoMap = logoTexture();
     const labelMap = labelTexture();
-    const shadowMap = shadowTexture();
+    const shadowMap = contactShadowTexture();
 
     const normalMap = detail > 0 ? kraftNormal() : null;
     const board = new THREE.MeshStandardMaterial({ map: kraftMap, normalMap, normalScale: new THREE.Vector2(0.7, 0.7), roughness: 0.92, metalness: 0 });
@@ -101,11 +110,11 @@ function buildAssets(detail: 0 | 1 | 2) {
     const edges =
       detail > 0
         ? {
-            flapFB: new THREE.EdgesGeometry(flapFB),
-            flapLR: new THREE.EdgesGeometry(flapLR),
-            wallFB: new THREE.EdgesGeometry(wallFB),
-            wallLR: new THREE.EdgesGeometry(wallLR),
-            bottom: new THREE.EdgesGeometry(bottom),
+            flapFB: new THREE.EdgesGeometry(plain.flapFB),
+            flapLR: new THREE.EdgesGeometry(plain.flapLR),
+            wallFB: new THREE.EdgesGeometry(plain.wallFB),
+            wallLR: new THREE.EdgesGeometry(plain.wallLR),
+            bottom: new THREE.EdgesGeometry(plain.bottom),
           }
         : null;
 
@@ -120,6 +129,7 @@ function buildAssets(detail: 0 | 1 | 2) {
     }
 
     const disposables: { dispose(): void }[] = [
+      ...Object.values(plain),
       flapFB, flapLR, bottom, wallFB, wallLR, tape, plane, streak,
       kraftMap, ...(normalMap ? [normalMap] : []), logoMap, labelMap, shadowMap,
       board, tapeMat, logoMat, labelMat, glowMat, shadowMat, streakMat, lineMat,

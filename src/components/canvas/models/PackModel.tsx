@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { composePanel, hasArt, type ArtMap, type Panel } from "@/lib/artwork";
 import { PANELS, type ModelId } from "@/lib/configurator";
+import { rbox } from "@/lib/geometry";
 import { createPackMaterial, type MaterialKind } from "@/lib/textures";
 
 /* All models are built from a handful of shared geometries + a base board material, plus one
@@ -22,12 +23,8 @@ const lerp = THREE.MathUtils.lerp;
 
 type Detail = 0 | 1 | 2;
 
-/** Box factory (Step 4 swaps in beveled edges here). */
-function box(w: number, h: number, d: number, _detail: Detail = 0, _radius = 0) {
-  void _detail;
-  void _radius;
-  return new THREE.BoxGeometry(w, h, d);
-}
+/** Beveled box factory (plain box on the low tier). */
+const box = rbox;
 
 /** Height profile of a flat pillow bag (courier / poly) at (u,v) in [-1,1] x [0,1]. */
 function pillowZ(u: number, v: number, bulge: number) {

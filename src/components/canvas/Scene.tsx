@@ -5,6 +5,7 @@ import { Canvas, useThree, type RootState } from "@react-three/fiber";
 import { useProgress } from "@react-three/drei";
 import { useAppStore } from "@/lib/store";
 import Box3D from "./Box3D";
+import RoomEnv from "./RoomEnv";
 
 /** Re-renders on demand when scroll values change (frameloop="demand" tiers). */
 function DemandInvalidator() {
@@ -70,7 +71,8 @@ export default function Scene() {
         window.__r3f = state;
       }}
     >
-      <hemisphereLight args={["#fff1dc", "#1a1008", 0.55]} />
+      {profile.tier !== "low" && <RoomEnv intensity={0.26} />}
+      <hemisphereLight args={["#fff1dc", "#1a1008", profile.tier === "low" ? 0.55 : 0.35]} />
       <directionalLight position={[3, 5, 3]} intensity={2.4} color="#ffe9cf" />
       <directionalLight position={[-4, 2, -3]} intensity={2.2} color="#ff5b2e" />
       <Box3D detail={profile.detail} reducedMotion={reducedMotion} />
