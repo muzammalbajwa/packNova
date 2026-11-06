@@ -29,32 +29,58 @@ function box(w: number, h: number, d: number, _detail: Detail = 0, _radius = 0) 
   return new THREE.BoxGeometry(w, h, d);
 }
 
-/** Height profile of a bulged pouch / pillow bag at (u,v) in [-1,1] x [0,1]. */
-function bulgeAt(u: number, v: number, bulge: number, stand: boolean) {
-  const side = Math.pow(Math.max(0, 1 - u * u), stand ? 0.8 : 0.7);
-  if (stand) return bulge * side * (1 - smooth(0.72, 0.93, v)) * (0.3 + 0.7 * smooth(0, 0.22, v));
-  return bulge * side * Math.pow(Math.sin(Math.PI * clamp(v, 0, 1)), 0.55);
+/** Height profile of a flat pillow bag (courier / poly) at (u,v) in [-1,1] x [0,1]. */
+function pillowZ(u: number, v: number, bulge: number) {
+  return bulge * Math.pow(Math.max(0, 1 - u * u), 0.7) * Math.pow(Math.sin(Math.PI * clamp(v, 0, 1)), 0.55);
 }
 
-function pillow(w: number, h: number, bulge: number, stand: boolean) {
-  const g = new THREE.PlaneGeometry(w, h, 18, 26).translate(0, h / 2, 0);
+/** Where the heat-sealed top ends (fraction of height); matches the crimp band in composePanel. */
+const POUCH_SEAL = 0.89;
+
+/**
+ * Stand-up pouch panel profile. Seen from the side it is a wedge: full depth `d` at the base,
+ * tapering to a flat heat seal at the top. Faces are flat across the width; the side seals are
+ * diagonal gusset seals, and the bottom corners are pulled in so the base reads as a boat shape.
+ */
+function pouchZ(u: number, v: number, d: number) {
+  const wedge = Math.pow(1 - smooth(0, POUCH_SEAL, v), 0.9);
+  const pinch = 1 - (0.25 + 0.75 * smooth(0, 0.62, v)) * Math.pow(Math.abs(u), 2.2);
+  const belly = 0.12 * d * Math.sin(Math.PI * clamp(v / POUCH_SEAL, 0, 1)) * (1 - u * u); // slight bulge
+  return d * wedge * pinch + belly;
+}
+
+type ZFn = (u: number, v: number) => number;
+
+function surface(w: number, h: number, z: ZFn, sx: number, sy: number) {
+  const g = new THREE.PlaneGeometry(w, h, sx, sy).translate(0, h / 2, 0);
   const p = g.attributes.position as THREE.BufferAttribute;
-  for (let i = 0; i < p.count; i++) {
-    p.setZ(i, bulgeAt(p.getX(i) / (w / 2), p.getY(i) / h, bulge, stand));
-  }
+  for (let i = 0; i < p.count; i++) p.setZ(i, z(p.getX(i) / (w / 2), p.getY(i) / h));
   g.computeVertexNormals();
   return g;
 }
 
-/** A thin strip that hugs the pillow surface at height fraction v (zip line, tamper tape). */
-function ribbon(w: number, h: number, v: number, thick: number, bulge: number, stand: boolean) {
-  const g = new THREE.PlaneGeometry(w * 0.94, thick, 18, 1).translate(0, v * h, 0);
+/** A thin strip that hugs a surface at height fraction v (zip line, tamper tape). */
+function ribbon(w: number, h: number, v: number, thick: number, z: ZFn) {
+  const g = new THREE.PlaneGeometry(w * 0.94, thick, 24, 1).translate(0, v * h, 0);
   const p = g.attributes.position as THREE.BufferAttribute;
-  for (let i = 0; i < p.count; i++) {
-    p.setZ(i, bulgeAt(p.getX(i) / (w / 2), v, bulge, stand) + 0.004);
-  }
+  for (let i = 0; i < p.count; i++) p.setZ(i, z(p.getX(i) / (w / 2), v) + 0.004);
   g.computeVertexNormals();
   return g;
+}
+
+/** Flat boat-shaped gusset base, outlined by the faces' bottom edge. */
+function pouchBase(w: number, d: number) {
+  const pts: THREE.Vector2[] = [];
+  const n = 20;
+  for (let i = 0; i <= n; i++) {
+    const u = -1 + (2 * i) / n;
+    pts.push(new THREE.Vector2((u * w) / 2, pouchZ(u, 0, d)));
+  }
+  for (let i = n; i >= 0; i--) {
+    const u = -1 + (2 * i) / n;
+    pts.push(new THREE.Vector2((u * w) / 2, -pouchZ(u, 0, d)));
+  }
+  return new THREE.ShapeGeometry(new THREE.Shape(pts)).rotateX(Math.PI / 2);
 }
 
 interface Dims {
@@ -259,17 +285,17 @@ function Rigid({ l, w, h, board, accent, panel, detail, open }: Dims & Parts) {
   );
 }
 
-/* ---------- 4. Stand-up pouch ---------- */
+/* ---------- 4. Stand-up pouch (flat faces, gusseted base, heat-sealed top, tear notches) ---------- */
 function Pouch({ l, w, h, board, accent, panel }: Dims & Parts) {
-  const bulge = Math.max(0.05, w / 2);
-  const g = useMemo(
-    () => ({
-      face: pillow(l, h, bulge, true),
-      base: new THREE.CircleGeometry(1, 28).rotateX(-Math.PI / 2).scale(l / 2, 1, bulge),
-      zip: ribbon(l, h, 0.78, 0.018, bulge, true),
-    }),
-    [l, h, bulge],
-  );
+  const d = Math.max(0.06, w / 2);
+  const g = useMemo(() => {
+    const z: ZFn = (u, v) => pouchZ(u, v, d);
+    return {
+      face: surface(l, h, z, 16, 28),
+      base: pouchBase(l, d),
+      zip: ribbon(l, h, 0.78, 0.018, z),
+    };
+  }, [l, h, d]);
   useDisposeGeoms(g);
   return (
     <group>
@@ -285,13 +311,10 @@ function Pouch({ l, w, h, board, accent, panel }: Dims & Parts) {
 /* ---------- 5. Poly / courier bag (flat pillow, tamper tape) ---------- */
 function Courier({ l, w, h, board, accent, panel }: Dims & Parts) {
   const bulge = Math.max(0.03, Math.min(w / 2, 0.14));
-  const g = useMemo(
-    () => ({
-      face: pillow(l, h, bulge, false),
-      tape: ribbon(l, h, 0.86, 0.07, bulge, false),
-    }),
-    [l, h, bulge],
-  );
+  const g = useMemo(() => {
+    const z: ZFn = (u, v) => pillowZ(u, v, bulge);
+    return { face: surface(l, h, z, 18, 26), tape: ribbon(l, h, 0.86, 0.07, z) };
+  }, [l, h, bulge]);
   useDisposeGeoms(g);
   return (
     <group>

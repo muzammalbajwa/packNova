@@ -112,7 +112,7 @@ export function composePanel({ kind, aspect, maxPx, art, deco = null }: ComposeO
     // Heat-sealed top band and side seals: fine crimp lines over the print.
     g.strokeStyle = "rgba(0,0,0,0.22)";
     g.lineWidth = 1;
-    const band = h * 0.095;
+    const band = h * 0.11; // matches POUCH_SEAL in PackModel
     for (let y = 0; y < band; y += 3) {
       g.beginPath();
       g.moveTo(0, y);
@@ -132,6 +132,7 @@ export function composePanel({ kind, aspect, maxPx, art, deco = null }: ComposeO
     }
     // Tear notches: real cut-outs (alpha 0) on both side edges, just under the seal.
     g.globalCompositeOperation = "destination-out";
+    g.fillStyle = "#000"; // must be fully opaque: destination-out removes alpha in proportion to it
     const ny = band + h * 0.03;
     const nw = w * 0.035;
     const nh = h * 0.03;
