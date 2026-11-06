@@ -1,0 +1,28 @@
+# Cloudflare Pages custom headers (https://developers.cloudflare.com/pages/configuration/headers/)
+
+# Hashed build output: the file name changes whenever the content changes, so cache for a year.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Un-hashed static assets (poster, social image, favicon, future models/textures):
+# cache for a week, serve stale while revalidating in the background.
+/textures/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+/models/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+/og.png
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+/favicon.ico
+  Cache-Control: public, max-age=604800
+
+# Pages: always revalidate so a new deploy is picked up immediately (assets above stay cached).
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/configurator/
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Safe defaults for every response
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

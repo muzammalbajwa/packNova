@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
+import DebugOverlay from "@/components/ui/DebugOverlay";
 import { site } from "@/content/site";
 import "./globals.css";
 
@@ -43,7 +44,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang={site.lang} dir={site.dir} className={`${bricolage.variable} ${instrument.variable}`}>
-      <body className="min-h-dvh antialiased">{children}</body>
+      <body className="min-h-dvh antialiased">
+        {children}
+        <DebugOverlay />
+      </body>
     </html>
   );
 }
