@@ -49,3 +49,26 @@ export function trackProgress(
     onRefresh: (self) => onProgress(self.progress),
   });
 }
+
+/**
+ * Fade/slide-in elements marked with `data-reveal` as they enter the viewport.
+ * Only elements below the fold are hidden up front, so nothing flashes and
+ * content stays visible if JS fails. Skipped for reduced-motion users.
+ */
+export function initReveal(reducedMotion: boolean): () => void {
+  if (reducedMotion) return () => {};
+  const items = gsap.utils.toArray<HTMLElement>("[data-reveal]");
+  const below = items.filter((el) => el.getBoundingClientRect().top > window.innerHeight * 0.9);
+  gsap.set(below, { opacity: 0, y: 36 });
+
+  const triggers = ScrollTrigger.batch(below, {
+    start: "top 90%",
+    once: true,
+    onEnter: (batch) =>
+      gsap.to(batch, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", stagger: 0.09, overwrite: true }),
+  });
+  return () => {
+    triggers.forEach((t) => t.kill());
+    gsap.set(items, { clearProps: "opacity,transform" });
+  };
+}

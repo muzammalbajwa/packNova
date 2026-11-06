@@ -6,8 +6,9 @@
   --muted: #8d857a;
   --accent: #ff5b2e;
   --kraft: #c9a574;
-  --font-display: ui-sans-serif, system-ui, sans-serif;
-  --font-body: ui-sans-serif, system-ui, sans-serif;
+  --line: rgba(243, 237, 228, 0.12);
+  --f-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --f-body: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
 }
 
 @theme inline {
@@ -16,8 +17,8 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-kraft: var(--kraft);
-  --font-display: var(--font-display);
-  --font-sans: var(--font-body);
+  --font-display: var(--f-display);
+  --font-sans: var(--f-body);
 }
 
 html {
@@ -28,7 +29,7 @@ html {
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: var(--font-body);
+  font-family: var(--f-body);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -47,4 +48,27 @@ body {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+.font-display {
+  font-family: var(--f-display);
+  font-variation-settings: "wdth" 90;
+}
+
+/* Scroll-reveal start state is applied by JS (lib/scroll.ts) only below the fold. */
+[data-reveal] {
+  will-change: transform, opacity;
+}
+
+.eyebrow {
+  font-family: var(--f-body);
+  font-size: 0.75rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+::selection {
+  background: var(--accent);
+  color: #000;
 }

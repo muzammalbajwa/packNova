@@ -40,6 +40,11 @@ Append `?tier=low|mid|high|none` to the URL to force a device tier while testing
 - A static poster (`public/textures/hero-poster.svg`) is eager + `fetchpriority=high`; it fades out once the live canvas is ready.
 - `prefers-reduced-motion`: Lenis off, the box rests in its open pose, CSS animations frozen.
 
+## Measuring
+
+`window.__gl` exposes the three.js renderer in the browser console, e.g. `__gl.info.render.calls` (draw calls) and `__gl.info.render.triangles`.
+`r3f-perf` is installed as a dev dependency if you want an on-screen overlay.
+
 ## R3F performance rules
 
 No setState in `useFrame` (mutate refs); reuse geometries/materials; instance repeated objects; no allocations in `useFrame`; dispose on unmount; read fast-changing store values with `getState()`.

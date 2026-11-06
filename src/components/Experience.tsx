@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { detectDevice } from "@/lib/deviceTier";
-import { initScroll } from "@/lib/scroll";
+import { initReveal, initScroll } from "@/lib/scroll";
 import { useAppStore } from "@/lib/store";
 import Loader from "./canvas/Loader";
 import SceneLoader from "./canvas/SceneLoader";
@@ -17,6 +17,7 @@ export default function Experience() {
     setProgress(40);
 
     const cleanupScroll = initScroll(reduced);
+    const cleanupReveal = initReveal(reduced);
     const timers: ReturnType<typeof setTimeout>[] = [];
     let creep: ReturnType<typeof setInterval> | undefined;
 
@@ -32,6 +33,7 @@ export default function Experience() {
     timers.push(setTimeout(setReady, 8000)); // failsafe: never trap the user
 
     return () => {
+      cleanupReveal();
       cleanupScroll();
       if (creep) clearInterval(creep);
       timers.forEach(clearTimeout);

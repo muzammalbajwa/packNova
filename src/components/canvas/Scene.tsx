@@ -40,6 +40,13 @@ function ReadySignal() {
   return null;
 }
 
+declare global {
+  interface Window {
+    /** Exposed for performance checks: window.__gl.info.render.calls */
+    __gl?: import("three").WebGLRenderer;
+  }
+}
+
 export default function Scene() {
   const profile = useAppStore((s) => s.profile);
   const reducedMotion = useAppStore((s) => s.reducedMotion);
@@ -54,13 +61,16 @@ export default function Scene() {
     <Canvas
       dpr={profile.dpr}
       frameloop={frameloop}
-      shadows={profile.shadows}
       gl={{ antialias: profile.tier !== "low", alpha: true, powerPreference: "high-performance" }}
-      camera={{ position: [0, 0.4, 5], fov: 35 }}
+      camera={{ position: [0, 0.5, 5], fov: 35 }}
+      onCreated={({ gl }) => {
+        window.__gl = gl;
+      }}
     >
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[3, 4, 2]} intensity={2} />
-      <Box3D />
+      <hemisphereLight args={["#fff1dc", "#1a1008", 0.55]} />
+      <directionalLight position={[3, 5, 3]} intensity={2.4} color="#ffe9cf" />
+      <directionalLight position={[-4, 2, -3]} intensity={2.2} color="#ff5b2e" />
+      <Box3D detail={profile.detail} reducedMotion={reducedMotion} />
       <DemandInvalidator />
       <ReadySignal />
     </Canvas>
