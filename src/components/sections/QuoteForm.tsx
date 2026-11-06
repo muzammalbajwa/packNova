@@ -2,55 +2,58 @@
 
 import { useState, type FormEvent } from "react";
 import { site } from "@/content/site";
+import { buildQuoteText, whatsappUrl } from "@/lib/quoteMessage";
+import QuoteHandoff from "../ui/QuoteHandoff";
 
 const f = site.quote.fields;
 const field =
   "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--accent)]";
 
 /**
- * Front-end only for now.
- * TODO(backend): POST the fields to a form service / Cloudflare Pages Function / email API.
+ * No backend: a valid submit opens a prefilled WhatsApp chat (and offers an email fallback).
+ * Nothing is sent until the visitor presses send there.
+ * TODO(form-service): replace/augment with a real form service (e.g. Cloudflare Pages Function,
+ * Formspree, or an email API) so requests are captured without relying on WhatsApp.
  */
 export default function QuoteForm() {
-  const [sent, setSent] = useState(false);
+  const [text, setText] = useState<string | null>(null);
+  const [vals, setVals] = useState<Record<string, string>>({}); // kept so "Edit request" does not lose input
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSent(true);
+    const d = new FormData(e.currentTarget);
+    const get = (k: string) => String(d.get(k) ?? "");
+    const msg = buildQuoteText({
+      name: get("name"),
+      phone: get("phone"),
+      product: get("product"),
+      quantity: get("quantity"),
+      message: get("message"),
+    });
+    setVals({ name: get("name"), phone: get("phone"), product: get("product"), quantity: get("quantity"), message: get("message") });
+    setText(msg);
+    // Inside the submit gesture, so popup blockers allow it; the link below is the fallback.
+    window.open(whatsappUrl(msg), "_blank", "noopener,noreferrer");
   };
 
-  if (sent) {
-    return (
-      <div role="status" className="rounded-3xl bg-black p-8 text-[var(--fg)] md:p-10">
-        <p className="font-display text-3xl font-bold tracking-tight">{site.quote.success.title}</p>
-        <p className="mt-3 text-[var(--muted)]">{site.quote.success.body}</p>
-        <button
-          type="button"
-          onClick={() => setSent(false)}
-          className="mt-6 rounded-full border border-white/20 px-5 py-2.5 text-sm transition-colors hover:border-[var(--fg)]"
-        >
-          {site.quote.success.again}
-        </button>
-      </div>
-    );
-  }
+  if (text) return <QuoteHandoff text={text} onEdit={() => setText(null)} />;
 
   return (
     <form onSubmit={onSubmit} className="grid gap-4 rounded-3xl bg-black p-6 text-[var(--fg)] md:p-8">
       <div className="grid gap-4 sm:grid-cols-2">
         <label>
           <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.name}</span>
-          <input name="name" required autoComplete="name" className={field} />
+          <input name="name" required autoComplete="name" defaultValue={vals.name ?? ""} className={field} />
         </label>
         <label>
           <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.phone}</span>
-          <input name="phone" type="tel" required autoComplete="tel" inputMode="tel" className={field} />
+          <input name="phone" type="tel" required autoComplete="tel" inputMode="tel" defaultValue={vals.phone ?? ""} className={field} />
         </label>
       </div>
       <div className="grid gap-4 sm:grid-cols-[1.4fr_1fr]">
         <label>
           <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.product}</span>
-          <select name="product" required defaultValue="" className={field}>
+          <select name="product" required defaultValue={vals.product ?? ""} className={field}>
             <option value="" disabled className="bg-black">
               {f.productPlaceholder}
             </option>
@@ -63,12 +66,12 @@ export default function QuoteForm() {
         </label>
         <label>
           <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.quantity}</span>
-          <input name="quantity" type="number" min={1} inputMode="numeric" required className={field} />
+          <input name="quantity" type="number" min={1} inputMode="numeric" required defaultValue={vals.quantity ?? ""} className={field} />
         </label>
       </div>
       <label>
         <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.message}</span>
-        <textarea name="message" rows={4} className={field} />
+        <textarea name="message" rows={4} defaultValue={vals.message ?? ""} className={field} />
       </label>
       <button
         type="submit"

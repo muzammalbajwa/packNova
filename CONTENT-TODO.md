@@ -45,6 +45,6 @@ Hero eyebrow and scroll hint; the one-line description, spec line and "best for"
 
 ## 5. Engineering TODOs
 
-- [ ] **Quote form backend.** `src/components/sections/QuoteForm.tsx` only shows a success state; nothing is sent. Connect it to a form service, a Cloudflare Pages Function, or an email API. Until then, "Request received" is not true, so do not launch without this.
+- [ ] **Quote form service.** The form has no backend. A valid submit opens a prefilled WhatsApp chat (number from `site.ts`) and offers a mailto fallback; nothing is sent until the visitor presses send there. Add a real form service later (marked `TODO(form-service)` in `src/components/sections/QuoteForm.tsx`) so requests are captured without relying on WhatsApp.
 - [ ] Full configurator (artwork upload, pricing). `/configurator/` is a live 3D preview only.
 - [ ] Privacy/cookie text, if analytics or a backend are added.

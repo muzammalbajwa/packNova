@@ -199,11 +199,23 @@ const en = {
     },
     submit: "Send request",
     success: {
-      title: "Request received.",
-      // TODO(backend): this success state is front-end only; no message is sent yet.
-      body: "Thanks. We will reply with a quote.",
-      again: "Send another request",
+      title: "Your message is ready in WhatsApp.",
+      body: "Press send in WhatsApp to finish. Nothing has been sent until you do.",
+      openAgain: "Open WhatsApp again",
+      emailInstead: "Send by email instead",
+      again: "Edit request",
     },
+    /** Message header used for WhatsApp / email (the fields are appended). */
+    messageIntro: "Hello, I would like a quote.",
+    messageLabels: {
+      name: "Name",
+      phone: "Phone",
+      product: "Product",
+      quantity: "Quantity",
+      message: "Notes",
+      spec: "Spec",
+    },
+    emailSubject: "Quote request",
     whatsappCta: "Or message us on WhatsApp",
   },
 
