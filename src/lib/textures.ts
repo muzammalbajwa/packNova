@@ -30,75 +30,116 @@ function finish(c: HTMLCanvasElement, srgb = true, repeat = true) {
   return t;
 }
 
-/** Kraft cardboard: warm base, corrugation banding and paper fibres. */
-export function kraftTexture() {
-  const [c, g] = makeCanvas(256, 256);
-  const rnd = mulberry32(7);
-  g.fillStyle = "#bd9460";
-  g.fillRect(0, 0, 256, 256);
-  for (let y = 0; y < 256; y += 6) {
-    g.fillStyle = y % 12 === 0 ? "rgba(90,60,25,0.10)" : "rgba(255,230,190,0.07)";
-    g.fillRect(0, y, 256, 3);
+export type MaterialKind = "kraft" | "white" | "black";
+
+/* Painters draw a material's base look into any canvas size, so the same look is used
+   for the tiling textures and for per-panel artwork composites. */
+export function paintBase(g: CanvasRenderingContext2D, w: number, h: number, kind: MaterialKind) {
+  const rnd = mulberry32(kind === "kraft" ? 7 : kind === "white" ? 5 : 9);
+  const area = (w * h) / (256 * 256);
+  if (kind === "kraft") {
+    g.fillStyle = "#bd9460";
+    g.fillRect(0, 0, w, h);
+    const step = Math.max(2, Math.round(h / 42));
+    for (let y = 0, i = 0; y < h; y += step, i++) {
+      g.fillStyle = i % 2 === 0 ? "rgba(90,60,25,0.10)" : "rgba(255,230,190,0.07)";
+      g.fillRect(0, y, w, Math.max(1, step / 2));
+    }
+    for (let i = 0; i < 1400 * area; i++) {
+      g.fillStyle = rnd() > 0.5 ? "rgba(70,45,15,0.16)" : "rgba(255,235,200,0.14)";
+      g.fillRect(rnd() * w, rnd() * h, 1 + rnd() * 2, 1);
+    }
+  } else if (kind === "white") {
+    g.fillStyle = "#ece8e1";
+    g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 2800 * area; i++) {
+      g.fillStyle = rnd() > 0.5 ? "rgba(0,0,0,0.035)" : "rgba(255,255,255,0.35)";
+      g.fillRect(rnd() * w, rnd() * h, 1, 1);
+    }
+  } else {
+    g.fillStyle = "#16130f";
+    g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 2000 * area; i++) {
+      g.fillStyle = "rgba(255,255,255,0.025)";
+      g.fillRect(rnd() * w, rnd() * h, 1, 1);
+    }
   }
-  for (let i = 0; i < 1400; i++) {
-    g.fillStyle = rnd() > 0.5 ? "rgba(70,45,15,0.16)" : "rgba(255,235,200,0.14)";
-    g.fillRect(rnd() * 256, rnd() * 256, 1 + rnd() * 2, 1);
-  }
+}
+
+function baseTexture(kind: MaterialKind, size: number) {
+  const [c, g] = makeCanvas(size, size);
+  paintBase(g, size, size, kind);
   return finish(c);
 }
 
-/** Corrugation relief (grayscale bump map): soft sine ridges plus grain. */
-export function kraftBump() {
-  const [c, g] = makeCanvas(128, 128);
-  const rnd = mulberry32(21);
-  for (let y = 0; y < 128; y++) {
-    const v = 128 + Math.sin((y / 128) * Math.PI * 2 * 12) * 70;
-    g.fillStyle = `rgb(${v},${v},${v})`;
-    g.fillRect(0, y, 128, 1);
+export const kraftTexture = () => baseTexture("kraft", 256);
+export const whiteTexture = () => baseTexture("white", 128);
+export const blackTexture = () => baseTexture("black", 128);
+
+/** Converts a grayscale height canvas into a tangent-space normal map (wraps, so it tiles). */
+function heightToNormal(src: HTMLCanvasElement, strength: number) {
+  const w = src.width;
+  const h = src.height;
+  const data = src.getContext("2d")!.getImageData(0, 0, w, h).data;
+  const [c, g] = makeCanvas(w, h);
+  const out = g.createImageData(w, h);
+  const H = (x: number, y: number) => data[(((y + h) % h) * w + ((x + w) % w)) * 4] / 255;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const dx = (H(x + 1, y) - H(x - 1, y)) * strength;
+      const dy = (H(x, y + 1) - H(x, y - 1)) * strength;
+      const len = Math.hypot(dx, dy, 1);
+      const i = (y * w + x) * 4;
+      out.data[i] = ((-dx / len) * 0.5 + 0.5) * 255;
+      out.data[i + 1] = ((dy / len) * 0.5 + 0.5) * 255; // canvas y is flipped vs. GL v
+      out.data[i + 2] = ((1 / len) * 0.5 + 0.5) * 255;
+      out.data[i + 3] = 255;
+    }
   }
-  for (let i = 0; i < 500; i++) {
-    g.fillStyle = `rgba(${rnd() > 0.5 ? 255 : 0},${rnd() > 0.5 ? 255 : 0},0,0.05)`;
-    g.fillRect(rnd() * 128, rnd() * 128, 1, 1);
-  }
+  g.putImageData(out, 0, 0);
   return finish(c, false);
 }
 
-/** Matte white card stock with a faint grain. */
-export function whiteTexture() {
-  const [c, g] = makeCanvas(128, 128);
-  const rnd = mulberry32(5);
-  g.fillStyle = "#ece8e1";
-  g.fillRect(0, 0, 128, 128);
-  for (let i = 0; i < 700; i++) {
-    g.fillStyle = rnd() > 0.5 ? "rgba(0,0,0,0.035)" : "rgba(255,255,255,0.35)";
-    g.fillRect(rnd() * 128, rnd() * 128, 1, 1);
+/** Corrugation ridges + paper fibres, as a normal map. */
+export function kraftNormal() {
+  const [c, g] = makeCanvas(256, 256);
+  const rnd = mulberry32(21);
+  for (let y = 0; y < 256; y++) {
+    const v = 128 + Math.sin((y / 256) * Math.PI * 2 * 14) * 80;
+    g.fillStyle = `rgb(${v},${v},${v})`;
+    g.fillRect(0, y, 256, 1);
   }
-  return finish(c);
+  for (let i = 0; i < 1800; i++) {
+    const v = rnd() > 0.5 ? 255 : 0;
+    g.fillStyle = `rgba(${v},${v},${v},0.18)`;
+    g.fillRect(rnd() * 256, rnd() * 256, 1 + rnd() * 5, 1);
+  }
+  return heightToNormal(c, 1.1);
 }
 
-/** Near-black laminated stock; the gloss comes from low roughness. */
-export function blackTexture() {
+/** Fine paper grain, as a normal map (white / black stock). */
+export function grainNormal() {
   const [c, g] = makeCanvas(128, 128);
-  const rnd = mulberry32(9);
-  g.fillStyle = "#16130f";
+  const rnd = mulberry32(33);
+  g.fillStyle = "#808080";
   g.fillRect(0, 0, 128, 128);
-  for (let i = 0; i < 500; i++) {
-    g.fillStyle = "rgba(255,255,255,0.025)";
-    g.fillRect(rnd() * 128, rnd() * 128, 1, 1);
+  for (let i = 0; i < 2600; i++) {
+    const v = rnd() > 0.5 ? 255 : 0;
+    g.fillStyle = `rgba(${v},${v},${v},0.22)`;
+    g.fillRect(rnd() * 128, rnd() * 128, 1 + rnd() * 2, 1);
   }
-  return finish(c);
+  return heightToNormal(c, 1.4);
 }
 
-export type MaterialKind = "kraft" | "white" | "black";
-
-/** PBR materials for the model library. Textures are owned by the returned object's `dispose`. */
-export function createPackMaterial(kind: MaterialKind) {
-  const map = kind === "kraft" ? kraftTexture() : kind === "white" ? whiteTexture() : blackTexture();
-  const bump = kind === "kraft" ? kraftBump() : null;
+/** PBR board material. `detail` 0 skips the normal map (low tier). Textures are disposed via `dispose`. */
+export function createPackMaterial(kind: MaterialKind, detail: 0 | 1 | 2 = 2) {
+  const map = baseTexture(kind, kind === "kraft" ? 256 : 128);
+  const normal = detail > 0 ? (kind === "kraft" ? kraftNormal() : grainNormal()) : null;
+  if (normal) normal.repeat.set(1, kind === "kraft" ? 1 : 3);
   const material = new THREE.MeshStandardMaterial({
     map,
-    bumpMap: bump,
-    bumpScale: 0.5,
+    normalMap: normal,
+    normalScale: new THREE.Vector2(kind === "kraft" ? 0.5 : 0.3, kind === "kraft" ? 0.5 : 0.3),
     roughness: kind === "kraft" ? 0.92 : kind === "white" ? 0.82 : 0.22,
     metalness: kind === "black" ? 0.12 : 0,
     side: THREE.DoubleSide,
@@ -107,7 +148,7 @@ export function createPackMaterial(kind: MaterialKind) {
     material,
     dispose() {
       map.dispose();
-      bump?.dispose();
+      normal?.dispose();
       material.dispose();
     },
   };
@@ -153,4 +194,17 @@ export function shadowTexture() {
   g.fillStyle = grd;
   g.fillRect(0, 0, 128, 128);
   return new THREE.CanvasTexture(c);
+}
+
+/** Soft rounded-rectangle footprint shadow (blurred), for contact shadows under a model. */
+export function contactShadowTexture() {
+  const [c, g] = makeCanvas(256, 256);
+  g.filter = "blur(18px)";
+  g.fillStyle = "rgba(0,0,0,0.8)";
+  g.beginPath();
+  g.roundRect(64, 64, 128, 128, 28);
+  g.fill();
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
 }

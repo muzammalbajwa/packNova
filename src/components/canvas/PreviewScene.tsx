@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+import type { ArtMap } from "@/lib/artwork";
 import type { Spec } from "@/lib/configurator";
 import { shadowTexture } from "@/lib/textures";
 import { useAppStore } from "@/lib/store";
@@ -32,7 +33,7 @@ function Shadow() {
 }
 
 /** Single-model preview canvas for the configurator page (drag to rotate). */
-export default function PreviewScene({ spec }: { spec: Spec }) {
+export default function PreviewScene({ spec, art, open }: { spec: Spec; art: ArtMap; open: boolean }) {
   const profile = useAppStore((s) => s.profile);
   const reduced = useAppStore((s) => s.reducedMotion);
   if (!profile) return null;
@@ -58,12 +59,15 @@ export default function PreviewScene({ spec }: { spec: Spec }) {
       <directionalLight position={[3, 5, 3]} intensity={2.4} color="#ffe9cf" />
       <directionalLight position={[-4, 2, -3]} intensity={2} color="#ff5b2e" />
       <group position={[0, -0.55, 0]}>
-        <PackModel model={spec.model} material={spec.material} l={l} w={w} h={h} />
+        <PackModel model={spec.model} material={spec.material} art={art} open={open} detail={profile.detail} l={l} w={w} h={h} />
         <Shadow />
       </group>
       <OrbitControls
         enablePan={false}
-        enableZoom={false}
+        enableZoom
+        zoomSpeed={0.6}
+        minDistance={3.4}
+        maxDistance={7.5}
         autoRotate={!calm}
         autoRotateSpeed={1.2}
         enableDamping

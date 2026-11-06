@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { composePanel, hasArt, type ArtMap, type Panel } from "@/lib/artwork";
+import { PANELS, type ModelId } from "@/lib/configurator";
 import { createPackMaterial, type MaterialKind } from "@/lib/textures";
-import type { ModelId } from "@/lib/configurator";
 
-/* All models are built from a handful of shared geometries + 2 materials (board + accent),
-   so each stays under ~12 draw calls. Origin = centre of the floor footprint, +y up. */
+/* All models are built from a handful of shared geometries + a base board material, plus one
+   material per printed panel. Origin = centre of the floor footprint, +y up, front = +z. */
 
 const T = 0.03; // board thickness (constant, so resizing never distorts the walls)
 const ACCENT = "#ff5b2e";
@@ -16,6 +18,16 @@ const smooth = (a: number, b: number, x: number) => {
   const t = clamp((x - a) / (b - a), 0, 1);
   return t * t * (3 - 2 * t);
 };
+const lerp = THREE.MathUtils.lerp;
+
+type Detail = 0 | 1 | 2;
+
+/** Box factory (Step 4 swaps in beveled edges here). */
+function box(w: number, h: number, d: number, _detail: Detail = 0, _radius = 0) {
+  void _detail;
+  void _radius;
+  return new THREE.BoxGeometry(w, h, d);
+}
 
 /** Height profile of a bulged pouch / pillow bag at (u,v) in [-1,1] x [0,1]. */
 function bulgeAt(u: number, v: number, bulge: number, stand: boolean) {
@@ -51,10 +63,31 @@ interface Dims {
   h: number; // y
 }
 
+/** Faces of a BoxGeometry, in material-array order. */
+interface Faces {
+  px?: THREE.Material;
+  nx?: THREE.Material;
+  py?: THREE.Material;
+  ny?: THREE.Material;
+  pz?: THREE.Material;
+  nz?: THREE.Material;
+}
+
 interface Parts {
   board: THREE.Material;
   accent: THREE.Material;
+  panel: Partial<Record<Panel, THREE.Material>>;
+  /** Top panel split across two flaps (carton only). */
+  topHalves: [THREE.Material, THREE.Material] | null;
+  detail: Detail;
+  open: boolean;
 }
+
+/** Per-face materials. Collapses to ONE material (one draw call) when no face is overridden. */
+const mat6 = (b: THREE.Material, f: Faces) =>
+  f.px || f.nx || f.py || f.ny || f.pz || f.nz
+    ? [f.px ?? b, f.nx ?? b, f.py ?? b, f.ny ?? b, f.pz ?? b, f.nz ?? b]
+    : b;
 
 /** Disposes every BufferGeometry held in `geoms` when it changes or the model unmounts. */
 function useDisposeGeoms(geoms: Record<string, unknown>) {
@@ -68,67 +101,158 @@ function useDisposeGeoms(geoms: Record<string, unknown>) {
   );
 }
 
-/* ---------- 1. Corrugated shipping carton (closed, taped) ---------- */
-function Carton({ l, w, h, board, accent }: Dims & Parts) {
-  const g = useMemo(() => ({
-      body: new THREE.BoxGeometry(l, h, w),
+/** Damped open/close animation applied through refs (no React state, no allocation per frame). */
+function useOpenAnim(open: boolean, apply: (t: number) => void) {
+  const cur = useRef(open ? 1 : 0);
+  const last = useRef(Number.NaN);
+  const applyRef = useRef(apply);
+  // Each commit may rebuild pivots (new dims): force a re-apply on the next frame.
+  useLayoutEffect(() => {
+    applyRef.current = apply;
+    last.current = Number.NaN;
+  });
+  useFrame((state, delta) => {
+    const target = open ? 1 : 0;
+    cur.current = THREE.MathUtils.damp(cur.current, target, 5, delta);
+    if (Math.abs(cur.current - target) < 0.0015) cur.current = target;
+    if (cur.current !== last.current) {
+      applyRef.current(cur.current);
+      last.current = cur.current;
+    }
+    if (cur.current !== target) state.invalidate(); // keep rendering in frameloop="demand"
+  });
+}
+
+/* ---------- 1. Corrugated shipping carton (walls + four real flaps) ---------- */
+function Carton({ l, w, h, board, accent, panel, topHalves, detail, open }: Dims & Parts) {
+  const g = useMemo(
+    () => ({
+      bottom: box(l, T, w, detail),
+      wallFB: box(l, h, T, detail),
+      wallLR: box(T, h, w - 2 * T, detail),
+      flapFB: box(l, T, w / 2, detail).translate(0, 0, w / 4),
+      flapLR: box(l * 0.42, T, w - 2 * T, detail).translate(l * 0.21, 0, 0),
       tape: new THREE.BoxGeometry(l + 0.01, 0.006, Math.min(0.16, w * 0.3)),
-      seam: new THREE.BoxGeometry(l + 0.004, 0.004, 0.006),
-      front: new THREE.PlaneGeometry(Math.min(l, w) * 0.5, h * 0.12),
-    }), [l, w, h]);
+    }),
+    [l, w, h, detail],
+  );
   useDisposeGeoms(g);
+
+  const flaps = useRef<(THREE.Group | null)[]>([null, null, null, null]);
+  const tape = useRef<THREE.Mesh>(null);
+  useOpenAnim(open, (t) => {
+    const fb = lerp(-Math.PI, -0.3, smooth(0, 0.75, t));
+    const lr = lerp(Math.PI, 0.3, smooth(0.2, 1, t));
+    const [f, b, r, le] = flaps.current;
+    if (f) f.rotation.x = fb;
+    if (b) b.rotation.x = fb;
+    if (r) r.rotation.z = lr;
+    if (le) le.rotation.z = lr;
+    if (tape.current) tape.current.visible = !topHalves && t < 0.04; // a printed top replaces the plain tape
+  });
+
+  const wall = (f: Faces) => mat6(board, f);
   return (
     <group>
-      <mesh geometry={g.body} material={board} position={[0, h / 2, 0]} />
-      <mesh geometry={g.seam} material={board} position={[0, h + 0.003, 0]} />
-      <mesh geometry={g.tape} material={accent} position={[0, h + 0.006, 0]} />
-      <mesh geometry={g.front} material={accent} position={[0, h * 0.55, w / 2 + 0.002]} />
+      <mesh geometry={g.bottom} material={board} position={[0, T / 2, 0]} />
+      <mesh geometry={g.wallFB} material={wall({ pz: panel.front })} position={[0, h / 2, w / 2 - T / 2]} />
+      <mesh geometry={g.wallFB} material={wall({ nz: panel.back })} position={[0, h / 2, -w / 2 + T / 2]} />
+      <mesh geometry={g.wallLR} material={wall({ px: panel.right })} position={[l / 2 - T / 2, h / 2, 0]} />
+      <mesh geometry={g.wallLR} material={wall({ nx: panel.left })} position={[-l / 2 + T / 2, h / 2, 0]} />
+
+      {/* flaps hinge on the top outer edges; the printed (outer) face of a flap is its -y face */}
+      <group position={[0, h, w / 2]}>
+        <group ref={(n) => void (flaps.current[0] = n)} rotation={[-Math.PI, 0, 0]}>
+          <mesh geometry={g.flapFB} material={mat6(board, { ny: topHalves?.[0] })} />
+        </group>
+      </group>
+      <group position={[0, h, -w / 2]} rotation={[0, Math.PI, 0]}>
+        <group ref={(n) => void (flaps.current[1] = n)} rotation={[-Math.PI, 0, 0]}>
+          <mesh geometry={g.flapFB} material={mat6(board, { ny: topHalves?.[1] })} />
+        </group>
+      </group>
+      <group position={[l / 2, h - T * 1.2, 0]}>
+        <group ref={(n) => void (flaps.current[2] = n)} rotation={[0, 0, Math.PI]}>
+          <mesh geometry={g.flapLR} material={board} />
+        </group>
+      </group>
+      <group position={[-l / 2, h - T * 1.2, 0]} rotation={[0, Math.PI, 0]}>
+        <group ref={(n) => void (flaps.current[3] = n)} rotation={[0, 0, Math.PI]}>
+          <mesh geometry={g.flapLR} material={board} />
+        </group>
+      </group>
+      <mesh ref={tape} geometry={g.tape} material={accent} position={[0, h + T + 0.006, 0]} />
     </group>
   );
 }
 
-/* ---------- 2. Folding carton (tuck-top with open lid) ---------- */
-function Folding({ l, w, h, board, accent }: Dims & Parts) {
-  const g = useMemo(() => ({
-      body: new THREE.BoxGeometry(l, h, w),
-      lid: new THREE.BoxGeometry(l, T, w * 0.92).translate(0, 0, w * 0.46),
-      tuck: new THREE.BoxGeometry(l * 0.9, T, w * 0.22).translate(0, 0, w * 0.11),
-      band: new THREE.PlaneGeometry(l * 0.84, h * 0.14),
-    }), [l, w, h]);
+/* ---------- 2. Folding carton (tuck-top lid that opens) ---------- */
+function Folding({ l, w, h, board, panel, detail, open }: Dims & Parts) {
+  const g = useMemo(
+    () => ({
+      body: box(l, h, w, detail, 0.02),
+      lid: box(l, T, w * 0.92, detail).translate(0, 0, w * 0.46),
+      tuck: box(l * 0.9, T, w * 0.22, detail).translate(0, 0, w * 0.11),
+    }),
+    [l, w, h, detail],
+  );
   useDisposeGeoms(g);
+
+  const lid = useRef<THREE.Group>(null);
+  const tuck = useRef<THREE.Group>(null);
+  useOpenAnim(open, (t) => {
+    if (lid.current) lid.current.rotation.x = lerp(0, -2.0, t);
+    if (tuck.current) tuck.current.rotation.x = lerp(1.45, 0.6, smooth(0, 1, t));
+  });
+
   return (
     <group>
-      <mesh geometry={g.body} material={board} position={[0, h / 2, 0]} />
-      {/* lid hinged on the back edge, swung open */}
-      <group position={[0, h, -w / 2]} rotation={[-2.0, 0, 0]}>
-        <mesh geometry={g.lid} material={board} />
-        <group position={[0, 0, w * 0.92]} rotation={[0.9, 0, 0]}>
+      <mesh
+        geometry={g.body}
+        material={mat6(board, { pz: panel.front, nz: panel.back, px: panel.right, nx: panel.left })}
+        position={[0, h / 2, 0]}
+      />
+      {/* lid hinged on the back edge */}
+      <group ref={lid} position={[0, h + T / 2, -w / 2]}>
+        <mesh geometry={g.lid} material={mat6(board, { py: panel.top })} />
+        <group ref={tuck} position={[0, 0, w * 0.92]}>
           <mesh geometry={g.tuck} material={board} />
         </group>
       </group>
-      <mesh geometry={g.band} material={accent} position={[0, h * 0.62, w / 2 + 0.002]} />
     </group>
   );
 }
 
 /* ---------- 3. Rigid gift box (base + lift-off lid, accent lining) ---------- */
-function Rigid({ l, w, h, board, accent }: Dims & Parts) {
+function Rigid({ l, w, h, board, accent, panel, detail, open }: Dims & Parts) {
   const baseH = h * 0.6;
   const lidH = h * 0.48;
-  const g = useMemo(() => ({
-      base: new THREE.BoxGeometry(l, baseH, w),
+  const g = useMemo(
+    () => ({
+      base: box(l, baseH, w, detail, 0.02),
       lining: new THREE.PlaneGeometry(l - 0.1, w - 0.1),
-      lid: new THREE.BoxGeometry(l + 0.05, lidH, w + 0.05),
-      pull: new THREE.BoxGeometry(0.1, 0.02, 0.2),
-    }), [l, w, baseH, lidH]);
+      lid: box(l + 0.05, lidH, w + 0.05, detail, 0.02),
+      pull: box(0.1, 0.02, 0.2, 0),
+    }),
+    [l, w, baseH, lidH, detail],
+  );
   useDisposeGeoms(g);
+
+  const lid = useRef<THREE.Group>(null);
+  useOpenAnim(open, (t) => {
+    if (lid.current) lid.current.rotation.x = lerp(0, -1.9, t);
+  });
+
   return (
     <group>
       <mesh geometry={g.base} material={board} position={[0, baseH / 2, 0]} />
       <mesh geometry={g.lining} material={accent} position={[0, baseH + 0.003, 0]} rotation={[-Math.PI / 2, 0, 0]} />
-      {/* lid lifted and tilted off the back edge */}
-      <group position={[0, baseH, -w / 2 - 0.03]} rotation={[-1.1, 0, 0]}>
-        <mesh geometry={g.lid} material={board} position={[0, lidH / 2, (w + 0.05) / 2]} />
+      <group ref={lid} position={[0, baseH, -w / 2 - 0.025]}>
+        <mesh
+          geometry={g.lid}
+          material={mat6(board, { pz: panel.front, nz: panel.back, px: panel.right, nx: panel.left, py: panel.top })}
+          position={[0, lidH / 2, (w + 0.05) / 2]}
+        />
       </group>
       <mesh geometry={g.pull} material={accent} position={[0, baseH * 0.9, w / 2 + 0.01]} />
     </group>
@@ -136,18 +260,21 @@ function Rigid({ l, w, h, board, accent }: Dims & Parts) {
 }
 
 /* ---------- 4. Stand-up pouch ---------- */
-function Pouch({ l, w, h, board, accent }: Dims & Parts) {
+function Pouch({ l, w, h, board, accent, panel }: Dims & Parts) {
   const bulge = Math.max(0.05, w / 2);
-  const g = useMemo(() => ({
+  const g = useMemo(
+    () => ({
       face: pillow(l, h, bulge, true),
       base: new THREE.CircleGeometry(1, 28).rotateX(-Math.PI / 2).scale(l / 2, 1, bulge),
       zip: ribbon(l, h, 0.78, 0.018, bulge, true),
-    }), [l, h, bulge]);
+    }),
+    [l, h, bulge],
+  );
   useDisposeGeoms(g);
   return (
     <group>
-      <mesh geometry={g.face} material={board} />
-      <mesh geometry={g.face} material={board} rotation={[0, Math.PI, 0]} />
+      <mesh geometry={g.face} material={panel.front ?? board} />
+      <mesh geometry={g.face} material={panel.back ?? board} rotation={[0, Math.PI, 0]} />
       <mesh geometry={g.base} material={board} position={[0, 0.002, 0]} />
       <mesh geometry={g.zip} material={accent} />
       <mesh geometry={g.zip} material={accent} rotation={[0, Math.PI, 0]} />
@@ -156,69 +283,146 @@ function Pouch({ l, w, h, board, accent }: Dims & Parts) {
 }
 
 /* ---------- 5. Poly / courier bag (flat pillow, tamper tape) ---------- */
-function Courier({ l, w, h, board, accent }: Dims & Parts) {
+function Courier({ l, w, h, board, accent, panel }: Dims & Parts) {
   const bulge = Math.max(0.03, Math.min(w / 2, 0.14));
-  const g = useMemo(() => ({
+  const g = useMemo(
+    () => ({
       face: pillow(l, h, bulge, false),
       tape: ribbon(l, h, 0.86, 0.07, bulge, false),
-    }), [l, h, bulge]);
+    }),
+    [l, h, bulge],
+  );
   useDisposeGeoms(g);
   return (
     <group>
-      <mesh geometry={g.face} material={board} />
-      <mesh geometry={g.face} material={board} rotation={[0, Math.PI, 0]} />
+      <mesh geometry={g.face} material={panel.front ?? board} />
+      <mesh geometry={g.face} material={panel.back ?? board} rotation={[0, Math.PI, 0]} />
       <mesh geometry={g.tape} material={accent} />
     </group>
   );
 }
 
 /* ---------- 6. Paper bag with handles ---------- */
-function PaperBag({ l, w, h, board, accent }: Dims & Parts) {
+function PaperBag({ l, w, h, board, panel, detail }: Dims & Parts) {
   const handleR = Math.min(l, w * 2) * 0.22;
-  const g = useMemo(() => ({
-      wallFB: new THREE.BoxGeometry(l, h, T),
-      wallLR: new THREE.BoxGeometry(T, h, w - 2 * T),
-      bottom: new THREE.BoxGeometry(l, T, w),
+  const g = useMemo(
+    () => ({
+      wallFB: box(l, h, T, detail),
+      wallLR: box(T, h, w - 2 * T, detail),
+      bottom: box(l, T, w, detail),
       handle: new THREE.TorusGeometry(handleR, 0.012, 8, 24, Math.PI),
-      band: new THREE.PlaneGeometry(l * 0.5, h * 0.1),
-    }), [l, w, h, handleR]);
+    }),
+    [l, w, h, handleR, detail],
+  );
   useDisposeGeoms(g);
   return (
     <group>
       <mesh geometry={g.bottom} material={board} position={[0, T / 2, 0]} />
-      <mesh geometry={g.wallFB} material={board} position={[0, h / 2, w / 2 - T / 2]} />
-      <mesh geometry={g.wallFB} material={board} position={[0, h / 2, -w / 2 + T / 2]} />
-      <mesh geometry={g.wallLR} material={board} position={[l / 2 - T / 2, h / 2, 0]} />
-      <mesh geometry={g.wallLR} material={board} position={[-l / 2 + T / 2, h / 2, 0]} />
+      <mesh geometry={g.wallFB} material={mat6(board, { pz: panel.front })} position={[0, h / 2, w / 2 - T / 2]} />
+      <mesh geometry={g.wallFB} material={mat6(board, { nz: panel.back })} position={[0, h / 2, -w / 2 + T / 2]} />
+      <mesh geometry={g.wallLR} material={mat6(board, { px: panel.right })} position={[l / 2 - T / 2, h / 2, 0]} />
+      <mesh geometry={g.wallLR} material={mat6(board, { nx: panel.left })} position={[-l / 2 + T / 2, h / 2, 0]} />
       <mesh geometry={g.handle} material={board} position={[0, h - 0.02, w / 2 - 0.05]} />
       <mesh geometry={g.handle} material={board} position={[0, h - 0.02, -w / 2 + 0.05]} />
-      <mesh geometry={g.band} material={accent} position={[0, h * 0.5, w / 2 + 0.002]} />
     </group>
   );
+}
+
+/* ---------- panel artwork -> materials ---------- */
+
+/** Physical panel proportions (only the ratio is used for the canvas). */
+export function panelAspects(model: ModelId, l: number, w: number, h: number): Record<Panel, number> {
+  const hh = model === "rigid" ? h * 0.48 : h;
+  return { front: l / hh, back: l / hh, left: w / hh, right: w / hh, top: l / w };
+}
+
+interface PanelSet {
+  base: ReturnType<typeof createPackMaterial>;
+  panel: Partial<Record<Panel, THREE.Material>>;
+  topHalves: [THREE.Material, THREE.Material] | null;
+  dispose(): void;
+}
+
+function buildPanelSet(model: ModelId, kind: MaterialKind, d: Dims, art: ArtMap, detail: Detail): PanelSet {
+  const base = createPackMaterial(kind, detail);
+  const maxPx = detail === 0 ? 512 : 1024;
+  const aspects = panelAspects(model, d.l, d.w, d.h);
+  const pouch = model === "pouch";
+  const owned: { dispose(): void }[] = [];
+  const panel: Partial<Record<Panel, THREE.Material>> = {};
+  let topHalves: [THREE.Material, THREE.Material] | null = null;
+
+  for (const p of PANELS[model]) {
+    if (!hasArt(art[p]) && !pouch) continue;
+    const tex = composePanel({ kind, aspect: aspects[p], maxPx, art: art[p], deco: pouch ? "pouch" : null });
+    owned.push(tex);
+
+    if (model === "carton" && p === "top") {
+      // The top print is shared by the two major flaps: each shows one half of the texture.
+      // Front flap: lower half, unchanged. Back flap sits in a flipped frame, so its half is
+      // mirrored in both axes to read upright from the front.
+      const halves = [
+        { rx: 1, ry: 0.5, ox: 0, oy: 0 },
+        { rx: -1, ry: -0.5, ox: 1, oy: 1 },
+      ].map((u) => {
+        const t = tex.clone();
+        t.repeat.set(u.rx, u.ry);
+        t.offset.set(u.ox, u.oy);
+        t.needsUpdate = true;
+        owned.push(t);
+        const m = base.material.clone();
+        m.map = t;
+        owned.push(m);
+        return m;
+      });
+      topHalves = [halves[0], halves[1]];
+      continue;
+    }
+
+    const m = base.material.clone();
+    m.map = tex;
+    if (pouch) m.alphaTest = 0.5; // cuts out the tear notches
+    owned.push(m);
+    panel[p] = m;
+  }
+
+  return {
+    base,
+    panel,
+    topHalves,
+    dispose() {
+      owned.forEach((o) => o.dispose());
+      base.dispose();
+    },
+  };
 }
 
 interface Props extends Dims {
   model: ModelId;
   material: MaterialKind;
+  art: ArtMap;
+  open: boolean;
+  detail: Detail;
 }
 
 /** Procedural model library. Dims are world units; origin is the floor centre. */
-export default function PackModel({ model, material, l, w, h }: Props) {
-  const parts = useMemo(() => {
-    const board = createPackMaterial(material);
-    const accent = new THREE.MeshStandardMaterial({ color: ACCENT, roughness: 0.45, side: THREE.DoubleSide });
-    return { board, accent };
-  }, [material]);
+export default function PackModel({ model, material, art, open, detail, l, w, h }: Props) {
+  const set = useMemo(() => buildPanelSet(model, material, { l, w, h }, art, detail), [model, material, art, detail, l, w, h]);
+  const accent = useMemo(() => new THREE.MeshStandardMaterial({ color: ACCENT, roughness: 0.45, side: THREE.DoubleSide }), []);
 
-  useEffect(
-    () => () => {
-      parts.board.dispose();
-      parts.accent.dispose();
-    },
-    [parts],
-  );
+  // Old textures/materials are freed whenever the inputs (and therefore `set`) change.
+  useEffect(() => () => set.dispose(), [set]);
+  useEffect(() => () => accent.dispose(), [accent]);
 
-  const p: Dims & Parts = { l, w, h, board: parts.board.material, accent: parts.accent };
+  const p: Dims & Parts = {
+    l, w, h,
+    board: set.base.material,
+    accent,
+    panel: set.panel,
+    topHalves: set.topHalves,
+    detail,
+    open,
+  };
   switch (model) {
     case "folding":
       return <Folding {...p} />;

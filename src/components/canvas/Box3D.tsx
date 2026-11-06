@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, type RootState } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAppStore } from "@/lib/store";
-import { kraftTexture, kraftBump, logoTexture, labelTexture, shadowTexture, mulberry32 } from "@/lib/textures";
+import { kraftTexture, kraftNormal, logoTexture, labelTexture, shadowTexture, mulberry32 } from "@/lib/textures";
 
 /* ---------- dimensions (world units) ---------- */
 const W = 1.6; // width  (x)
@@ -75,8 +75,8 @@ function buildAssets(detail: 0 | 1 | 2) {
     const labelMap = labelTexture();
     const shadowMap = shadowTexture();
 
-    const bumpMap = kraftBump();
-    const board = new THREE.MeshStandardMaterial({ map: kraftMap, bumpMap, bumpScale: 0.6, roughness: 0.92, metalness: 0 });
+    const normalMap = detail > 0 ? kraftNormal() : null;
+    const board = new THREE.MeshStandardMaterial({ map: kraftMap, normalMap, normalScale: new THREE.Vector2(0.7, 0.7), roughness: 0.92, metalness: 0 });
     const tapeMat = new THREE.MeshStandardMaterial({ color: ACCENT, roughness: 0.4 });
     const logoMat = new THREE.MeshBasicMaterial({ map: logoMap, transparent: true, opacity: 0, depthWrite: false });
     const labelMat = new THREE.MeshBasicMaterial({ map: labelMap, transparent: true, opacity: 0, depthWrite: false });
@@ -121,7 +121,7 @@ function buildAssets(detail: 0 | 1 | 2) {
 
     const disposables: { dispose(): void }[] = [
       flapFB, flapLR, bottom, wallFB, wallLR, tape, plane, streak,
-      kraftMap, bumpMap, logoMap, labelMap, shadowMap,
+      kraftMap, ...(normalMap ? [normalMap] : []), logoMap, labelMap, shadowMap,
       board, tapeMat, logoMat, labelMat, glowMat, shadowMat, streakMat, lineMat,
       ...(edges ? Object.values(edges) : []),
     ];

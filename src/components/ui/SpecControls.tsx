@@ -1,29 +1,66 @@
 "use client";
 
 import { site } from "@/content/site";
-import { DEFAULT_DIMS, MODELS, type MaterialId, type ModelId, type Spec } from "@/lib/configurator";
+import {
+  DEFAULT_DIMS,
+  LIMITS,
+  MODELS,
+  QUANTITY_LIMITS,
+  clampDim,
+  type MaterialId,
+  type ModelId,
+  type Spec,
+} from "@/lib/configurator";
 
 const L = site.configurator.labels;
 
 const inputCls =
   "w-full rounded-xl border border-[var(--line)] bg-black/40 px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors focus:border-[var(--accent)]";
 
-/** Shared by the home-page teaser and the configurator page. */
-export default function SpecControls({ spec, onChange }: { spec: Spec; onChange: (s: Spec) => void }) {
-  const dim = (key: "l" | "w" | "h", label: string) => (
-    <label className="block">
-      <span className="mb-1.5 block text-xs text-[var(--muted)]">{label}</span>
-      <input
-        type="number"
-        inputMode="decimal"
-        min={1}
-        max={200}
-        value={spec[key]}
-        onChange={(e) => onChange({ ...spec, [key]: Math.min(200, Math.max(1, Number(e.target.value) || 1)) })}
-        className={inputCls}
-      />
-    </label>
-  );
+/** Shared by the home-page teaser and the configurator page. `sliders` adds range inputs for the size. */
+export default function SpecControls({
+  spec,
+  onChange,
+  sliders = false,
+}: {
+  spec: Spec;
+  onChange: (s: Spec) => void;
+  sliders?: boolean;
+}) {
+  const dim = (key: "l" | "w" | "h", label: string) => {
+    const [min, max] = LIMITS[spec.model][key];
+    return (
+      <label className="block">
+        <span className="mb-1.5 flex justify-between text-xs text-[var(--muted)]">
+          <span>{label}</span>
+          <span className="tabular-nums">
+            {min}-{max}
+          </span>
+        </span>
+        <input
+          type="number"
+          inputMode="decimal"
+          min={min}
+          max={max}
+          value={spec[key]}
+          onChange={(e) => onChange({ ...spec, [key]: clampDim(spec.model, key, Number(e.target.value) || min) })}
+          className={inputCls}
+        />
+        {sliders && (
+          <input
+            type="range"
+            aria-label={`${label} slider`}
+            min={min}
+            max={max}
+            step={0.5}
+            value={spec[key]}
+            onChange={(e) => onChange({ ...spec, [key]: clampDim(spec.model, key, Number(e.target.value)) })}
+            className="mt-2 w-full accent-[var(--accent)]"
+          />
+        )}
+      </label>
+    );
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -75,6 +112,24 @@ export default function SpecControls({ spec, onChange }: { spec: Spec; onChange:
           ))}
         </div>
       </fieldset>
+
+      <label className="block">
+        <span className="eyebrow mb-3 block">{L.quantity}</span>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={QUANTITY_LIMITS[0]}
+          max={QUANTITY_LIMITS[1]}
+          value={spec.quantity}
+          onChange={(e) =>
+            onChange({
+              ...spec,
+              quantity: Math.min(QUANTITY_LIMITS[1], Math.max(QUANTITY_LIMITS[0], Math.round(Number(e.target.value)) || 1)),
+            })
+          }
+          className={inputCls}
+        />
+      </label>
     </div>
   );
 }
