@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PackCo: cinematic 3D packaging site
 
-## Getting Started
+Scroll-driven 3D marketing site (placeholder brand "PackCo"). Next.js static export, deployable on Cloudflare Pages.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Next.js 16 (App Router, TypeScript, Tailwind CSS 4, ESLint), `output: 'export'`
+- 3D: three, @react-three/fiber, @react-three/drei
+- Motion: GSAP + ScrollTrigger, Lenis smooth scroll
+- State: zustand. Utilities: react-intersection-observer
+- Dev only: r3f-perf, @gltf-transform/cli, gltfpack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Requires **Node >= 20.19** (Tailwind's Turbopack loader needs `require(esm)`). `.nvmrc` pins 22.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+    npm run dev      # dev server (http://localhost:3000)
+    npm run build    # static export to ./out
+    npm run lint
+    npx serve out    # preview the export
 
-## Learn More
+Deploy: Cloudflare Pages, build command `npm run build`, output directory `out`.
+Append `?tier=low|mid|high|none` to the URL to force a device tier while testing.
 
-To learn more about Next.js, take a look at the following resources:
+## Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    src/app/                 layout, page, globals.css (design tokens as CSS variables)
+    src/components/canvas/   Scene (R3F canvas, own chunk), Box3D, Loader, SceneZone, SceneLoader
+    src/components/sections/ Hero, Products, Story, Configurator, Quote, Footer
+    src/components/ui/       Navbar, Marquee, Button
+    src/lib/                 deviceTier.ts, store.ts (zustand), scroll.ts (Lenis + ScrollTrigger)
+    public/models, public/textures   compressed GLB / KTX2 (see scripts/optimize-models.md)
+    scripts/optimize-models.md       gltf-transform / gltfpack / KTX2 commands
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## How it works
 
-## Deploy on Vercel
+- The canvas is loaded with `next/dynamic` (`ssr: false`), so three.js is in a separate chunk and the page paints without it.
+- One fixed canvas serves the whole page. Regions that need it are wrapped in `SceneZone`; the canvas stops rendering (`frameloop="never"`) when none is on screen.
+- `deviceTier.ts` classifies the device (low / mid / high / none). Low: dpr <= 1.25, no shadows, no post-processing, `frameloop="demand"`. None (no WebGL): static 2D fallback, all text and the quote path intact.
+- A static poster (`public/textures/hero-poster.svg`) is eager + `fetchpriority=high`; it fades out once the live canvas is ready.
+- `prefers-reduced-motion`: Lenis off, the box rests in its open pose, CSS animations frozen.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## R3F performance rules
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+No setState in `useFrame` (mutate refs); reuse geometries/materials; instance repeated objects; no allocations in `useFrame`; dispose on unmount; read fast-changing store values with `getState()`.
+
+## Performance budget
+
+| Metric | Target |
+| --- | --- |
+| Initial JS (gzip), 3D in separate chunk | < 300 kB |
+| Hero GLB | < 3 MB |
+| Draw calls | < 100 |
+| Frame rate | 60 fps desktop, 30 fps low-end phones |

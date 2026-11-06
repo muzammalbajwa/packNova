@@ -1,10 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // Static export -> deploys to Cloudflare Pages (publish dir: `out`).
+  output: "export",
+  images: { unoptimized: true },
+  trailingSlash: true,
+  reactStrictMode: true,
+  // Silence the multi-lockfile warning: the project root is this folder.
   turbopack: {
+    root: __dirname,
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],
