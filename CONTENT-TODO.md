@@ -7,7 +7,7 @@ Replace it before launch. All brand values and copy live in **`src/content/site.
 
 | Value | Dummy | `site.ts` key | Where it appears |
 | --- | --- | --- | --- |
-| Company name | PackNova | `brand.name` | Logo (navbar, footer) `ui/Logo.tsx`; footer copyright `sections/Footer.tsx`; page titles/Open Graph `app/layout.tsx`, `app/configurator/page.tsx`; the logo printed on the 3D box in the "Print" scene `lib/textures.ts` |
+| Company name | PackNova | `brand.name` | Logo (navbar, footer) `ui/Logo.tsx`; footer copyright `sections/Footer.tsx`; page titles/Open Graph `app/layout.tsx`, `app/configurator/page.tsx`; the logo printed on the 3D carton in the making-of story `lib/dieline.ts` |
 | Tagline | Packaging that makes your product unforgettable. | `brand.tagline` | Open Graph image alt text `app/layout.tsx` |
 | Short description | Custom boxes, cartons and pouches, designed in 3D and made to order. | `brand.description`, `footer.blurb` | Footer `sections/Footer.tsx` |
 | Site URL | https://example.com | `brand.url` | Absolute Open Graph URLs `app/layout.tsx` (set to the real domain) |
@@ -48,3 +48,15 @@ Hero eyebrow and scroll hint; the one-line description, spec line and "best for"
 - [ ] **Quote form service.** The form has no backend. A valid submit opens a prefilled WhatsApp chat (number from `site.ts`) and offers a mailto fallback; nothing is sent until the visitor presses send there. Add a real form service later (marked `TODO(form-service)` in `src/components/sections/QuoteForm.tsx`) so requests are captured without relying on WhatsApp.
 - [ ] Full configurator (artwork upload, pricing). `/configurator/` is a live 3D preview only.
 - [ ] Privacy/cookie text, if analytics or a backend are added.
+
+## 4. Reviews and clients (intentionally empty)
+
+`site.reviews.items` and `site.reviews.clients` in `src/content/site.ts` are empty arrays, so the section is not shown. Add **real** entries only, with permission to publish them. Never add invented testimonials, statistics, client logos or certifications.
+
+## 5. Making-of story copy
+
+`site.making` (seven stage titles and lines, the final CTA, `quoteProduct`/`quoteNote`). The story shows a 12 x 6 x 18 cm folding carton, the same as the configurator default, and passes that type and size to the quote message.
+
+## 6. Colors
+
+Pick the final theme (`?theme=a|b|c|d`, compare with `?themes=1`) and make it the default in `src/lib/palette.ts` (`DEFAULT_THEME`), then re-run `node scripts/export-images.mjs --theme <id>`.
