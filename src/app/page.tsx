@@ -4,7 +4,7 @@ import Footer from "@/components/sections/Footer";
 import Hero from "@/components/sections/Hero";
 import Products from "@/components/sections/Products";
 import Process from "@/components/sections/Process";
-import Story from "@/components/sections/Story";
+import MakingOf from "@/components/sections/MakingOf";
 import Quote from "@/components/sections/Quote";
 import Marquee from "@/components/ui/Marquee";
 import Navbar from "@/components/ui/Navbar";
@@ -18,7 +18,7 @@ export default function Home() {
         <Hero />
         <Marquee />
         <Products />
-        <Story />
+        <MakingOf />
         <Process />
         <Configurator />
         <Quote />

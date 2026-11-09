@@ -13,7 +13,7 @@ function DemandInvalidator() {
   useEffect(() => {
     invalidate();
     return useAppStore.subscribe((s, prev) => {
-      if (s.heroProgress !== prev.heroProgress || s.storyProgress !== prev.storyProgress) {
+      if (s.heroProgress !== prev.heroProgress) {
         invalidate();
       }
     });

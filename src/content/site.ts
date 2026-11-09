@@ -136,22 +136,29 @@ const en = {
     ],
   },
 
-  story: {
-    eyebrow: "From idea to doorstep",
-    chapters: [
-      {
-        title: "Design",
-        body: "Pick a box, set the size, add your artwork. Watch it come to life in 3D.",
-      },
-      {
-        title: "Print",
-        body: "Sharp colors, clean finishes: lamination, UV, embossing and foil, matched to your brand.",
-      },
-      {
-        title: "Deliver",
-        body: "Packed, palletized and sent to your door. Your packaging arrives ready to impress.",
-      },
+  making: {
+    eyebrow: "How your box is made",
+    stepsLabel: "Making steps",
+    stages: [
+      { step: "Board", title: "Choose your board", line: "Kraft, white or black stock, in the thickness your product needs." },
+      { step: "Print", title: "Your brand, printed edge to edge", line: "Artwork is printed across the whole flat sheet before anything is cut." },
+      { step: "Finish", title: "Lamination, UV and foil", line: "Gloss or matt protection, spot UV and foil accents on the printed sheet." },
+      { step: "Die-cut", title: "Cut and creased in one press", line: "A steel die cuts the outline and presses the fold lines in a single stroke." },
+      { step: "Fold", title: "Crease and fold", line: "Each panel folds along its crease: the sides first, then the flaps." },
+      { step: "Glue", title: "Glue and close", line: "One glued seam holds the sides together, and the top tucks in." },
+      { step: "Ship", title: "Ready to ship", line: "Your finished carton, ready to be packed and sent." },
     ],
+    quoteButton: "Want this box? Get a quote",
+    cta: {
+      title: "Your box is ready. Let's make it real.",
+      body: "Tell us the size and quantity and we will reply with a quote.",
+      primary: "Open the configurator",
+      secondary: "Chat on WhatsApp",
+    },
+    /** Spec handed to the quote flow from this section: the carton shown in the animation. */
+    quoteProduct: "Folding Cartons",
+    quoteNote: "I liked the folding carton in the how-it's-made animation (12 x 6 x 18 cm).",
+    skip: "Skip to the quote form",
   },
 
   process: {

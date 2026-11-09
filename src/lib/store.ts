@@ -19,7 +19,8 @@ interface AppState {
    * subscribe to them with a hook (that would re-render React on every tick).
    */
   heroProgress: number;
-  storyProgress: number;
+  /** 0-1 progress through the pinned "how your box is made" section. */
+  makingProgress: number;
 
   /** Active color theme (palette.ts). 3D materials, lights and the loader follow it. */
   themeId: ThemeId;
@@ -30,7 +31,10 @@ interface AppState {
   setReady: () => void;
   zoneChange: (delta: 1 | -1) => void;
   setHeroProgress: (n: number) => void;
-  setStoryProgress: (n: number) => void;
+  setMakingProgress: (n: number) => void;
+  /** Set by CTAs ("Want this box?") so the quote form can start with the right product. */
+  quotePrefill: { product?: string; note?: string } | null;
+  setQuotePrefill: (v: { product?: string; note?: string } | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -41,7 +45,8 @@ export const useAppStore = create<AppState>((set) => ({
   zones: 0,
   sceneActive: false,
   heroProgress: 0,
-  storyProgress: 0,
+  makingProgress: 0,
+  quotePrefill: null,
 
   themeId: DEFAULT_THEME,
   setThemeId: (themeId) => set({ themeId }),
@@ -54,5 +59,6 @@ export const useAppStore = create<AppState>((set) => ({
       return { zones, sceneActive: zones > 0 };
     }),
   setHeroProgress: (heroProgress) => set({ heroProgress }),
-  setStoryProgress: (storyProgress) => set({ storyProgress }),
+  setMakingProgress: (makingProgress) => set({ makingProgress }),
+  setQuotePrefill: (quotePrefill) => set({ quotePrefill }),
 }));

@@ -53,7 +53,7 @@ for (const mode of ["desktop", "mobile"]) {
   await send("Page.navigate", { url: `${BASE}/` });
   await waitFor("window.__r3f && !document.querySelector('[role=status]') && document.querySelector('canvas')");
   await sleep(1500);
-  const g = JSON.parse(await ev(`JSON.stringify((()=>{const vh=innerHeight; const hero=document.getElementById('top'); const story=document.getElementById('story');
+  const g = JSON.parse(await ev(`JSON.stringify((()=>{const vh=innerHeight; const hero=document.getElementById('top'); const story=document.getElementById("making");
     return { vh, heroEnd: hero.offsetHeight - vh, sTop: story.offsetTop, sLen: story.offsetHeight - vh, marquee: document.querySelector('main > div[aria-hidden]').getBoundingClientRect().top + scrollY,
       products: document.getElementById('products').offsetTop, process: document.getElementById('process').offsetTop, conf: document.getElementById('configurator').offsetTop, quote: document.getElementById('quote').offsetTop, h: document.documentElement.scrollHeight }; })())`));
 

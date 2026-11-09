@@ -36,8 +36,21 @@ export interface Theme {
   accent: string;
   /** Text/icon color to put ON the accent color (buttons, accent sections). */
   onAccent: string;
+  /** Material/process colors used by the making-of story (foil, die lines, steel press). */
+  ink: ProcessInk;
   scene: SceneLook;
 }
+
+export interface ProcessInk {
+  foil: string;
+  cut: string;
+  crease: string;
+  steel: string;
+  /** Highlight for the glue strip. */
+  glue: string;
+}
+
+const PROCESS_INK: ProcessInk = { foil: "#E3BE68", cut: "#E8334F", crease: "#2F7BFF", steel: "#9AA3AF", glue: "#FFC531" };
 
 const DARK_SCENE: Omit<SceneLook, "rimColor"> = {
   hemiSky: "#fff1dc",
@@ -78,6 +91,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     kraftInk: "#8A5E30",
     accent: "#0F5C4D",
     onAccent: "#FFFFFF",
+    ink: PROCESS_INK,
     scene: { ...LIGHT_SCENE, rimColor: "#9fe3d0" },
   },
   b: {
@@ -92,6 +106,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     kraftInk: "#C9A574",
     accent: "#E8B04B",
     onAccent: "#0B1220",
+    ink: PROCESS_INK,
     scene: { ...DARK_SCENE, rimColor: "#ffc766" },
   },
   c: {
@@ -106,6 +121,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     kraftInk: "#C8A27A",
     accent: "#C6F24E",
     onAccent: "#0E1F1A",
+    ink: PROCESS_INK,
     scene: { ...DARK_SCENE, rimColor: "#c6f24e", rim: 1.1 },
   },
   d: {
@@ -120,6 +136,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     kraftInk: "#85582B",
     accent: "#2B4BFF",
     onAccent: "#FFFFFF",
+    ink: PROCESS_INK,
     scene: { ...LIGHT_SCENE, rimColor: "#9db0ff" },
   },
 };

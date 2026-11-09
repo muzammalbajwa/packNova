@@ -111,7 +111,7 @@ try {
 
   /* ---- home: frame stats per scene ---- */
   await sleep(800);
-  const geo = JSON.parse(await cdp.evaluate(`JSON.stringify((()=>{ const vh = innerHeight; const hero = document.getElementById('top'); const story = document.getElementById('story');
+  const geo = JSON.parse(await cdp.evaluate(`JSON.stringify((()=>{ const vh = innerHeight; const hero = document.getElementById('top'); const story = document.getElementById("making");
     const heroEnd = hero.offsetHeight - vh; const sTop = story.offsetTop; const sLen = story.offsetHeight - vh; return { heroEnd, sTop, sLen }; })())`));
   const run = (a, b, ms) => cdp.evaluate(`window.__scrollRun(${a}, ${b}, ${ms})`);
   result.hero = await run(0, geo.heroEnd, 5000);
