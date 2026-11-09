@@ -21,7 +21,7 @@ export interface Story3DConfig {
   /** Making-of framing. `wide` applies when the canvas aspect ratio exceeds `wideAspect`. */
   story: { wide: LayoutParams; narrow: LayoutParams; wideAspect: number };
   /** Hero box placement on the shared fixed canvas. */
-  hero: { offsetX: number; narrowOffsetY: number; scale: number };
+  hero: { offsetX: number; offsetY: number; narrowOffsetY: number; scale: number };
   light: { keyPos: [number, number, number]; rimPos: [number, number, number] };
   /** Multipliers on the palette's contact shadow. */
   shadow: { opacity: number; spread: number };
@@ -38,7 +38,7 @@ export const DEFAULT_STORY3D: Story3DConfig = {
     narrow: { offsetX: 0, offsetY: 0.2, widthFrac: 0.94, heightFrac: 0.42 },
     wideAspect: 1.1,
   },
-  hero: { offsetX: 0.2, narrowOffsetY: 0.2, scale: 1 },
+  hero: { offsetX: 0.2, offsetY: 0, narrowOffsetY: 0.2, scale: 1 },
   light: { keyPos: [3, 5, 3], rimPos: [-4, 2, -3] },
   shadow: { opacity: 1, spread: 1 },
   board: { roughness: 0.9 },

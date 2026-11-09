@@ -152,8 +152,9 @@ const tex = (c: HTMLCanvasElement) => {
 
 /** Brand block + text colors for a theme (dark themes print the surface color, light ones the accent). */
 function printColors(t: Theme) {
+  // dark themes print a lifted ink block (the plain surface color would vanish against the page background)
   return t.dark
-    ? { block: t.surface, mark: t.accent, text: t.fg, stripe: t.accent }
+    ? { block: new THREE.Color(t.surface).lerp(new THREE.Color("#ffffff"), 0.14).getStyle(), mark: t.accent, text: t.fg, stripe: t.accent }
     : { block: t.accent, mark: t.onAccent, text: t.onAccent, stripe: t.kraft };
 }
 

@@ -125,7 +125,7 @@ function updateFrame(
   r.scale.setScalar(fit);
   r.position.x = wide ? vw * cfg.hero.offsetX : 0;
   // Group origin is the box floor; lift by half the (flaps-open) height to centre it.
-  r.position.y = (wide ? 0 : vh * cfg.hero.narrowOffsetY) + bob - 0.62 * fit;
+  r.position.y = (wide ? vh * cfg.hero.offsetY : vh * cfg.hero.narrowOffsetY) + bob - 0.62 * fit;
   r.rotation.y = cur.rotY + (reducedMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.5) * 0.04);
   r.rotation.x = 0.18;
 

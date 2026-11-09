@@ -10,7 +10,7 @@ export const config: Story3DConfig = {
     narrow: { offsetX: 0, offsetY: 0, widthFrac: 0.84, heightFrac: 0.8 },
     wideAspect: 1.1,
   },
-  hero: { offsetX: 0.2, narrowOffsetY: 0.2, scale: 1 },
+  hero: { offsetX: 0.2, offsetY: 0, narrowOffsetY: 0.2, scale: 1 },
   light: { keyPos: [3, 5, 3], rimPos: [-4, 2, -3] },
   shadow: { opacity: 1, spread: 1.1 },
   board: { roughness: 0.92 },
