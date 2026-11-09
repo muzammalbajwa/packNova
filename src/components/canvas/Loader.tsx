@@ -44,7 +44,7 @@ export default function Loader() {
       }`}
     >
       <p className="font-display text-sm uppercase tracking-[0.3em] text-[var(--muted)]">{message}</p>
-      <div className="h-px w-56 overflow-hidden bg-white/10">
+      <div className="h-px w-56 overflow-hidden bg-[var(--line)]">
         <div
           className="h-full origin-left bg-[var(--accent)] transition-transform duration-300 ease-out"
           style={{ transform: `scaleX(${progress / 100})` }}

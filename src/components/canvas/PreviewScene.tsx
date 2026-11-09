@@ -9,7 +9,7 @@ import type { Spec } from "@/lib/configurator";
 import { contactShadowTexture } from "@/lib/textures";
 import { useAppStore } from "@/lib/store";
 import PackModel from "./models/PackModel";
-import RoomEnv from "./RoomEnv";
+import SceneLights from "./SceneLights";
 
 const TARGET = 1.7; // largest dimension in world units
 
@@ -57,10 +57,7 @@ export default function PreviewScene({ spec, art, open }: { spec: Spec; art: Art
         window.__r3f = state;
       }}
     >
-      {profile.tier !== "low" && <RoomEnv intensity={0.26} />}
-      <hemisphereLight args={["#fff1dc", "#1a1008", profile.tier === "low" ? 0.6 : 0.4]} />
-      <directionalLight position={[3, 5, 3]} intensity={2.4} color="#ffe9cf" />
-      <directionalLight position={[-4, 2, -3]} intensity={2} color="#ff5b2e" />
+      <SceneLights low={profile.tier === "low"} />
       <group position={[0, -0.55, 0]}>
         <PackModel model={spec.model} material={spec.material} art={art} open={open} detail={profile.detail} l={l} w={w} h={h} />
         <Shadow fx={l} fz={spec.model === "pouch" ? Math.max(w, 0.12) : w} />

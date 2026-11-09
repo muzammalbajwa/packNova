@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { DeviceProfile } from "./deviceTier";
+import { DEFAULT_THEME, type ThemeId } from "./palette";
 
 interface AppState {
   profile: DeviceProfile | null;
@@ -20,6 +21,10 @@ interface AppState {
   heroProgress: number;
   storyProgress: number;
 
+  /** Active color theme (palette.ts). 3D materials, lights and the loader follow it. */
+  themeId: ThemeId;
+  setThemeId: (id: ThemeId) => void;
+
   setProfile: (p: DeviceProfile, reducedMotion: boolean) => void;
   setProgress: (n: number) => void;
   setReady: () => void;
@@ -38,6 +43,8 @@ export const useAppStore = create<AppState>((set) => ({
   heroProgress: 0,
   storyProgress: 0,
 
+  themeId: DEFAULT_THEME,
+  setThemeId: (themeId) => set({ themeId }),
   setProfile: (profile, reducedMotion) => set({ profile, reducedMotion }),
   setProgress: (n) => set((s) => (n > s.progress ? { progress: Math.min(100, n) } : s)),
   setReady: () => set({ ready: true, progress: 100 }),

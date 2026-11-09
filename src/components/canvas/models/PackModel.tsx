@@ -6,13 +6,14 @@ import * as THREE from "three";
 import { composePanel, hasArt, type ArtMap, type Panel } from "@/lib/artwork";
 import { PANELS, type ModelId } from "@/lib/configurator";
 import { rbox } from "@/lib/geometry";
-import { createPackMaterial, type MaterialKind } from "@/lib/textures";
+import { createPackMaterial, setKraftBase, type MaterialKind } from "@/lib/textures";
+import { THEMES } from "@/lib/palette";
+import { useAppStore } from "@/lib/store";
 
 /* All models are built from a handful of shared geometries + a base board material, plus one
    material per printed panel. Origin = centre of the floor footprint, +y up, front = +z. */
 
 const T = 0.03; // board thickness (constant, so resizing never distorts the walls)
-const ACCENT = "#ff5b2e";
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const smooth = (a: number, b: number, x: number) => {
@@ -427,8 +428,12 @@ interface Props extends Dims {
 
 /** Procedural model library. Dims are world units; origin is the floor centre. */
 export default function PackModel({ model, material, art, open, detail, l, w, h }: Props) {
-  const set = useMemo(() => buildPanelSet(model, material, { l, w, h }, art, detail), [model, material, art, detail, l, w, h]);
-  const accent = useMemo(() => new THREE.MeshStandardMaterial({ color: ACCENT, roughness: 0.45, side: THREE.DoubleSide }), []);
+  const theme = THEMES[useAppStore((s) => s.themeId)];
+  const set = useMemo(() => {
+    setKraftBase(theme.kraft);
+    return buildPanelSet(model, material, { l, w, h }, art, detail);
+  }, [model, material, art, detail, l, w, h, theme]);
+  const accent = useMemo(() => new THREE.MeshStandardMaterial({ color: theme.accent, roughness: 0.45, side: THREE.DoubleSide }), [theme]);
 
   // Old textures/materials are freed whenever the inputs (and therefore `set`) change.
   useEffect(() => () => set.dispose(), [set]);

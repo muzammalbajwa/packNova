@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import DebugOverlay from "@/components/ui/DebugOverlay";
 import { site } from "@/content/site";
+import ThemeSync from "@/components/ui/ThemeSync";
+import { THEMES, DEFAULT_THEME, THEME_BOOT_SCRIPT, themeCss } from "@/lib/palette";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -36,16 +38,21 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b0a09",
+  themeColor: THEMES[DEFAULT_THEME].bg,
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={site.lang} dir={site.dir} className={`${bricolage.variable} ${instrument.variable}`}>
+    <html lang={site.lang} dir={site.dir} className={`${bricolage.variable} ${instrument.variable}`} suppressHydrationWarning>
+      <head>
+        <style dangerouslySetInnerHTML={{ __html: themeCss() }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body className="min-h-dvh antialiased">
         {children}
+        <ThemeSync />
         <DebugOverlay />
       </body>
     </html>

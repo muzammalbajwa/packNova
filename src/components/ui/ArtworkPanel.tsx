@@ -7,7 +7,7 @@ import { PANELS, panelLabel, type ModelId } from "@/lib/configurator";
 
 const S = site.configurator.studio;
 const field =
-  "w-full rounded-xl border border-[var(--line)] bg-black/40 px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors focus:border-[var(--accent)]";
+  "w-full rounded-xl border border-[var(--line)] bg-[var(--field)] px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors focus:border-[var(--accent)]";
 
 /** Per-panel artwork: image upload (validated), text and a background color. */
 export default function ArtworkPanel({
@@ -58,7 +58,7 @@ export default function ArtworkPanel({
             }}
             className={`rounded-full border px-4 py-2 text-sm transition-colors ${
               p === active
-                ? "border-[var(--accent)] bg-[var(--accent)] text-black"
+                ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)]"
                 : "border-[var(--line)] text-[var(--fg)] hover:border-[var(--fg)]"
             }`}
           >
@@ -134,7 +134,7 @@ export default function ArtworkPanel({
               type="color"
               value={a.textColor}
               onChange={(e) => patch({ textColor: e.target.value })}
-              className="h-11 w-full cursor-pointer rounded-xl border border-[var(--line)] bg-black/40 p-1"
+              className="h-11 w-full cursor-pointer rounded-xl border border-[var(--line)] bg-[var(--field)] p-1"
             />
           </label>
           <div>
@@ -145,7 +145,7 @@ export default function ArtworkPanel({
                 aria-label={S.background}
                 value={a.bg ?? "#bd9460"}
                 onChange={(e) => patch({ bg: e.target.value })}
-                className="h-11 w-16 cursor-pointer rounded-xl border border-[var(--line)] bg-black/40 p-1"
+                className="h-11 w-16 cursor-pointer rounded-xl border border-[var(--line)] bg-[var(--field)] p-1"
               />
               <label className="flex items-center gap-2 text-xs text-[var(--muted)]">
                 <input type="checkbox" checked={a.bg === null} onChange={(e) => patch({ bg: e.target.checked ? null : "#bd9460" })} className="accent-[var(--accent)]" />

@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0b0a09;
-  --fg: #f3ede4;
-  --muted: #8d857a;
-  --accent: #ff5b2e;
-  --kraft: #c9a574;
-  --line: rgba(243, 237, 228, 0.12);
+  /* Theme colors (--bg, --surface, --fg, --muted, --kraft, --accent, --on-accent) are
+     generated from src/lib/palette.ts and injected in <head> by layout.tsx. */
+  --line: color-mix(in srgb, var(--fg) 14%, transparent);
+  --line-strong: color-mix(in srgb, var(--fg) 30%, transparent);
+  --wash: color-mix(in srgb, var(--fg) 6%, transparent);
+  --field: color-mix(in srgb, var(--fg) 5%, var(--surface));
+  --glass: color-mix(in srgb, var(--bg) 78%, transparent);
   --f-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --f-body: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
 }
@@ -17,13 +18,15 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-kraft: var(--kraft);
+  --color-kraft-ink: var(--kraft-ink);
+  --color-surface: var(--surface);
+  --color-on-accent: var(--on-accent);
   --font-display: var(--f-display);
   --font-sans: var(--f-body);
 }
 
 html {
   background: var(--bg);
-  color-scheme: dark;
 }
 
 body {
@@ -70,5 +73,5 @@ body {
 
 ::selection {
   background: var(--accent);
-  color: #000;
+  color: var(--on-accent);
 }

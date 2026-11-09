@@ -21,23 +21,23 @@ export default function Products() {
             <li key={p.id} className="group relative bg-[var(--bg)]">
               <a href="#quote" data-reveal className="relative block h-full overflow-hidden p-8 md:p-10">
                 {/* kraft wash that wipes up on hover */}
-                <span className="absolute inset-0 translate-y-full bg-[var(--kraft)] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:translate-y-0" />
-                <span className="relative flex h-full flex-col transition-colors duration-500 group-hover:text-black">
+                <span className="absolute inset-0 translate-y-full bg-[var(--accent)] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:translate-y-0" />
+                <span className="relative flex h-full flex-col transition-colors duration-500 group-hover:text-[var(--on-accent)]">
                   <span className="flex items-start justify-between">
-                    <span className="text-sm tabular-nums text-[var(--muted)] transition-colors duration-500 group-hover:text-black/60">
+                    <span className="text-sm tabular-nums text-[var(--muted)] transition-colors duration-500 group-hover:text-[var(--on-accent)]/60">
                       0{i + 1}
                     </span>
-                    <span className="size-24 text-[var(--kraft)] transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:-translate-y-2 group-hover:rotate-[-4deg] group-hover:text-black md:size-28">
+                    <span className="size-24 text-[var(--kraft-ink)] transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:-translate-y-2 group-hover:rotate-[-4deg] group-hover:text-[var(--on-accent)] md:size-28">
                       <ProductIcon kind={p.icon} />
                     </span>
                   </span>
                   <span className="font-display mt-10 text-2xl font-semibold leading-tight tracking-tight md:text-3xl">
                     {p.name}
                   </span>
-                  <span className="mt-1 text-sm text-[var(--accent)] transition-colors duration-500 group-hover:text-black/70">
+                  <span className="mt-1 text-sm text-[var(--accent)] transition-colors duration-500 group-hover:text-[var(--on-accent)]">
                     {p.spec}
                   </span>
-                  <span className="mt-3 max-w-xs text-[var(--muted)] transition-colors duration-500 group-hover:text-black/75">
+                  <span className="mt-3 max-w-xs text-[var(--muted)] transition-colors duration-500 group-hover:text-[var(--on-accent)]">
                     {p.description}
                   </span>
                   <span className="mt-8 flex flex-wrap items-center gap-2">

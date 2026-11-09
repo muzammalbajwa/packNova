@@ -26,7 +26,7 @@ export default function Hero() {
       {/* Scroll distance that drives the box opening (0 -> 1). */}
       <div ref={track} className="absolute inset-0" />
       <div className="sticky top-0 h-dvh overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_75%_50%,rgba(255,91,46,0.13),transparent_70%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_75%_50%,color-mix(in_srgb,var(--accent)_14%,transparent),transparent_70%)]" />
 
         {/* Static poster: eager + high priority, faded out once the live canvas is ready. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -47,7 +47,7 @@ export default function Hero() {
           <p className="eyebrow">{hero.eyebrow}</p>
           <h1 className="font-display mt-5 max-w-[10ch] text-[clamp(3.1rem,9vw,7.6rem)] font-bold leading-[0.92] tracking-[-0.03em]">
             {before}
-            <em className="text-[var(--kraft)] not-italic">{hero.headlineAccent}</em>
+            <em className="text-[var(--kraft-ink)] not-italic">{hero.headlineAccent}</em>
             {after}
           </h1>
           <p className="mt-6 max-w-md text-lg leading-relaxed text-[var(--muted)]">{hero.sub}</p>

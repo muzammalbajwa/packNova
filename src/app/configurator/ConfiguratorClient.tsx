@@ -69,13 +69,13 @@ function Studio({ initial }: { initial: Spec }) {
       </div>
 
       <div className="order-1 flex flex-col gap-6 lg:order-2 lg:sticky lg:top-24 lg:self-start">
-        <div className="relative h-[380px] overflow-hidden rounded-3xl border border-[var(--line)] bg-[radial-gradient(60%_60%_at_50%_45%,rgba(255,91,46,0.12),transparent_70%)] lg:h-[540px]">
+        <div className="relative h-[380px] overflow-hidden rounded-3xl border border-[var(--line)] bg-[radial-gradient(60%_60%_at_50%_45%,color-mix(in_srgb,var(--accent)_14%,transparent),transparent_70%)] lg:h-[540px]">
           {profile?.webgl ? (
             <PreviewScene spec={liveSpec} art={liveArt} open={open} />
           ) : (
             profile && (
               <div className="flex h-full flex-col items-center justify-center gap-5 p-8 text-center">
-                <div className="size-40 text-[var(--kraft)]">
+                <div className="size-40 text-[var(--kraft-ink)]">
                   <ProductIcon kind={item?.icon ?? "corrugated"} />
                 </div>
                 <p className="max-w-xs text-sm text-[var(--muted)]">{S.noPreview}</p>
@@ -93,7 +93,7 @@ function Studio({ initial }: { initial: Spec }) {
               type="button"
               aria-pressed={open}
               onClick={() => setOpen((o) => !o)}
-              className="absolute right-4 top-4 rounded-full border border-[var(--line)] bg-black/60 px-5 py-2.5 text-sm backdrop-blur transition-colors hover:border-[var(--fg)]"
+              className="absolute right-4 top-4 rounded-full border border-[var(--line)] bg-[var(--glass)] px-5 py-2.5 text-sm backdrop-blur transition-colors hover:border-[var(--fg)]"
             >
               {open ? S.close : S.open}
             </button>
@@ -116,7 +116,7 @@ function Studio({ initial }: { initial: Spec }) {
             <button
               type="button"
               onClick={requestQuote}
-              className="inline-flex items-center justify-center rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-black transition-colors duration-300 hover:bg-[var(--fg)]"
+              className="inline-flex items-center justify-center rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-[var(--on-accent)] transition-colors duration-300 hover:bg-[var(--fg)]"
             >
               {S.quoteButton}
             </button>

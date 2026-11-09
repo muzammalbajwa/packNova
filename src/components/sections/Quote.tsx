@@ -4,7 +4,7 @@ import QuoteForm from "./QuoteForm";
 export default function Quote() {
   const q = site.quote;
   return (
-    <section id="quote" className="relative z-10 overflow-hidden bg-[var(--accent)] px-6 py-28 text-black md:py-40">
+    <section id="quote" className="relative z-10 overflow-hidden bg-[var(--accent)] px-6 py-28 text-[var(--on-accent)] md:py-40">
       <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[1.1fr_1fr] md:items-start">
         <div>
           <p className="text-xs uppercase tracking-[0.28em] opacity-70" data-reveal>
@@ -19,7 +19,7 @@ export default function Quote() {
           <a
             data-reveal
             href={site.contact.whatsappHref}
-            className="mt-8 inline-flex items-center gap-2 border-b border-black/50 pb-0.5 text-base font-medium transition-colors hover:border-black"
+            className="mt-8 inline-flex items-center gap-2 border-b border-[color-mix(in_srgb,var(--on-accent)_50%,transparent)] pb-0.5 text-base font-medium transition-colors hover:border-[var(--on-accent)]"
           >
             {q.whatsappCta}: {site.contact.whatsapp} →
           </a>

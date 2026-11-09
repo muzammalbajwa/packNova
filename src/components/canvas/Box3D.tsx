@@ -5,7 +5,8 @@ import { useFrame, type RootState } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAppStore } from "@/lib/store";
 import { rbox } from "@/lib/geometry";
-import { kraftTexture, kraftNormal, logoTexture, labelTexture, contactShadowTexture, mulberry32 } from "@/lib/textures";
+import { THEMES, type Theme } from "@/lib/palette";
+import { setKraftBase, kraftTexture, kraftNormal, logoTexture, labelTexture, contactShadowTexture, mulberry32 } from "@/lib/textures";
 
 /* ---------- dimensions (world units) ---------- */
 const W = 1.6; // width  (x)
@@ -59,9 +60,10 @@ const KRAFT = new THREE.Color("#ffffff"); // texture carries the kraft color
 const BLUE = new THREE.Color("#4d7cff");
 const PRINT = new THREE.Color("#5a5148");
 const BLUE_GLOW = new THREE.Color("#0c2c9a");
-const ACCENT = new THREE.Color("#ff5b2e");
 
-function buildAssets(detail: 0 | 1 | 2) {
+function buildAssets(detail: 0 | 1 | 2, theme: Theme) {
+    setKraftBase(theme.kraft);
+    const ACCENT = new THREE.Color(theme.accent);
     // Beveled meshes; the blueprint edge lines are traced on the plain boxes (clean outlines).
     const flapFB = rbox(W, T, D / 2, detail).translate(0, 0, D / 4);
     const flapLR = rbox(W * 0.42, T, D - 2 * T, detail).translate(W * 0.21, 0, 0);
@@ -80,7 +82,7 @@ function buildAssets(detail: 0 | 1 | 2) {
     const streak = new THREE.PlaneGeometry(0.55, 0.01);
 
     const kraftMap = kraftTexture();
-    const logoMap = logoTexture();
+    const logoMap = logoTexture(theme.accent);
     const labelMap = labelTexture();
     const shadowMap = contactShadowTexture();
 
@@ -141,6 +143,8 @@ function buildAssets(detail: 0 | 1 | 2) {
       m: { board, tapeMat, logoMat, labelMat, glowMat, shadowMat, streakMat, lineMat },
       edges,
       lanes,
+      accent: ACCENT,
+      look: theme.scene,
       disposables,
     };
 }
@@ -251,8 +255,14 @@ function updateFrame(
     if (parts.glowRef.current) parts.glowRef.current.visible = cur.open > 0.02;
     if (parts.light.current) parts.light.current.intensity = cur.open * 2.4;
 
-    m.shadowMat.opacity = 0.9 - bob * 2;
-    if (parts.shadowRef.current) parts.shadowRef.current.scale.setScalar(2.4 + cur.open * 0.8);
+    // Contact shadow lies on the ground under the box (not at a fixed world height), so on
+    // light themes the box does not look like it floats. bob lifts the box, not the shadow.
+    m.shadowMat.opacity = Math.min(1, (0.9 - bob * 2) * assets.look.shadow);
+    const sh = parts.shadowRef.current;
+    if (sh) {
+      sh.position.set(r.position.x, r.position.y - bob + 0.01, r.position.z);
+      sh.scale.setScalar((2.4 + cur.open * 0.8) * (fit / 0.82) * assets.look.shadowSpread);
+    }
 
     /* instanced motion streaks (mid/high only) */
     const sm = parts.streaks.current;
@@ -282,7 +292,8 @@ const STREAKS = 36;
 
 export default function Box3D({ detail, reducedMotion }: Props) {
   /* ----- one-time assets: 5 box geometries, 1 board material, small textures ----- */
-  const assets = useMemo(() => buildAssets(detail), [detail]);
+  const themeId = useAppStore((s) => s.themeId);
+  const assets = useMemo(() => buildAssets(detail, THEMES[themeId]), [detail, themeId]);
 
   useEffect(
     () => () => assets.disposables.forEach((d) => d.dispose()),
@@ -371,7 +382,7 @@ export default function Box3D({ detail, reducedMotion }: Props) {
           scale={[W - 2 * T, D - 2 * T, 1]}
           visible={false}
         />
-        {detail > 0 && <pointLight ref={light} position={[0, H * 0.55, 0]} color={ACCENT} distance={4} intensity={0} />}
+        {detail > 0 && <pointLight ref={light} position={[0, H * 0.55, 0]} color={assets.accent} distance={4} intensity={0} />}
         <mesh
           ref={logoRef}
           geometry={g.plane}

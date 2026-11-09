@@ -15,7 +15,7 @@ import {
 const L = site.configurator.labels;
 
 const inputCls =
-  "w-full rounded-xl border border-[var(--line)] bg-black/40 px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors focus:border-[var(--accent)]";
+  "w-full rounded-xl border border-[var(--line)] bg-[var(--field)] px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors focus:border-[var(--accent)]";
 
 /** Shared by the home-page teaser and the configurator page. `sliders` adds range inputs for the size. */
 export default function SpecControls({
@@ -76,7 +76,7 @@ export default function SpecControls({
           className={inputCls}
         >
           {MODELS.map((m) => (
-            <option key={m.id} value={m.id} className="bg-black">
+            <option key={m.id} value={m.id} className="bg-[var(--surface)]">
               {m.label}
             </option>
           ))}
@@ -103,7 +103,7 @@ export default function SpecControls({
               onClick={() => onChange({ ...spec, material: m.id as MaterialId })}
               className={`rounded-full border px-5 py-2.5 text-sm transition-colors duration-300 ${
                 spec.material === m.id
-                  ? "border-[var(--accent)] bg-[var(--accent)] text-black"
+                  ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)]"
                   : "border-[var(--line)] text-[var(--fg)] hover:border-[var(--fg)]"
               }`}
             >

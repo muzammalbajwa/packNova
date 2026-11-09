@@ -13,7 +13,7 @@ export default function Configurator() {
 
   return (
     <section id="configurator" className="relative z-10 bg-[var(--bg)] px-6 pb-28 md:pb-40">
-      <div className="mx-auto grid max-w-6xl gap-12 rounded-3xl border border-[var(--line)] bg-[linear-gradient(135deg,rgba(201,165,116,0.08),transparent_60%)] p-8 md:grid-cols-2 md:p-14">
+      <div className="mx-auto grid max-w-6xl gap-12 rounded-3xl border border-[var(--line)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--kraft)_12%,transparent),transparent_60%)] p-8 md:grid-cols-2 md:p-14">
         <div data-reveal>
           <p className="eyebrow">{c.eyebrow}</p>
           <h2 className="font-display mt-4 text-5xl font-bold leading-[0.98] tracking-[-0.025em] md:text-6xl">

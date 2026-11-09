@@ -29,7 +29,7 @@ export default function Navbar({ fromHome = true }: { fromHome?: boolean }) {
     >
       <nav
         aria-label="Primary"
-        className="flex w-full max-w-3xl items-center justify-between gap-4 rounded-full border border-[var(--line)] bg-black/55 py-2 pl-5 pr-2 backdrop-blur-xl"
+        className="flex w-full max-w-3xl items-center justify-between gap-4 rounded-full border border-[var(--line)] bg-[var(--glass)] py-2 pl-5 pr-2 backdrop-blur-xl"
       >
         <a href={fromHome ? "#top" : "/"} aria-label={`${site.brand.name} home`} className="text-xl">
           <Logo />

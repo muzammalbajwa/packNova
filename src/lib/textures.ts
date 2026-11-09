@@ -30,6 +30,12 @@ function finish(c: HTMLCanvasElement, srgb = true, repeat = true) {
   return t;
 }
 
+/** Kraft stock color of the active theme (palette.ts). Set before textures are built. */
+let kraftBase = "#bd9460";
+export const setKraftBase = (hex: string) => {
+  kraftBase = hex;
+};
+
 export type MaterialKind = "kraft" | "white" | "black";
 
 /* Painters draw a material's base look into any canvas size, so the same look is used
@@ -38,7 +44,7 @@ export function paintBase(g: CanvasRenderingContext2D, w: number, h: number, kin
   const rnd = mulberry32(kind === "kraft" ? 7 : kind === "white" ? 5 : 9);
   const area = (w * h) / (256 * 256);
   if (kind === "kraft") {
-    g.fillStyle = "#bd9460";
+    g.fillStyle = kraftBase;
     g.fillRect(0, 0, w, h);
     const step = Math.max(2, Math.round(h / 42));
     for (let y = 0, i = 0; y < h; y += step, i++) {
@@ -154,11 +160,11 @@ export function createPackMaterial(kind: MaterialKind, detail: 0 | 1 | 2 = 2) {
   };
 }
 
-export function logoTexture() {
+export function logoTexture(accent = "#ff5b2e") {
   const [c, g] = makeCanvas(1024, 256);
   g.textAlign = "center";
   g.textBaseline = "middle";
-  g.fillStyle = "#ff5b2e";
+  g.fillStyle = accent;
   g.font = "700 150px system-ui, sans-serif";
   g.fillText(site.brand.name, 512, 108);
   g.fillStyle = "rgba(255,255,255,0.75)";

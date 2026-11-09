@@ -4,11 +4,11 @@ import { site } from "@/content/site";
 export function LogoMark({ size = 28 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden className="shrink-0">
-      <polygon points="4,12 16,18 16,29 4,23" fill="#c9a574" />
-      <polygon points="28,12 16,18 16,29 28,23" fill="#8d6a3a" />
-      <polygon points="16,5 28,11 16,17 4,11" fill="#ff5b2e" />
+      <polygon points="4,12 16,18 16,29 4,23" fill="var(--kraft)" />
+      <polygon points="28,12 16,18 16,29 28,23" fill="color-mix(in srgb, var(--kraft) 62%, #000)" />
+      <polygon points="16,5 28,11 16,17 4,11" fill="var(--accent)" />
       <polygon points="4,11 16,17 16,13 7,8.5" fill="#000" opacity="0.18" />
-      <path d="M16 17v12" stroke="#0b0a09" strokeOpacity="0.35" strokeWidth="1" />
+      <path d="M16 17v12" stroke="var(--bg)" strokeOpacity="0.35" strokeWidth="1" />
     </svg>
   );
 }

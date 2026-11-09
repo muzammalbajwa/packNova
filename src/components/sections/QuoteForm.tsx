@@ -7,7 +7,7 @@ import QuoteHandoff from "../ui/QuoteHandoff";
 
 const f = site.quote.fields;
 const field =
-  "w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--accent)]";
+  "w-full rounded-xl border border-[var(--line)] bg-[var(--wash)] px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--accent)]";
 
 /**
  * No backend: a valid submit opens a prefilled WhatsApp chat (and offers an email fallback).
@@ -39,7 +39,7 @@ export default function QuoteForm() {
   if (text) return <QuoteHandoff text={text} onEdit={() => setText(null)} />;
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-4 rounded-3xl bg-black p-6 text-[var(--fg)] md:p-8">
+    <form onSubmit={onSubmit} className="grid gap-4 rounded-3xl bg-[var(--surface)] p-6 text-[var(--fg)] md:p-8">
       <div className="grid gap-4 sm:grid-cols-2">
         <label>
           <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.name}</span>
@@ -54,11 +54,11 @@ export default function QuoteForm() {
         <label>
           <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.product}</span>
           <select name="product" required defaultValue={vals.product ?? ""} className={field}>
-            <option value="" disabled className="bg-black">
+            <option value="" disabled className="bg-[var(--surface)]">
               {f.productPlaceholder}
             </option>
             {site.products.items.map((p) => (
-              <option key={p.id} value={p.name} className="bg-black">
+              <option key={p.id} value={p.name} className="bg-[var(--surface)]">
                 {p.name}
               </option>
             ))}
@@ -75,7 +75,7 @@ export default function QuoteForm() {
       </label>
       <button
         type="submit"
-        className="mt-1 inline-flex items-center justify-center rounded-full bg-[var(--accent)] px-8 py-4 text-base font-medium text-black transition-colors duration-300 hover:bg-[var(--fg)]"
+        className="mt-1 inline-flex items-center justify-center rounded-full bg-[var(--accent)] px-8 py-4 text-base font-medium text-[var(--on-accent)] transition-colors duration-300 hover:bg-[var(--fg)]"
       >
         {site.quote.submit}
       </button>

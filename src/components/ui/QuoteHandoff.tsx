@@ -5,10 +5,10 @@ import { mailtoUrl, whatsappUrl } from "@/lib/quoteMessage";
 export default function QuoteHandoff({ text, onEdit }: { text: string; onEdit: () => void }) {
   const s = site.quote.success;
   return (
-    <div role="status" className="rounded-3xl bg-black p-8 text-[var(--fg)] md:p-10">
+    <div role="status" className="rounded-3xl bg-[var(--surface)] p-8 text-[var(--fg)] md:p-10">
       <p className="font-display text-3xl font-bold leading-tight tracking-tight">{s.title}</p>
       <p className="mt-3 text-[var(--muted)]">{s.body}</p>
-      <pre className="mt-5 max-h-40 overflow-auto whitespace-pre-wrap rounded-xl border border-white/10 bg-white/5 p-4 font-sans text-sm text-[var(--muted)]">
+      <pre className="mt-5 max-h-40 overflow-auto whitespace-pre-wrap rounded-xl border border-[var(--line)] bg-[var(--wash)] p-4 font-sans text-sm text-[var(--muted)]">
         {text}
       </pre>
       <div className="mt-6 flex flex-wrap gap-3">
@@ -16,13 +16,13 @@ export default function QuoteHandoff({ text, onEdit }: { text: string; onEdit: (
           href={whatsappUrl(text)}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-[var(--fg)]"
+          className="rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-[var(--on-accent)] transition-colors hover:bg-[var(--fg)]"
         >
           {s.openAgain}
         </a>
         <a
           href={mailtoUrl(text)}
-          className="rounded-full border border-white/20 px-6 py-3 text-sm transition-colors hover:border-[var(--fg)]"
+          className="rounded-full border border-[var(--line-strong)] px-6 py-3 text-sm transition-colors hover:border-[var(--fg)]"
         >
           {s.emailInstead}
         </a>
