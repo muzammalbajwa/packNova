@@ -17,7 +17,13 @@ Requires **Node >= 20.19** (Tailwind's Turbopack loader needs `require(esm)`). `
     npm run dev      # dev server (http://localhost:3000)
     npm run build    # static export to ./out
     npm run lint
-    npx serve out    # preview the export
+    npm run serve:out   # serve ./out with Brotli on 0.0.0.0:8080 (prints the phone URL)
+
+    node scripts/perf-measure.mjs --base http://localhost:8080 [--cpu 4] [--net slow4g] [--mobile]
+    bash scripts/perf-matrix.sh            # full throttled matrix + Lighthouse (run on a quiet machine)
+    node scripts/screenshots.mjs           # desktop + mobile screenshots -> docs/screenshots/
+
+Add `?debug=1` to any page for a live fps / draw-call overlay. See `PHONE-TEST.md`, `DEPLOY.md`, `docs/PERFORMANCE.md`.
 
 Deploy: Cloudflare Pages, build command `npm run build`, output directory `out`.
 Append `?tier=low|mid|high|none` to the URL to force a device tier while testing.

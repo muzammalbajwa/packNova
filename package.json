@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "serve:out": "python3 -m http.server 8080 --bind 0.0.0.0 --directory out"
+    "serve:out": "node scripts/serve.mjs 8080 0.0.0.0"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",

@@ -1,0 +1,73 @@
+{
+  "label": "mobile-cpu4-slow4g",
+  "base": "http://localhost:8080",
+  "cpuSlowdown": 4,
+  "network": "slow4g",
+  "mobile": true,
+  "forcedTier": null,
+  "loadAvgAtStart": 14.68,
+  "gpu": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+  "tier": "n/a",
+  "load": {
+    "firstPaintMs": 960,
+    "firstContentfulPaintMs": 960,
+    "lcpMs": 1800,
+    "threeInitMs": 4360,
+    "loaderGoneMs": 5664,
+    "sceneVisibleMs": 5664,
+    "completed": true
+  },
+  "transferKB": 607,
+  "hero": {
+    "frames": 299,
+    "avgFps": 60,
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.8,
+    "max": 16.8,
+    "over33ms": 0,
+    "maxDrawCalls": 12
+  },
+  "storyDesign": {
+    "frames": 239,
+    "avgFps": 60,
+    "p50": 16.7,
+    "p95": 16.7,
+    "p99": 16.8,
+    "max": 16.8,
+    "over33ms": 0,
+    "maxDrawCalls": 11
+  },
+  "storyPrint": {
+    "frames": 239,
+    "avgFps": 60,
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.8,
+    "max": 16.8,
+    "over33ms": 0,
+    "maxDrawCalls": 13
+  },
+  "storyDeliver": {
+    "frames": 239,
+    "avgFps": 60,
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 16.8,
+    "max": 16.8,
+    "over33ms": 0,
+    "maxDrawCalls": 13
+  },
+  "configurator": {
+    "frames": 410,
+    "avgFps": 58.7,
+    "p50": 16.7,
+    "p95": 16.8,
+    "p99": 33.3,
+    "max": 66.7,
+    "over33ms": 1,
+    "maxDrawCalls": 11,
+    "note": "7s: auto-rotate, slider changes every 250ms from 1s, Open at 3s"
+  },
+  "loadAvgAtEnd": 8.46
+}
