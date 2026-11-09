@@ -22,7 +22,7 @@ const subscribe = () => () => {};
 const getSearch = () => window.location.search;
 const getServerSearch = () => "";
 
-function Studio({ initial }: { initial: Spec }) {
+function Studio({ initial, base }: { initial: Spec; base: string }) {
   const [spec, setSpec] = useState(initial);
   const [art, setArt] = useState<ArtMap>(emptyArt);
   const [open, setOpen] = useState(false);
@@ -71,7 +71,7 @@ function Studio({ initial }: { initial: Spec }) {
       </div>
 
       <div className="order-1 flex flex-col gap-6 lg:order-2 lg:sticky lg:top-24 lg:self-start">
-        <div className="relative h-[380px] overflow-hidden rounded-3xl border border-[var(--line)] bg-[radial-gradient(60%_60%_at_50%_45%,color-mix(in_srgb,var(--accent)_14%,transparent),transparent_70%)] lg:h-[540px]">
+        <div className="relative h-[380px] overflow-hidden rounded-[var(--r-card)] border border-[var(--line)] bg-[radial-gradient(60%_60%_at_50%_45%,color-mix(in_srgb,var(--accent)_14%,transparent),transparent_70%)] lg:h-[540px]">
           {profile?.webgl ? (
             <PreviewScene spec={liveSpec} art={liveArt} open={open} />
           ) : (
@@ -95,14 +95,14 @@ function Studio({ initial }: { initial: Spec }) {
               type="button"
               aria-pressed={open}
               onClick={() => setOpen((o) => !o)}
-              className="absolute right-4 top-4 rounded-full border border-[var(--line)] bg-[var(--glass)] px-5 py-2.5 text-sm backdrop-blur transition-colors hover:border-[var(--fg)]"
+              className="absolute right-4 top-4 rounded-[var(--r-btn)] border border-[var(--line)] bg-[var(--glass)] px-5 py-2.5 text-sm backdrop-blur transition-colors hover:border-[var(--fg)]"
             >
               {open ? S.close : S.open}
             </button>
           )}
         </div>
 
-        <section aria-labelledby="spec-title" className="rounded-3xl border border-[var(--line)] p-6">
+        <section aria-labelledby="spec-title" className="rounded-[var(--r-card)] border border-[var(--line)] p-6">
           <h2 id="spec-title" className="eyebrow mb-4">
             {S.summaryTitle}
           </h2>
@@ -118,11 +118,11 @@ function Studio({ initial }: { initial: Spec }) {
             <button
               type="button"
               onClick={requestQuote}
-              className="inline-flex items-center justify-center rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-[var(--on-accent)] transition-colors duration-300 hover:bg-[var(--fg)]"
+              className="inline-flex items-center justify-center rounded-[var(--r-btn)] bg-[var(--accent)] px-6 py-3 text-sm font-medium text-[var(--on-accent)] transition-colors duration-300 hover:bg-[var(--fg)]"
             >
               {S.quoteButton}
             </button>
-            <Button href="/" variant="ghost">
+            <Button href={`${base}/`} variant="ghost">
               {p.back}
             </Button>
           </div>
@@ -135,8 +135,8 @@ function Studio({ initial }: { initial: Spec }) {
 }
 
 /** Reads the spec handed over from the home-page teaser (?type=&l=&w=&h=&m=&q=). */
-export default function ConfiguratorClient() {
+export default function ConfiguratorClient({ base = "" }: { base?: string }) {
   const search = useSyncExternalStore(subscribe, getSearch, getServerSearch);
   // `key` remounts the studio when the URL spec arrives after hydration.
-  return <Studio key={search} initial={specFromSearch(search)} />;
+  return <Studio key={search} initial={specFromSearch(search)} base={base} />;
 }

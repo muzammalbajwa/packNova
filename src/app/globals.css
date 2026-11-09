@@ -1,15 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  /* Theme colors (--bg, --surface, --fg, --muted, --kraft, --accent, --on-accent) are
-     generated from src/lib/palette.ts and injected in <head> by layout.tsx. */
+  /* Neutral fallback tokens (template picker). Templates override them in src/templates/<name>/tokens.css. */
+  --bg: #f5f0e8;
+  --surface: #ffffff;
+  --fg: #111318;
+  --muted: #59554d;
+  --kraft: #b8895a;
+  --kraft-ink: #8a5e30;
+  --accent: #0f5c4d;
+  --on-accent: #ffffff;
+  --r-card: 1.5rem;
+  --r-field: 0.75rem;
+  --r-btn: 9999px;
+  --f-display: ui-sans-serif, system-ui, sans-serif;
+  --f-body: ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Derived tokens are computed wherever the template's colors are defined (html and the template root). */
+:root,
+[data-template] {
   --line: color-mix(in srgb, var(--fg) 14%, transparent);
   --line-strong: color-mix(in srgb, var(--fg) 30%, transparent);
   --wash: color-mix(in srgb, var(--fg) 6%, transparent);
   --field: color-mix(in srgb, var(--fg) 5%, var(--surface));
   --glass: color-mix(in srgb, var(--bg) 78%, transparent);
-  --f-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
-  --f-body: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
 }
 
 @theme inline {
@@ -55,7 +70,7 @@ body {
 
 .font-display {
   font-family: var(--f-display);
-  font-variation-settings: "wdth" 90;
+  font-variation-settings: var(--display-variation, normal);
 }
 
 /* Scroll-reveal start state is applied by JS (lib/scroll.ts) only below the fold. */

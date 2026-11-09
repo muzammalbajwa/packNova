@@ -1,7 +1,7 @@
 /**
- * ONE source of truth for color. The CSS variables (generated into <head> by layout.tsx),
- * the 3D lights/materials/shadows and the loader all read from here. Pure data: safe to
- * import from server and client code.
+ * Color palettes. Each template (src/templates/<name>/tokens.css) writes the same hex values as CSS
+ * variables; the 3D lights, kraft, foil, shadows read them from here (`Story3DConfig.theme`).
+ * scripts/contrast.mjs checks WCAG AA and that every tokens.css matches its palette.
  */
 export type ThemeId = "a" | "b" | "c" | "d";
 
@@ -143,25 +143,6 @@ export const THEMES: Record<ThemeId, Theme> = {
 
 export const THEME_IDS = Object.keys(THEMES) as ThemeId[];
 export const DEFAULT_THEME: ThemeId = "a";
-export const THEME_STORAGE_KEY = "packnova-theme";
-
-export const isThemeId = (v: unknown): v is ThemeId => typeof v === "string" && v in THEMES;
-
-const cssBlock = (t: Theme) =>
-  `--bg:${t.bg};--surface:${t.surface};--fg:${t.fg};--muted:${t.muted};--kraft:${t.kraft};--kraft-ink:${t.kraftInk};` +
-  `--accent:${t.accent};--on-accent:${t.onAccent};color-scheme:${t.dark ? "dark" : "light"};`;
-
-/** CSS for every theme. Default theme is on :root so first paint is correct without JS. */
-export function themeCss(): string {
-  const root = `:root{${cssBlock(THEMES[DEFAULT_THEME])}}`;
-  const rest = THEME_IDS.map((id) => `:root[data-theme="${id}"]{${cssBlock(THEMES[id])}}`).join("");
-  return root + rest;
-}
-
-/** Runs in <head> before paint: picks the theme from ?theme= or localStorage. */
-export const THEME_BOOT_SCRIPT = `(function(){try{var ids=${JSON.stringify(THEME_IDS)};var d=${JSON.stringify(
-  DEFAULT_THEME,
-)};var k=${JSON.stringify(THEME_STORAGE_KEY)};var q=new URLSearchParams(location.search).get("theme");var t=null;if(q&&ids.indexOf(q)>-1){t=q;try{localStorage.setItem(k,q)}catch(e){}}else{try{t=localStorage.getItem(k)}catch(e){}}if(!t||ids.indexOf(t)<0)t=d;document.documentElement.setAttribute("data-theme",t)}catch(e){}})();`;
 
 /* ---------- contrast helpers (also used by scripts/contrast.mjs) ---------- */
 const lin = (c: number) => {

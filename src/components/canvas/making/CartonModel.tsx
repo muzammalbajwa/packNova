@@ -89,7 +89,7 @@ totalEmissiveRadiance += vec3(1.0) * band * 0.5;`,
 
 /* ---------- assets: built once per (theme, tier), disposed on change/unmount ---------- */
 
-function buildAssets(theme: Theme, low: boolean) {
+function buildAssets(theme: Theme, low: boolean, roughness: number) {
   setKraftBase(theme.kraft);
   const kraft = kraftTexture();
   kraft.repeat.set(SHEET.w / 1.3, SHEET.h / 1.3);
@@ -115,7 +115,7 @@ function buildAssets(theme: Theme, low: boolean) {
     uFoilColor: { value: new THREE.Color(theme.ink.foil) },
   };
 
-  const outer = new THREE.MeshStandardMaterial({ map: kraft, roughness: 0.9, metalness: 0 });
+  const outer = new THREE.MeshStandardMaterial({ map: kraft, roughness, metalness: 0 });
   if (!low) patchPrint(outer, uniforms);
   const inner = new THREE.MeshStandardMaterial({ map: kraft, color: "#f1e2c6", roughness: 0.95 });
   const edge = new THREE.MeshStandardMaterial({ color: new THREE.Color(theme.kraft).multiplyScalar(0.86), roughness: 0.95 });
@@ -173,7 +173,8 @@ interface Props {
 
 export default function CartonModel({ low, reducedMotion }: Props) {
   const themeId = useAppStore((s) => s.themeId);
-  const a = useMemo(() => buildAssets(THEMES[themeId], low), [themeId, low]);
+  const roughness = useAppStore((s) => s.story3d.board.roughness);
+  const a = useMemo(() => buildAssets(THEMES[themeId], low, roughness), [themeId, low, roughness]);
   useEffect(() => () => a.disposables.forEach((d) => d.dispose()), [a]);
 
   const root = useRef<THREE.Group>(null);
@@ -249,11 +250,12 @@ function update(state: RootState, dt: number, a: Assets, s: { p: number; spin: n
   const t = state.clock.elapsedTime;
 
   /* --- layout: model beside the text on wide screens, above it on narrow ones --- */
+  const cfg = useAppStore.getState().story3d;
   const vw = state.viewport.width;
   const vh = state.viewport.height;
-  const wide = vw / vh > 1.1;
-  const availW = wide ? vw * 0.42 : vw * 0.94;
-  const availH = wide ? vh * 0.8 : vh * 0.42;
+  const L = vw / vh > cfg.story.wideAspect ? cfg.story.wide : cfg.story.narrow;
+  const availW = vw * L.widthFrac;
+  const availH = vh * L.heightFrac;
   const fitFlat = Math.min(availW / SHEET.w, availH / (SHEET.h * Math.cos(TABLE_TILT)));
   // the open flaps stand ~0.9 above the carton until the lid closes, so size for that
   const fitBox = Math.min(availW / (W * 2.2), availH / ((H + 0.9) * 1.12));
@@ -262,10 +264,10 @@ function update(state: RootState, dt: number, a: Assets, s: { p: number; spin: n
   const rise = seg(p, 0, 0.1);
 
   rootG.scale.setScalar(fit);
-  rootG.position.x = wide ? vw * 0.18 : 0;
+  rootG.position.x = vw * L.offsetX;
   // flaps stand above the carton while it is open: drop it a little so they stay in frame
   const flapsUp = seg(p, 0.6, 0.7) * (1 - seg(p, 0.9, 0.93));
-  rootG.position.y = (wide ? 0 : vh * 0.2) - (1 - rise) * vh * 0.6 - 0.3 * fit * flapsUp;
+  rootG.position.y = vh * L.offsetY - (1 - rise) * vh * 0.6 - 0.3 * fit * flapsUp;
 
   const tiltAmt = seg(p, FOLD.tilt[0], FOLD.tilt[1]);
   tiltG.rotation.x = lerp(TABLE_TILT, UPRIGHT_TILT, tiltAmt);
@@ -351,8 +353,8 @@ function update(state: RootState, dt: number, a: Assets, s: { p: number; spin: n
     const boxY = -(H / 2) - 0.04;
     const y = lerp(flatY, boxY, foldAmt);
     sh.position.set(0, y, 0);
-    const sw = lerp(SHEET.w * 1.05, W * 2.1, foldAmt);
+    const sw = lerp(SHEET.w * 1.05, W * 2.1, foldAmt) * cfg.shadow.spread;
     sh.scale.set(sw, sw * 0.85, 1);
-    a.m.shadow.opacity = Math.min(1, 0.7 * a.look.shadow) * rise;
+    a.m.shadow.opacity = Math.min(1, 0.7 * a.look.shadow * cfg.shadow.opacity) * rise;
   }
 }

@@ -1,0 +1,27 @@
+/* Editorial Light: ivory paper, ink text, kraft + deep green. Colors mirror THEMES.a in lib/palette.ts. */
+:root[data-template="editorial"],
+div[data-template="editorial"] {
+  --bg: #f5f0e8;
+  --surface: #ffffff;
+  --fg: #111318;
+  --muted: #59554d;
+  --kraft: #b8895a;
+  --kraft-ink: #8a5e30;
+  --accent: #0f5c4d;
+  --on-accent: #ffffff;
+  --r-card: 0.125rem;
+  --r-field: 0.125rem;
+  --r-btn: 0.125rem;
+  --f-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --f-body: var(--font-ed-sans), ui-sans-serif, system-ui, sans-serif;
+  --display-variation: normal;
+}
+
+/* thin editorial rules and slow, soft motion */
+div[data-template="editorial"] .ed-rule {
+  border-color: var(--fg);
+  opacity: 0.9;
+}
+div[data-template="editorial"] .eyebrow {
+  letter-spacing: 0.22em;
+}

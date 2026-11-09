@@ -9,7 +9,7 @@ import QuoteHandoff from "../ui/QuoteHandoff";
 
 const f = site.quote.fields;
 const field =
-  "w-full rounded-xl border border-[var(--line)] bg-[var(--field)] px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--accent)]";
+  "w-full rounded-[var(--r-field)] border border-[var(--line)] bg-[var(--field)] px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--accent)]";
 
 /**
  * Four essentials (name, phone, what you are packing, quantity) plus an optional message.
@@ -47,7 +47,7 @@ export default function QuoteForm() {
     <form
       key={`${prefill?.product ?? ""}|${prefill?.note ?? ""}`}
       onSubmit={onSubmit}
-      className="grid gap-4 rounded-3xl bg-[var(--surface)] p-6 text-[var(--fg)] md:p-8"
+      className="grid gap-4 rounded-[var(--r-card)] bg-[var(--surface)] p-6 text-[var(--fg)] md:p-8"
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <label>
@@ -84,7 +84,7 @@ export default function QuoteForm() {
       </label>
       <button
         type="submit"
-        className="mt-1 inline-flex items-center justify-center rounded-full bg-[var(--accent)] px-8 py-4 text-base font-medium text-[var(--on-accent)] transition-colors duration-300 hover:bg-[var(--fg)]"
+        className="mt-1 inline-flex items-center justify-center rounded-[var(--r-btn)] bg-[var(--accent)] px-8 py-4 text-base font-medium text-[var(--on-accent)] transition-colors duration-300 hover:bg-[var(--fg)]"
       >
         {site.quote.submit}
       </button>

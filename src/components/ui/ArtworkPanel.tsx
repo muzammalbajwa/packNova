@@ -7,7 +7,7 @@ import { PANELS, panelLabel, type ModelId } from "@/lib/configurator";
 
 const S = site.configurator.studio;
 const field =
-  "w-full rounded-xl border border-[var(--line)] bg-[var(--field)] px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors focus:border-[var(--accent)]";
+  "w-full rounded-[var(--r-field)] border border-[var(--line)] bg-[var(--field)] px-4 py-3 text-base text-[var(--fg)] outline-none transition-colors focus:border-[var(--accent)]";
 
 /** Per-panel artwork: image upload (validated), text and a background color. */
 export default function ArtworkPanel({
@@ -56,21 +56,21 @@ export default function ArtworkPanel({
               setPicked(p);
               setError(null);
             }}
-            className={`rounded-full border px-4 py-2 text-sm transition-colors ${
+            className={`rounded-[var(--r-btn)] border px-4 py-2 text-sm transition-colors ${
               p === active
                 ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)]"
                 : "border-[var(--line)] text-[var(--fg)] hover:border-[var(--fg)]"
             }`}
           >
             {panelLabel(p)}
-            {hasArt(art[p]) && <span aria-hidden className="ml-1.5 inline-block size-1.5 rounded-full bg-current" />}
+            {hasArt(art[p]) && <span aria-hidden className="ml-1.5 inline-block size-1.5 rounded-[var(--r-btn)] bg-current" />}
           </button>
         ))}
       </div>
 
       <div className="flex flex-col gap-4">
         <div>
-          <label className="inline-flex cursor-pointer items-center gap-3 rounded-full border border-[var(--line)] px-5 py-2.5 text-sm transition-colors hover:border-[var(--fg)]">
+          <label className="inline-flex cursor-pointer items-center gap-3 rounded-[var(--r-btn)] border border-[var(--line)] px-5 py-2.5 text-sm transition-colors hover:border-[var(--fg)]">
             <input
               type="file"
               accept={ACCEPTED_TYPES.join(",")}
@@ -106,7 +106,7 @@ export default function ArtworkPanel({
                 type="button"
                 aria-pressed={a.fit === f}
                 onClick={() => patch({ fit: f })}
-                className={`rounded-full border px-4 py-2 text-xs ${
+                className={`rounded-[var(--r-btn)] border px-4 py-2 text-xs ${
                   a.fit === f ? "border-[var(--fg)] text-[var(--fg)]" : "border-[var(--line)] text-[var(--muted)]"
                 }`}
               >
@@ -134,7 +134,7 @@ export default function ArtworkPanel({
               type="color"
               value={a.textColor}
               onChange={(e) => patch({ textColor: e.target.value })}
-              className="h-11 w-full cursor-pointer rounded-xl border border-[var(--line)] bg-[var(--field)] p-1"
+              className="h-11 w-full cursor-pointer rounded-[var(--r-field)] border border-[var(--line)] bg-[var(--field)] p-1"
             />
           </label>
           <div>
@@ -145,7 +145,7 @@ export default function ArtworkPanel({
                 aria-label={S.background}
                 value={a.bg ?? "#bd9460"}
                 onChange={(e) => patch({ bg: e.target.value })}
-                className="h-11 w-16 cursor-pointer rounded-xl border border-[var(--line)] bg-[var(--field)] p-1"
+                className="h-11 w-16 cursor-pointer rounded-[var(--r-field)] border border-[var(--line)] bg-[var(--field)] p-1"
               />
               <label className="flex items-center gap-2 text-xs text-[var(--muted)]">
                 <input type="checkbox" checked={a.bg === null} onChange={(e) => patch({ bg: e.target.checked ? null : "#bd9460" })} className="accent-[var(--accent)]" />

@@ -10,7 +10,8 @@ const spec = defaultSpec("folding");
 export const storySpecLines = () =>
   specLines(spec, emptyArt()).filter((l) => !l.startsWith("Quantity") && !l.startsWith("Artwork"));
 
-export const storyConfiguratorHref = () => `/configurator/?${specToQuery(spec)}`;
+/** `base` is the template route (e.g. "/t/editorial"), so the configurator keeps the template look. */
+export const storyConfiguratorHref = (base = "") => `${base}/configurator/?${specToQuery(spec)}`;
 
 export const storyWhatsappHref = () =>
   whatsappUrl(buildQuoteText({ product: site.making.quoteProduct, spec: storySpecLines().join("\n") }));

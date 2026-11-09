@@ -14,7 +14,7 @@ interface Props {
 
 export default function Button({ href, variant = "primary", children, className = "", track: event }: Props) {
   const base =
-    "inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium transition-colors duration-300";
+    "inline-flex items-center justify-center rounded-[var(--r-btn)] px-6 py-3 text-sm font-medium transition-colors duration-300";
   const styles =
     variant === "primary"
       ? "bg-[var(--accent)] text-[var(--on-accent)] hover:bg-[var(--fg)]"

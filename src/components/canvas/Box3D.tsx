@@ -116,15 +116,16 @@ function updateFrame(
   if (Math.abs(cur.open - pose.open) + Math.abs(cur.rotY - pose.rotY) > 0.002) state.invalidate();
 
   /* layout: box sits beside the text on wide screens, above it on narrow ones */
+  const cfg = useAppStore.getState().story3d;
   const vw = state.viewport.width;
   const vh = state.viewport.height;
   const wide = vw > 4.6;
-  const fit = Math.min(0.82, vw / 3.9);
+  const fit = Math.min(0.82, vw / 3.9) * cfg.hero.scale;
   const bob = reducedMotion || detail === 0 ? 0 : Math.sin(state.clock.elapsedTime * 1.1) * 0.06;
   r.scale.setScalar(fit);
-  r.position.x = wide ? vw * 0.2 : 0;
+  r.position.x = wide ? vw * cfg.hero.offsetX : 0;
   // Group origin is the box floor; lift by half the (flaps-open) height to centre it.
-  r.position.y = (wide ? 0 : vh * 0.2) + bob - 0.62 * fit;
+  r.position.y = (wide ? 0 : vh * cfg.hero.narrowOffsetY) + bob - 0.62 * fit;
   r.rotation.y = cur.rotY + (reducedMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.5) * 0.04);
   r.rotation.x = 0.18;
 
@@ -150,11 +151,11 @@ function updateFrame(
 
   // Contact shadow lies on the ground under the box (not at a fixed world height), so on
   // light themes the box does not look like it floats. bob lifts the box, not the shadow.
-  m.shadowMat.opacity = Math.min(1, (0.9 - bob * 2) * assets.look.shadow);
+  m.shadowMat.opacity = Math.min(1, (0.9 - bob * 2) * assets.look.shadow * cfg.shadow.opacity);
   const sh = parts.shadowRef.current;
   if (sh) {
     sh.position.set(r.position.x, r.position.y - bob + 0.01, r.position.z);
-    sh.scale.setScalar((2.4 + cur.open * 0.8) * (fit / 0.82) * assets.look.shadowSpread);
+    sh.scale.setScalar((2.4 + cur.open * 0.8) * (fit / 0.82) * assets.look.shadowSpread * cfg.shadow.spread);
   }
 }
 

@@ -29,6 +29,7 @@ function Invalidator({ active }: { active: boolean }) {
 export default function MakingScene({ active }: { active: boolean }) {
   const profile = useAppStore((s) => s.profile);
   const reduced = useAppStore((s) => s.reducedMotion);
+  const cam = useAppStore((s) => s.story3d.camera);
   if (!profile) return null;
   const low = profile.tier === "low";
   const frameloop = !active ? "never" : low || reduced ? "demand" : "always";
@@ -39,7 +40,7 @@ export default function MakingScene({ active }: { active: boolean }) {
       frameloop={frameloop}
       gl={{ antialias: !low, alpha: true, powerPreference: "high-performance" }}
       // tight near/far keeps depth precision high enough that stacked flaps never z-fight
-      camera={{ position: [0, 0, 7], fov: 32, near: 3, far: 14 }}
+      camera={{ position: [0, 0, cam.z], fov: cam.fov, near: cam.z - 4, far: cam.z + 7 }}
       onCreated={(state) => {
         window.__glMaking = state.gl;
       }}

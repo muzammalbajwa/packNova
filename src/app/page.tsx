@@ -1,31 +1,18 @@
-import Experience from "@/components/Experience";
-import Configurator from "@/components/sections/Configurator";
-import Footer from "@/components/sections/Footer";
-import Hero from "@/components/sections/Hero";
-import Products from "@/components/sections/Products";
-import Process from "@/components/sections/Process";
-import MakingOf from "@/components/sections/MakingOf";
-import Quote from "@/components/sections/Quote";
-import Reviews from "@/components/sections/Reviews";
-import Marquee from "@/components/ui/Marquee";
-import Navbar from "@/components/ui/Navbar";
+import { TEMPLATE_META } from "@/templates/registry";
 
-export default function Home() {
+export default function TemplatePicker() {
   return (
-    <>
-      <Experience />
-      <Navbar />
-      <main className="relative z-10">
-        <Hero />
-        <Marquee />
-        <Products />
-        <MakingOf />
-        <Process />
-        <Reviews />
-        <Configurator />
-        <Quote />
-      </main>
-      <Footer />
-    </>
+    <main className="mx-auto max-w-5xl px-6 py-20">
+      <h1 className="text-4xl font-bold">Choose a template</h1>
+      <ul className="mt-10 grid gap-6 sm:grid-cols-2">
+        {TEMPLATE_META.map((t) => (
+          <li key={t.id} className="rounded-xl border border-[var(--line-strong)] p-6">
+            <h2 className="text-xl font-semibold">{t.name}</h2>
+            <p className="mt-2 text-[var(--muted)]">{t.blurb}</p>
+            <a href={`/t/${t.id}/?preview=1`} className="mt-4 inline-block underline">Open</a>
+          </li>
+        ))}
+      </ul>
+    </main>
   );
 }

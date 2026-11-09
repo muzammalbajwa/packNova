@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { DeviceProfile } from "./deviceTier";
 import { DEFAULT_THEME, type ThemeId } from "./palette";
+import { DEFAULT_STORY3D, type Story3DConfig } from "@/shared/story3d";
 
 interface AppState {
   profile: DeviceProfile | null;
@@ -25,6 +26,9 @@ interface AppState {
   /** Active color theme (palette.ts). 3D materials, lights and the loader follow it. */
   themeId: ThemeId;
   setThemeId: (id: ThemeId) => void;
+  /** Active template's 3D framing/light/shadow/board settings (see shared/story3d.ts). */
+  story3d: Story3DConfig;
+  setStory3D: (c: Story3DConfig) => void;
 
   setProfile: (p: DeviceProfile, reducedMotion: boolean) => void;
   setProgress: (n: number) => void;
@@ -50,6 +54,8 @@ export const useAppStore = create<AppState>((set) => ({
 
   themeId: DEFAULT_THEME,
   setThemeId: (themeId) => set({ themeId }),
+  story3d: DEFAULT_STORY3D,
+  setStory3D: (story3d) => set({ story3d, themeId: story3d.theme }),
   setProfile: (profile, reducedMotion) => set({ profile, reducedMotion }),
   setProgress: (n) => set((s) => (n > s.progress ? { progress: Math.min(100, n) } : s)),
   setReady: () => set({ ready: true, progress: 100 }),

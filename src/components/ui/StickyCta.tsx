@@ -19,9 +19,10 @@ function WhatsAppGlyph() {
  * "Get a quote" pill top right and a floating WhatsApp button bottom right. Nothing pops up,
  * nothing blocks the page. The WhatsApp number comes from content/site.ts.
  */
-export default function StickyCta() {
-  const onHome = usePathname() === "/";
-  const quoteHref = onHome ? "#quote" : "/#quote";
+export default function StickyCta({ base = "" }: { base?: string }) {
+  const path = usePathname().replace(/\/$/, "");
+  const onHome = path === base || path === "";
+  const quoteHref = onHome ? "#quote" : `${base}/#quote`;
   const wa = whatsappUrl(site.quote.messageIntro);
   const label = site.nav.cta;
 
@@ -34,7 +35,7 @@ export default function StickyCta() {
       <a
         href={quoteHref}
         onClick={quote("top-right")}
-        className="fixed right-5 top-5 z-40 hidden items-center rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-medium text-[var(--on-accent)] ring-2 ring-[var(--bg)] shadow-[0_6px_24px_-8px_rgba(0,0,0,0.45)] transition-colors duration-300 hover:bg-[var(--fg)] xl:inline-flex"
+        className="fixed right-5 top-[1.1rem] z-[60] hidden items-center rounded-[var(--r-btn)] bg-[var(--accent)] px-6 py-3 text-sm font-medium text-[var(--on-accent)] ring-2 ring-[var(--bg)] shadow-[0_6px_24px_-8px_rgba(0,0,0,0.45)] transition-colors duration-300 hover:bg-[var(--fg)] xl:inline-flex"
       >
         {label}
       </a>
@@ -45,7 +46,7 @@ export default function StickyCta() {
         aria-label="Chat on WhatsApp"
         title="Chat on WhatsApp"
         onClick={chat("float")}
-        className="fixed bottom-6 right-6 z-40 hidden size-14 place-items-center rounded-full border border-[var(--line-strong)] bg-[var(--surface)] text-[var(--fg)] shadow-[0_8px_28px_-10px_rgba(0,0,0,0.5)] transition-colors hover:border-[var(--fg)] xl:grid"
+        className="fixed bottom-6 right-6 z-40 hidden size-14 place-items-center rounded-[var(--r-btn)] border border-[var(--line-strong)] bg-[var(--surface)] text-[var(--fg)] shadow-[0_8px_28px_-10px_rgba(0,0,0,0.5)] transition-colors hover:border-[var(--fg)] xl:grid"
       >
         <WhatsAppGlyph />
       </a>
@@ -55,7 +56,7 @@ export default function StickyCta() {
         <a
           href={quoteHref}
           onClick={quote("bottom-bar")}
-          className="inline-flex h-12 flex-1 items-center justify-center rounded-full bg-[var(--accent)] text-base font-medium text-[var(--on-accent)] transition-colors hover:bg-[var(--fg)]"
+          className="inline-flex h-12 flex-1 items-center justify-center rounded-[var(--r-btn)] bg-[var(--accent)] text-base font-medium text-[var(--on-accent)] transition-colors hover:bg-[var(--fg)]"
         >
           {label}
         </a>
@@ -65,7 +66,7 @@ export default function StickyCta() {
           rel="noopener noreferrer"
           aria-label="Chat on WhatsApp"
           onClick={chat("bar")}
-          className="grid size-12 shrink-0 place-items-center rounded-full border border-[var(--line-strong)] bg-[var(--surface)] text-[var(--fg)] transition-colors hover:border-[var(--fg)]"
+          className="grid size-12 shrink-0 place-items-center rounded-[var(--r-btn)] border border-[var(--line-strong)] bg-[var(--surface)] text-[var(--fg)] transition-colors hover:border-[var(--fg)]"
         >
           <WhatsAppGlyph />
         </a>

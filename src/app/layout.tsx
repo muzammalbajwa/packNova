@@ -1,23 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import DebugOverlay from "@/components/ui/DebugOverlay";
 import { site } from "@/content/site";
-import StickyCta from "@/components/ui/StickyCta";
-import ThemeSync from "@/components/ui/ThemeSync";
-import { THEMES, DEFAULT_THEME, THEME_BOOT_SCRIPT, themeCss } from "@/lib/palette";
 import "./globals.css";
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  variable: "--font-bricolage",
-  display: "swap",
-  axes: ["wdth"],
-});
-const instrument = Instrument_Sans({
-  subsets: ["latin"],
-  variable: "--font-instrument",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.brand.url),
@@ -39,22 +23,17 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: THEMES[DEFAULT_THEME].bg,
+  themeColor: "#F5F0E8",
   width: "device-width",
   initialScale: 1,
 };
 
+// Fonts, colors and layout belong to the templates (src/templates/<name>); the root only provides the shell.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={site.lang} dir={site.dir} className={`${bricolage.variable} ${instrument.variable}`} suppressHydrationWarning>
-      <head>
-        <style dangerouslySetInnerHTML={{ __html: themeCss() }} />
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
-      </head>
-      <body className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))] antialiased xl:pb-0">
+    <html lang={site.lang} dir={site.dir} suppressHydrationWarning>
+      <body className="min-h-dvh antialiased">
         {children}
-        <StickyCta />
-        <ThemeSync />
         <DebugOverlay />
       </body>
     </html>
