@@ -1,3 +1,4 @@
+import TrackedA from "../ui/TrackedA";
 import { site } from "@/content/site";
 import ProductIcon from "../ui/ProductIcon";
 
@@ -19,12 +20,12 @@ export default function Products() {
         <ul className="mt-16 grid gap-px overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--line)] sm:grid-cols-2 lg:grid-cols-3">
           {products.items.map((p, i) => (
             <li key={p.id} className="group relative bg-[var(--bg)]">
-              <a href="#quote" data-reveal className="relative block h-full overflow-hidden p-8 md:p-10">
+              <TrackedA href="#quote" event="product_card_quote" data={{ product: p.id }} prefill={{ product: p.name }} data-reveal className="relative block h-full overflow-hidden p-8 md:p-10">
                 {/* kraft wash that wipes up on hover */}
                 <span className="absolute inset-0 translate-y-full bg-[var(--accent)] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:translate-y-0" />
                 <span className="relative flex h-full flex-col transition-colors duration-500 group-hover:text-[var(--on-accent)]">
                   <span className="flex items-start justify-between">
-                    <span className="text-sm tabular-nums text-[var(--muted)] transition-colors duration-500 group-hover:text-[var(--on-accent)]/60">
+                    <span className="text-sm tabular-nums text-[var(--muted)] transition-colors duration-500 group-hover:text-[var(--on-accent)]">
                       0{i + 1}
                     </span>
                     <span className="size-24 text-[var(--kraft-ink)] transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:-translate-y-2 group-hover:rotate-[-4deg] group-hover:text-[var(--on-accent)] md:size-28">
@@ -49,7 +50,7 @@ export default function Products() {
                     ))}
                   </span>
                 </span>
-              </a>
+              </TrackedA>
             </li>
           ))}
         </ul>

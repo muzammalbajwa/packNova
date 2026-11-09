@@ -43,7 +43,7 @@ export default function Navbar({ fromHome = true }: { fromHome?: boolean }) {
             </li>
           ))}
         </ul>
-        <Button href={fromHome ? "#quote" : "/#quote"} className="!px-5 !py-2.5">
+        <Button href={fromHome ? "#quote" : "/#quote"} className="!px-5 !py-2.5" track="nav_quote">
           {site.nav.cta}
         </Button>
       </nav>

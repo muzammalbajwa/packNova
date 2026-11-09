@@ -8,6 +8,7 @@ import ProductIcon from "@/components/ui/ProductIcon";
 import QuoteHandoff from "@/components/ui/QuoteHandoff";
 import SpecControls from "@/components/ui/SpecControls";
 import { site } from "@/content/site";
+import { track } from "@/lib/track";
 import { emptyArt, type ArtMap } from "@/lib/artwork";
 import { OPENABLE, specFromSearch, specLines, type Spec } from "@/lib/configurator";
 import { detectDevice } from "@/lib/deviceTier";
@@ -43,6 +44,7 @@ function Studio({ initial }: { initial: Spec }) {
   }, []);
 
   const requestQuote = () => {
+    track("configurator_request_quote", { model: spec.model });
     const text = buildQuoteText({ product: item?.name, quantity: spec.quantity.toLocaleString("en-US"), spec: lines.join("\n") });
     setHandoff(text);
     window.open(whatsappUrl(text), "_blank", "noopener,noreferrer");

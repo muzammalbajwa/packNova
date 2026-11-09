@@ -172,6 +172,18 @@ const en = {
     ],
   },
 
+  /**
+   * Real customer reviews and client names ONLY. Both lists are empty on purpose: the section
+   * renders nothing until you add real entries (with permission to publish them).
+   * Never add invented testimonials, statistics, client logos or certifications.
+   */
+  reviews: {
+    eyebrow: "Clients and reviews",
+    heading: "What our customers say.",
+    items: [] as { quote: string; name: string; role?: string }[],
+    clients: [] as { name: string; logo?: string }[],
+  },
+
   configurator: {
     eyebrow: "Configurator",
     heading: "Your box, your size.",
@@ -234,7 +246,7 @@ const en = {
       product: "What are you packing?",
       productPlaceholder: "Choose a product",
       quantity: "Quantity",
-      message: "Anything else we should know?",
+      message: "Anything else we should know? (optional)",
     },
     submit: "Send request",
     success: {

@@ -6,6 +6,7 @@ import Products from "@/components/sections/Products";
 import Process from "@/components/sections/Process";
 import MakingOf from "@/components/sections/MakingOf";
 import Quote from "@/components/sections/Quote";
+import Reviews from "@/components/sections/Reviews";
 import Marquee from "@/components/ui/Marquee";
 import Navbar from "@/components/ui/Navbar";
 
@@ -20,6 +21,7 @@ export default function Home() {
         <Products />
         <MakingOf />
         <Process />
+        <Reviews />
         <Configurator />
         <Quote />
       </main>

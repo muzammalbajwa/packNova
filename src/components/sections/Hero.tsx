@@ -52,8 +52,8 @@ export default function Hero() {
           </h1>
           <p className="mt-6 max-w-md text-lg leading-relaxed text-[var(--muted)]">{hero.sub}</p>
           <div className="mt-9 flex flex-wrap gap-3">
-            <Button href={resolveHref(hero.primary)}>{hero.primary.label}</Button>
-            <Button href={resolveHref(hero.secondary)} variant="ghost">
+            <Button href={resolveHref(hero.primary)} track="hero_primary">{hero.primary.label}</Button>
+            <Button href={resolveHref(hero.secondary)} variant="ghost" track="hero_secondary">
               {hero.secondary.label}
             </Button>
           </div>

@@ -25,7 +25,7 @@ export default function Configurator() {
         <div data-reveal className="flex flex-col gap-7">
           <SpecControls spec={spec} onChange={setSpec} />
           <div className="border-t border-[var(--line)] pt-6">
-            <Button href={`/configurator/?${specToQuery(spec)}`}>{c.cta}</Button>
+            <Button href={`/configurator/?${specToQuery(spec)}`} track="configurator_teaser">{c.cta}</Button>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { site } from "@/content/site";
+import TrackedA from "../ui/TrackedA";
 import QuoteForm from "./QuoteForm";
 
 export default function Quote() {
@@ -16,13 +17,14 @@ export default function Quote() {
           >
             {q.heading}
           </h2>
-          <a
+          <TrackedA
+            event="quote_section_whatsapp"
             data-reveal
             href={site.contact.whatsappHref}
             className="mt-8 inline-flex items-center gap-2 border-b border-[color-mix(in_srgb,var(--on-accent)_50%,transparent)] pb-0.5 text-base font-medium transition-colors hover:border-[var(--on-accent)]"
           >
             {q.whatsappCta}: {site.contact.whatsapp} →
-          </a>
+          </TrackedA>
           <ul data-reveal className="mt-6 space-y-1 text-sm font-medium opacity-80">
             <li>
               <a href={site.contact.phoneHref}>{site.contact.phone}</a>

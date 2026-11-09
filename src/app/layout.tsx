@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import DebugOverlay from "@/components/ui/DebugOverlay";
 import { site } from "@/content/site";
+import StickyCta from "@/components/ui/StickyCta";
 import ThemeSync from "@/components/ui/ThemeSync";
 import { THEMES, DEFAULT_THEME, THEME_BOOT_SCRIPT, themeCss } from "@/lib/palette";
 import "./globals.css";
@@ -50,8 +51,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <style dangerouslySetInnerHTML={{ __html: themeCss() }} />
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
-      <body className="min-h-dvh antialiased">
+      <body className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))] antialiased xl:pb-0">
         {children}
+        <StickyCta />
         <ThemeSync />
         <DebugOverlay />
       </body>
