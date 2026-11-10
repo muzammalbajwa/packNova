@@ -9,7 +9,7 @@ import QuoteHandoff from "@/components/ui/QuoteHandoff";
 import SpecControls from "@/components/ui/SpecControls";
 import { site } from "@/content/site";
 import { track } from "@/lib/track";
-import { emptyArt, type ArtMap } from "@/lib/artwork";
+import { emptyArt, type ArtMap } from "@/lib/artwork-data";
 import { OPENABLE, specFromSearch, specLines, type Spec } from "@/lib/configurator";
 import { detectDevice } from "@/lib/deviceTier";
 import { buildQuoteText, whatsappUrl } from "@/lib/quoteMessage";

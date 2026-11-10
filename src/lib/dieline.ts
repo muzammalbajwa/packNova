@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { site } from "@/content/site";
 import { makeCanvas, mulberry32 } from "./textures";
-import { FOLD } from "./making";
+import { BOX_CM, FOLD } from "./making";
 import type { Theme } from "./palette";
 
 /**
@@ -22,16 +22,15 @@ import type { Theme } from "./palette";
  * local x axis, every bottom flap +90deg, because "inward" is local -z for all of them.
  * `lift` stacks overlapping flaps: outermost layer 0, each inner layer more negative.
  */
-export const W = 1.2;
-export const H = 1.8;
-export const D = 0.6;
+export const W = BOX_CM.l / 10;
+export const H = BOX_CM.h / 10;
+export const D = BOX_CM.w / 10;
 const GL = 0.26; // glue flap width
 const DF = 0.3; // dust flap length
 const TAB = 0.3; // tuck tab length
 const T = 0.014; // board thickness
 const M = 0.3; // sheet margin around the dieline (becomes waste)
 
-export const BOX_CM = { l: W * 10, w: D * 10, h: H * 10 } as const;
 
 export type PanelId =
   | "front" | "left" | "back" | "right" | "glue"
@@ -154,7 +153,7 @@ const tex = (c: HTMLCanvasElement) => {
 function printColors(t: Theme) {
   // dark themes print a lifted ink block (the plain surface color would vanish against the page background)
   return t.dark
-    ? { block: new THREE.Color(t.surface).lerp(new THREE.Color("#ffffff"), 0.14).getStyle(), mark: t.accent, text: t.fg, stripe: t.accent }
+    ? { block: t.printBlock ?? new THREE.Color(t.surface).lerp(new THREE.Color("#ffffff"), 0.14).getStyle(), mark: t.accent, text: t.fg, stripe: t.accent }
     : { block: t.accent, mark: t.onAccent, text: t.onAccent, stripe: t.kraft };
 }
 

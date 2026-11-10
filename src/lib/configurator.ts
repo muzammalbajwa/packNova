@@ -1,5 +1,5 @@
 import { site } from "@/content/site";
-import { ALL_PANELS, hasArt, type ArtMap, type Panel } from "./artwork";
+import { ALL_PANELS, hasArt, type ArtMap, type Panel } from "./artwork-data";
 
 export type ModelId = "carton" | "folding" | "rigid" | "pouch" | "courier" | "paperbag";
 export type MaterialId = "kraft" | "white" | "black";

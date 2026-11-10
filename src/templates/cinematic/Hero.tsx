@@ -14,7 +14,7 @@ export default function Hero({ base }: { base: string }) {
       posterClassName="left-1/2 top-[58%] w-[min(86vw,620px)] -translate-x-1/2 -translate-y-1/2 max-md:top-[44%]"
       behind={<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_45%_at_50%_58%,color-mix(in_srgb,var(--accent)_20%,transparent),transparent_72%)]" />}
     >
-      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center px-6 pb-12 pt-[16vh] text-center">
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center px-6 pb-28 pt-[16vh] text-center md:pb-12">
         <p className="eyebrow" data-og-eyebrow>{hero.eyebrow}</p>
         <h1 className="font-display mt-5 text-[clamp(3.2rem,11vw,10rem)] font-extrabold leading-[0.86] tracking-[-0.045em]">
           {before}

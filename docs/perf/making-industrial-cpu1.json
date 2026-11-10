@@ -1,0 +1,29 @@
+{
+  "when": "2026-11-10T08:15:49.266Z",
+  "template": "industrial",
+  "gpu": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+  "cpuThrottle": 1,
+  "mobile": false,
+  "tier": "mid",
+  "seconds": 24,
+  "loadAverageAtStart": 3.46,
+  "loadAverageAtEnd": 4.56,
+  "initialJs": {
+    "files": 10,
+    "rawKB": 1601.9,
+    "gzipKB": 454.1,
+    "budgetKB": 300
+  },
+  "lazyMakingChunksGzipKB": 3.4,
+  "makingOf": {
+    "frames": 1438,
+    "avgFps": 59.9,
+    "p95ms": 16.7,
+    "p99ms": 16.8,
+    "maxMs": 50,
+    "over33ms": 1,
+    "over33pct": 0.1,
+    "maxDrawCalls": 83,
+    "maxTriangles": 176
+  }
+}

@@ -1,6 +1,6 @@
 import { site } from "@/content/site";
 import { defaultSpec, specLines, specToQuery } from "./configurator";
-import { emptyArt } from "./artwork";
+import { emptyArt } from "./artwork-data";
 import { buildQuoteText, whatsappUrl } from "./quoteMessage";
 
 /** The carton shown in the making-of story is the configurator's default folding carton (12 x 6 x 18 cm). */

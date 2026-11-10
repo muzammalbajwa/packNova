@@ -1,0 +1,44 @@
+/* Playful Eco: deep green, lime stickers, big rounded shapes. Colors mirror THEMES.c in lib/palette.ts. */
+:root[data-template="eco"],
+div[data-template="eco"] {
+  --bg: #0e1f1a;
+  --surface: #15302a;
+  --fg: #f2efe6;
+  --muted: #9db3a9;
+  --kraft: #c8a27a;
+  --kraft-ink: #c8a27a;
+  --accent: #c6f24e;
+  --on-accent: #0e1f1a;
+  --r-card: 2rem;
+  --r-field: 1.1rem;
+  --r-btn: 9999px;
+  --f-display: var(--font-outfit), ui-rounded, system-ui, sans-serif;
+  --f-body: var(--font-nunito), ui-rounded, system-ui, sans-serif;
+  --display-variation: normal;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+div[data-template="eco"] .blob {
+  border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%;
+}
+@keyframes eco-wobble {
+  0%, 100% { transform: rotate(-4deg) scale(1); }
+  50% { transform: rotate(3deg) scale(1.04); }
+}
+@keyframes eco-morph {
+  0%, 100% { border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%; }
+  50% { border-radius: 40% 60% 42% 58% / 58% 40% 60% 42%; }
+}
+div[data-template="eco"] .sticker {
+  animation: eco-wobble 5s ease-in-out infinite;
+}
+div[data-template="eco"] .morph {
+  animation: eco-morph 14s ease-in-out infinite;
+}
+@keyframes eco-pop {
+  0% { transform: translateY(14px) scale(0.92); opacity: 0; }
+  100% { transform: none; opacity: 1; }
+}
+div[data-template="eco"] .pop {
+  animation: eco-pop 0.55s var(--spring) both;
+}

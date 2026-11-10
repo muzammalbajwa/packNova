@@ -5,7 +5,7 @@ export const config: Story3DConfig = {
   theme: "b",
   camera: { z: 7, fov: 30 },
   story: {
-    wide: { offsetX: 0, offsetY: 0.19, widthFrac: 0.5, heightFrac: 0.62 },
+    wide: { offsetX: 0, offsetY: 0.17, widthFrac: 0.55, heightFrac: 0.7 },
     narrow: { offsetX: 0, offsetY: 0.2, widthFrac: 0.9, heightFrac: 0.42 },
     wideAspect: 1.1,
   },

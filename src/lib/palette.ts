@@ -36,6 +36,8 @@ export interface Theme {
   accent: string;
   /** Text/icon color to put ON the accent color (buttons, accent sections). */
   onAccent: string;
+  /** Dark themes: ink block color printed on the carton (kept clearly lighter than the page background). */
+  printBlock?: string;
   /** Material/process colors used by the making-of story (foil, die lines, steel press). */
   ink: ProcessInk;
   scene: SceneLook;
@@ -106,6 +108,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     kraftInk: "#C9A574",
     accent: "#E8B04B",
     onAccent: "#0B1220",
+    printBlock: "#26385c",
     ink: PROCESS_INK,
     scene: { ...DARK_SCENE, rimColor: "#ffc766" },
   },
@@ -121,6 +124,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     kraftInk: "#C8A27A",
     accent: "#C6F24E",
     onAccent: "#0E1F1A",
+    printBlock: "#2e5d45",
     ink: PROCESS_INK,
     scene: { ...DARK_SCENE, rimColor: "#c6f24e", rim: 1.1 },
   },

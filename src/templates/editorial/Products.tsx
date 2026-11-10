@@ -26,7 +26,7 @@ export default function Products() {
               >
                 <div className="flex items-start justify-between">
                   <span className="font-display text-8xl font-extralight italic leading-none text-[var(--kraft-ink)]">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="size-20 text-[var(--kraft-ink)] transition-transform duration-700 group-hover:-translate-y-1">
+                  <span className="ed-icon size-20 text-[var(--kraft-ink)] transition-colors duration-700 group-hover:text-[var(--accent)]">
                     <ProductIcon kind={p.icon} />
                   </span>
                 </div>

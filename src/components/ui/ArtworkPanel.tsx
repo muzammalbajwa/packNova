@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { site } from "@/content/site";
-import { ACCEPTED_TYPES, hasArt, loadArtwork, emptyPanel, type ArtMap, type Panel } from "@/lib/artwork";
+import { ACCEPTED_TYPES, hasArt, loadArtwork, emptyPanel, type ArtMap, type Panel } from "@/lib/artwork-data";
 import { PANELS, panelLabel, type ModelId } from "@/lib/configurator";
 
 const S = site.configurator.studio;

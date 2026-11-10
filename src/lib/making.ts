@@ -54,5 +54,8 @@ export const FOLD = {
   tab: [0.9, 0.92],
 } as const;
 
+/** Size of the carton in the story, in cm (12 x 6 x 18 = the configurator's default folding carton). Three-free so UI code can import it. */
+export const BOX_CM = { l: 12, w: 6, h: 18 } as const;
+
 /** Page-level scroll length of the pinned section. */
 export const SCROLL_VH = { desktop: 700, mobile: 450 } as const;

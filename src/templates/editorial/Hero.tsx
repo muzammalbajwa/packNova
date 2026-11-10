@@ -13,7 +13,7 @@ export default function Hero({ base }: { base: string }) {
       posterAlt={hero.posterAlt}
       posterClassName="w-[min(78vw,540px)] max-md:left-1/2 max-md:top-[30%] max-md:-translate-x-1/2 max-md:-translate-y-1/2 md:right-[5vw] md:top-1/2 md:-translate-y-1/2"
     >
-      <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-6 pb-14 pt-24 md:justify-center md:pb-0">
+      <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-6 pb-28 pt-24 md:justify-center md:pb-0">
         <div className="flex items-center gap-4 border-t border-[var(--fg)] pt-3 md:max-w-[52%]">
           <span className="font-display text-sm italic">No. 01</span>
           <p className="eyebrow" data-og-eyebrow>

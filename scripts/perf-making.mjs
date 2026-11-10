@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Frame stats for the making-of section on the production export, plus initial JS size and draw calls.
 // Usage: npm run build && npm run serve:out   (other terminal)
-//        node scripts/perf-making.mjs [--base http://localhost:8080] [--cpu 1|4] [--seconds 24] [--mobile] [--tier low|mid|high]
+//        node scripts/perf-making.mjs --template editorial [--base http://localhost:8080] [--cpu 1|4] [--seconds 24] [--mobile] [--tier low|mid|high]
 // Run on a QUIET machine: it refuses to start if the 1-minute load average is above 4 (use --force to override).
 import { writeFileSync, mkdirSync } from "node:fs";
 import { loadavg } from "node:os";
@@ -10,6 +10,7 @@ import { launch, sleep } from "./lib/cdp.mjs";
 
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://localhost:8080");
+const TEMPLATE = arg("template", "editorial");
 const CPU = Number(arg("cpu", 1));
 const SECONDS = Number(arg("seconds", 24));
 const MOBILE = process.argv.includes("--mobile");
@@ -22,7 +23,7 @@ if (load0 > 4 && !process.argv.includes("--force")) {
 
 const c = await launch(MOBILE ? { width: 412, height: 915, dpr: 2, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
 await c.send("Network.enable");
-await c.send("Page.navigate", { url: `${BASE}/?theme=a${TIER ? `&tier=${TIER}` : ""}` });
+await c.send("Page.navigate", { url: `${BASE}/t/${TEMPLATE}/?${TIER ? `tier=${TIER}` : ""}` });
 await c.waitFor("window.__r3f && !document.querySelector('[role=status]') && document.querySelector('canvas')", 90000);
 await sleep(1500);
 
@@ -65,14 +66,14 @@ const stats = JSON.parse(await c.ev(`(async () => {
 })()`));
 
 const out = {
-  when: new Date().toISOString(), gpu, cpuThrottle: CPU, mobile: MOBILE, tier: TIER || "auto", seconds: SECONDS,
+  when: new Date().toISOString(), template: TEMPLATE, gpu, cpuThrottle: CPU, mobile: MOBILE, tier: TIER || "auto", seconds: SECONDS,
   loadAverageAtStart: load0, loadAverageAtEnd: +loadavg()[0].toFixed(2),
   initialJs: { files: new Set(scripts).size, rawKB: +(raw / 1024).toFixed(1), gzipKB: +(gz / 1024).toFixed(1), budgetKB: 300 },
   lazyMakingChunksGzipKB: +(lazyGz / 1024).toFixed(1),
   makingOf: stats,
 };
 mkdirSync("docs/perf", { recursive: true });
-const file = `docs/perf/making-cpu${CPU}${MOBILE ? "-mobile" : ""}.json`;
+const file = `docs/perf/making-${TEMPLATE}-cpu${CPU}${MOBILE ? "-mobile" : ""}.json`;
 writeFileSync(file, JSON.stringify(out, null, 2));
 console.log(JSON.stringify(out, null, 2), "\nwrote", file);
 c.kill(); process.exit(0);
