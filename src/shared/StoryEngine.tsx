@@ -166,7 +166,8 @@ function Pinned({ base, canvasClassName, stickyClassName = "", behind, overlay: 
       // keep in sync with SCROLL_VH in lib/making.ts (Tailwind needs literal class names)
       className="relative z-10 h-[450vh] md:h-[700vh]"
     >
-      <div ref={stickyRef} data-stage={stage} className={`sticky top-0 h-dvh overflow-hidden ${stickyClassName}`} style={{ ["--p" as string]: 0 }}>
+      <div ref={stickyRef} data-stage={stage} // opaque: the fixed hero canvas (the closed box) must never show through behind the story
+      className={`sticky top-0 h-dvh overflow-hidden bg-[var(--bg)] ${stickyClassName}`} style={{ ["--p" as string]: 0 }}>
         {behind}
         {mounted || live.inView ? (
           <div className={canvasClassName}>
