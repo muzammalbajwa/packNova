@@ -19,8 +19,9 @@ export async function launch({ width = 1440, height = 900, dpr = 1, mobile = fal
   }
   const ws = new WebSocket(json.webSocketDebuggerUrl);
   await new Promise((r, j) => { ws.onopen = r; ws.onerror = j; });
-  let id = 0; const pending = new Map();
-  ws.onmessage = (m) => { const d = JSON.parse(m.data); if (d.id && pending.has(d.id)) { const p = pending.get(d.id); pending.delete(d.id); d.error ? p.j(new Error(d.error.message)) : p.r(d.result); } };
+  let id = 0; const pending = new Map(); const listeners = new Map();
+  const on = (method, cb) => { listeners.set(method, [...(listeners.get(method) ?? []), cb]); };
+  ws.onmessage = (m) => { const d = JSON.parse(m.data); if (d.method) (listeners.get(d.method) ?? []).forEach((cb) => cb(d.params)); if (d.id && pending.has(d.id)) { const p = pending.get(d.id); pending.delete(d.id); d.error ? p.j(new Error(d.error.message)) : p.r(d.result); } };
   const send = (method, params = {}) => new Promise((r, j) => { const i = ++id; pending.set(i, { r, j }); ws.send(JSON.stringify({ id: i, method, params })); });
   const ev = async (expression) => { const r = await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true }); if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description); return r.result.value; };
   const waitFor = async (expr, ms = 60000) => { const t = Date.now(); while (Date.now() - t < ms) { try { if (await ev(expr)) return true; } catch {} await sleep(250); } return false; };
@@ -31,5 +32,5 @@ export async function launch({ width = 1440, height = 900, dpr = 1, mobile = fal
     await send("Emulation.setUserAgentOverride", { userAgent: "Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36" });
   }
   if (cores) await send("Emulation.setHardwareConcurrencyOverride", { hardwareConcurrency: cores });
-  return { send, ev, waitFor, kill };
+  return { send, ev, waitFor, kill, on };
 }

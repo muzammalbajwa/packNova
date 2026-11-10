@@ -17,10 +17,10 @@ export default function Products() {
               event="product_card_quote"
               data={{ product: p.id }}
               prefill={{ product: p.name }}
-              className="group grid items-center gap-x-6 gap-y-3 px-4 py-6 transition-colors duration-150 hover:bg-[var(--accent)] hover:text-[var(--on-accent)] md:grid-cols-[4rem_5rem_1.2fr_1.6fr_1.2fr] md:px-6"
+              className="group grid items-center gap-x-6 gap-y-3 px-4 py-6 transition-[background-color,color,transform,box-shadow] duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[var(--accent)] hover:text-[var(--on-accent)] hover:shadow-[4px_4px_0_var(--fg)] focus-visible:bg-[var(--accent)] focus-visible:text-[var(--on-accent)] md:grid-cols-[4rem_5rem_1.2fr_1.6fr_1.2fr] md:px-6"
             >
               <span className="mono text-sm text-[var(--accent)] group-hover:text-[var(--on-accent)]">{String(i + 1).padStart(2, "0")}</span>
-              <span className="size-14 text-[var(--kraft-ink)] group-hover:text-[var(--on-accent)]"><ProductIcon kind={p.icon} /></span>
+              <span className="size-14 text-[var(--kraft-ink)] group-hover:text-[var(--on-accent)] group-hover:[--pi-accent:var(--on-accent)] group-focus-visible:[--pi-accent:var(--on-accent)]"><ProductIcon kind={p.icon} /></span>
               <span>
                 <span className="font-display block text-2xl font-bold uppercase tracking-tight">{p.name}</span>
                 <span className="mono text-xs text-[var(--muted)] group-hover:text-[var(--on-accent)]">{p.spec}</span>

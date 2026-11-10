@@ -22,11 +22,11 @@ export default function Products() {
                 event="product_card_quote"
                 data={{ product: p.id }}
                 prefill={{ product: p.name }}
-                className="group block"
+                className="group block transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(.2,.8,.2,1)] hover:-translate-y-1 hover:shadow-[0_22px_30px_-24px_rgba(17,19,24,0.5)] focus-visible:-translate-y-1 focus-visible:shadow-[0_22px_30px_-24px_rgba(17,19,24,0.5)]"
               >
                 <div className="flex items-start justify-between">
                   <span className="font-display text-8xl font-extralight italic leading-none text-[var(--kraft-ink)]">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="ed-icon size-20 text-[var(--kraft-ink)] transition-colors duration-700 group-hover:text-[var(--accent)]">
+                  <span className="size-20 text-[var(--kraft-ink)] transition-colors duration-700 group-hover:text-[var(--accent)] group-focus-visible:text-[var(--accent)]">
                     <ProductIcon kind={p.icon} />
                   </span>
                 </div>

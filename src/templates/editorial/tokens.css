@@ -25,22 +25,3 @@ div[data-template="editorial"] .ed-rule {
 div[data-template="editorial"] .eyebrow {
   letter-spacing: 0.22em;
 }
-
-/* product icons: lift off, tilt, then float gently while the card is hovered or focused */
-@keyframes ed-icon-float {
-  0% { transform: translateY(0) rotate(0deg) scale(1); }
-  35% { transform: translateY(-10px) rotate(-7deg) scale(1.08); }
-  70% { transform: translateY(-6px) rotate(4deg) scale(1.06); }
-  100% { transform: translateY(-9px) rotate(-3deg) scale(1.07); }
-}
-div[data-template="editorial"] .ed-icon {
-  display: block;
-  transform-origin: 50% 80%;
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), color 0.7s;
-  will-change: transform;
-}
-div[data-template="editorial"] .group:hover .ed-icon,
-div[data-template="editorial"] .group:focus-visible .ed-icon {
-  animation: ed-icon-float 1.6s cubic-bezier(0.22, 1, 0.36, 1) infinite alternate;
-  filter: drop-shadow(0 10px 8px rgb(17 19 24 / 0.18));
-}

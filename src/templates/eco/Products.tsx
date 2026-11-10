@@ -18,7 +18,7 @@ export default function Products() {
                 event="product_card_quote"
                 data={{ product: p.id }}
                 prefill={{ product: p.name }}
-                className="group relative flex h-full flex-col rounded-[var(--r-card)] bg-[var(--surface)] p-7 transition-transform duration-500 [transition-timing-function:var(--spring)] hover:-translate-y-2 hover:rotate-[-1deg]"
+                className="group relative flex h-full flex-col rounded-[var(--r-card)] bg-[var(--surface)] p-7 transition-transform duration-500 [transition-timing-function:var(--spring)] hover:-translate-y-2 hover:rotate-[-1deg] hover:shadow-[0_26px_36px_-22px_rgba(0,0,0,0.7)] focus-visible:-translate-y-2"
               >
                 <span className="absolute -top-3 left-6 grid size-10 place-items-center rounded-full bg-[var(--accent)] font-display text-lg font-extrabold text-[var(--on-accent)] [transition-timing-function:var(--spring)] group-hover:rotate-12">{i + 1}</span>
                 <span className="blob mx-auto mt-4 grid size-32 place-items-center bg-[var(--bg)] text-[var(--accent)] transition-transform duration-500 [transition-timing-function:var(--spring)] group-hover:scale-110 group-hover:-rotate-6">

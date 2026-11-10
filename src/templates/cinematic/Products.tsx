@@ -20,7 +20,7 @@ export default function Products() {
                 event="product_card_quote"
                 data={{ product: p.id }}
                 prefill={{ product: p.name }}
-                className="glass group relative flex h-full flex-col overflow-hidden rounded-[var(--r-card)] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[var(--accent)]"
+                className="glass group relative flex h-full flex-col overflow-hidden rounded-[var(--r-card)] p-7 transition-all duration-500 ease-[cubic-bezier(.2,.8,.2,1)] hover:-translate-y-1 hover:border-[var(--accent)] hover:shadow-[0_26px_40px_-22px_rgba(0,0,0,0.7)] focus-visible:-translate-y-1 focus-visible:border-[var(--accent)]"
               >
                 <span className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-[var(--accent)] opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-25" />
                 <span className="flex items-start justify-between">
