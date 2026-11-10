@@ -13,7 +13,7 @@ export default function Products() {
           {products.heading}
         </h2>
         <ul className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {products.items.map((p, i) => (
+          {products.items.map((p) => (
             <li key={p.id} data-reveal>
               <TrackedA
                 href="#quote"
@@ -23,9 +23,8 @@ export default function Products() {
                 className="glass group relative flex h-full flex-col overflow-hidden rounded-[var(--r-card)] p-7 transition-all duration-500 ease-[cubic-bezier(.2,.8,.2,1)] hover:-translate-y-1 hover:border-[var(--accent)] hover:shadow-[0_26px_40px_-22px_rgba(0,0,0,0.7)] focus-visible:-translate-y-1 focus-visible:border-[var(--accent)]"
               >
                 <span className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-[var(--accent)] opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-25" />
-                <span className="flex items-start justify-between">
-                  <span className="text-sm tabular-nums text-[var(--muted)]">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="size-20 text-[var(--accent)]">
+                <span className="flex h-36 items-center justify-center">
+                  <span className="size-32 text-[var(--accent)]">
                     <ProductIcon kind={p.icon} />
                   </span>
                 </span>

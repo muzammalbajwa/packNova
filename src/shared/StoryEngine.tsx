@@ -92,16 +92,27 @@ function Pinned({ base, canvasClassName, stickyClassName = "", behind, overlay: 
   const [cta, setCta] = useState(false);
   const links = useStoryLinks(base);
 
-  // "near" mounts the canvas shortly before the section; "live" renders only while it is on screen.
-  const near = useInView({ rootMargin: "100% 0px" });
+  // The canvas is mounted (and its shaders/textures warmed) in idle time right after the page is ready,
+  // long before the user can reach the section. "live" only switches it to continuous rendering.
+  const ready = useAppStore((s) => s.ready);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    if (!ready) return;
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (h: number) => void };
+    if (w.requestIdleCallback) {
+      const h = w.requestIdleCallback(() => setMounted(true), { timeout: 1200 });
+      return () => w.cancelIdleCallback?.(h);
+    }
+    const h = window.setTimeout(() => setMounted(true), 300);
+    return () => window.clearTimeout(h);
+  }, [ready]);
   const live = useInView({ rootMargin: "0px" });
   const setRefs = useCallback(
     (node: HTMLElement | null) => {
       sectionRef.current = node;
-      near.ref(node);
       live.ref(node);
     },
-    [near, live],
+    [live],
   );
 
   useEffect(() => {
@@ -157,7 +168,7 @@ function Pinned({ base, canvasClassName, stickyClassName = "", behind, overlay: 
     >
       <div ref={stickyRef} data-stage={stage} className={`sticky top-0 h-dvh overflow-hidden ${stickyClassName}`} style={{ ["--p" as string]: 0 }}>
         {behind}
-        {near.inView || live.inView ? (
+        {mounted || live.inView ? (
           <div className={canvasClassName}>
             <MakingScene active={live.inView} />
           </div>

@@ -49,8 +49,9 @@ function Overlay(api: StoryApi) {
               <div
                 key={c.step}
                 aria-hidden={!active}
-                className={`absolute inset-x-0 top-0 transition-all duration-1000 ease-[cubic-bezier(.22,1,.36,1)] ${
-                  active ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
+                className={`absolute inset-x-0 top-0 ${
+                  // the outgoing caption is hidden at once (no cross-fade), only the incoming one eases in
+                  active ? "translate-y-0 opacity-100 transition-all duration-300 ease-out" : "pointer-events-none invisible translate-y-4 opacity-0"
                 }`}
               >
                 {i === stages.length - 1 && cta ? (

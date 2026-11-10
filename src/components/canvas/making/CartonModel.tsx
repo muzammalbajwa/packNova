@@ -12,7 +12,6 @@ import {
 } from "@/lib/dieline";
 import { contactShadowTexture, kraftTexture, setKraftBase } from "@/lib/textures";
 
-const damp = THREE.MathUtils.damp;
 const lerp = THREE.MathUtils.lerp;
 
 /* ---------- print / sheen / foil shader patch (mid and high tiers) ---------- */
@@ -241,10 +240,8 @@ function update(state: RootState, dt: number, a: Assets, s: { p: number; spin: n
   const yawG = r.yaw.current;
   if (!rootG || !sheetG || !tiltG || !yawG) return;
 
-  const target = useAppStore.getState().makingProgress;
-  s.p = damp(s.p, target, reduced ? 60 : 7, dt);
-  // keep rendering in frameloop="demand" until the damped value has caught up
-  if (Math.abs(s.p - target) > 0.0004) state.invalidate();
+  // Pure function of the scroll progress: no smoothing, so a jump to any stage draws that stage in the first frame.
+  s.p = useAppStore.getState().makingProgress;
   const p = s.p;
   const u = a.uniforms;
   const t = state.clock.elapsedTime;
@@ -261,7 +258,7 @@ function update(state: RootState, dt: number, a: Assets, s: { p: number; spin: n
   const fitBox = Math.min(availW / (W * 2.2), availH / ((H + 0.9) * 1.12));
   const foldAmt = seg(p, FOLD.tilt[0], 0.8);
   const fit = lerp(fitFlat, fitBox, foldAmt);
-  const rise = seg(p, 0, 0.1);
+  const rise = 1; // the sheet is fully in frame from progress 0 (it used to rise in from below the screen)
 
   rootG.scale.setScalar(fit);
   rootG.position.x = vw * L.offsetX;
