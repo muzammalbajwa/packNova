@@ -32,6 +32,8 @@ async function capture(base, mapP, tag) {
   await c.ev(`(()=>{const el=document.getElementById('making'); window.scrollTo(0, el.getBoundingClientRect().top+scrollY+(el.offsetHeight-innerHeight)*0.3);})()`);
   await sleep(1200);
   await c.waitFor("window.__makingSet", 30000);
+  // compare the 3D only: hide the template's overlay (captions, step indicator), which changed on purpose
+  await c.ev(`(()=>{const f=document.querySelector('#making > div'); for (const el of f.children) if (!el.querySelector('canvas')) el.style.visibility='hidden'; return 1;})()`);
   for (const p of POINTS) {
     await c.ev(`window.__makingSet(${mapP(p)})`);
     await sleep(1600);

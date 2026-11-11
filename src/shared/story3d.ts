@@ -27,6 +27,8 @@ export interface Story3DConfig {
   shadow: { opacity: number; spread: number };
   /** Board finish: kraft material roughness (lower = more satin). */
   board: { roughness: number };
+  /** Which top corner the route map sits in during the flight (a template keeps it clear of its own controls). */
+  map: { side: "left" | "right" };
 }
 
 /** Defaults equal the framing the story shipped with (text on the left, model on the right). */
@@ -42,4 +44,5 @@ export const DEFAULT_STORY3D: Story3DConfig = {
   light: { keyPos: [3, 5, 3], rimPos: [-4, 2, -3] },
   shadow: { opacity: 1, spread: 1 },
   board: { roughness: 0.9 },
+  map: { side: "right" },
 };

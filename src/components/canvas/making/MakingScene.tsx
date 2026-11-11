@@ -6,6 +6,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useAppStore } from "@/lib/store";
 import SceneLights from "../SceneLights";
 import CartonModel from "./CartonModel";
+import JourneyScene from "./JourneyScene";
 
 declare global {
   interface Window {
@@ -120,7 +121,7 @@ export default function MakingScene({ active }: { active: boolean }) {
           state.scene.updateMatrixWorld(true);
           state.scene.traverse((o) => {
             const mesh = o as THREE.Mesh;
-            if (any || !mesh.isMesh || !mesh.geometry) return;
+            if (any || !mesh.isMesh || !mesh.geometry || mesh.userData.bg || (mesh as THREE.InstancedMesh).isInstancedMesh) return;
             for (let n: THREE.Object3D | null = mesh; n; n = n.parent) if (!n.visible) return;
             const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
             if (!mats.some((mt) => mt.opacity > 0.5 && !(mt as THREE.MeshBasicMaterial).map?.name?.includes("shadow"))) return;
@@ -136,6 +137,7 @@ export default function MakingScene({ active }: { active: boolean }) {
     >
       <SceneLights low={low} />
       <CartonModel low={low} reducedMotion={reduced} />
+      <JourneyScene low={low} />
       <WarmUp />
       <Invalidator active={active} />
       <VisibleGuard />

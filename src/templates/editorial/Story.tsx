@@ -39,7 +39,7 @@ function Overlay(api: StoryApi) {
   const { stage, chapter, chapters, cta, stages, goTo, links, showQuote } = api;
   return (
     <>
-      <div className="pointer-events-none relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-6 pb-[7.75rem] md:justify-center md:pb-0">
+      <div className="pointer-events-none relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-6 pb-[9rem] md:justify-center md:pb-0">
         <p className="eyebrow mb-4 border-t border-[var(--fg)] pt-3 md:max-w-[44%]">{M.eyebrow}</p>
         <div className="relative min-h-[15rem] md:min-h-[24rem] md:max-w-[44%]" aria-live="polite">
           {stages.map((c, i) => {
@@ -89,7 +89,7 @@ function Overlay(api: StoryApi) {
               <li key={c.step} className={chapters.some((ch, k) => k > 0 && ch.from === i) ? "md:mt-3" : ""}>
                 {chapters.map((ch, k) =>
                   ch.from === i ? (
-                    <button key={ch.id} type="button" onClick={() => api.goToChapter(k)} className={`mb-1 hidden w-full text-left font-display text-[11px] uppercase tracking-[0.2em] md:block ${k === chapter ? "text-[var(--fg)]" : "text-[var(--muted)] hover:text-[var(--fg)]"}`}>
+                    <button key={ch.id} type="button" onClick={() => api.goToChapter(k)} className={`mb-1 hidden w-full pl-8 text-left font-display text-[11px] uppercase tracking-[0.2em] md:block ${k === chapter ? "text-[var(--fg)]" : "text-[var(--muted)] hover:text-[var(--fg)]"}`}>
                       {ch.label}
                     </button>
                   ) : null,

@@ -5,7 +5,8 @@ import { useFrame, type RootState } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAppStore } from "@/lib/store";
 import { THEMES, type Theme } from "@/lib/palette";
-import { FOLD, lin, seg, toLegacy } from "@/lib/making";
+import { FOLD, SPLIT, lin, seg, toLegacy } from "@/lib/making";
+import { boxCount, leadPose, type LeadPose } from "@/lib/journey";
 import {
   PANELS, PANEL_BY_ID, CHILDREN, SHEET, W, H, D,
   panelGeometry, buildArtTextures, type PanelId,
@@ -226,6 +227,7 @@ interface Refs {
 }
 
 const HALF_PI = Math.PI / 2;
+const LEAD: LeadPose = { x: 0, y: 0, z: 0, lay: 0, visible: true };
 const TABLE_TILT = -0.85; // sheet lies on a table, seen from above
 const UPRIGHT_TILT = -0.2; // finished carton: slightly looking down on it
 const YAW_LEFT = 0.62; // shows the left side swinging back while it folds
@@ -249,8 +251,10 @@ function update(state: RootState, dt: number, a: Assets, s: { p: number; spin: n
 
   /* --- layout: model beside the text on wide screens, above it on narrow ones --- */
   const cfg = useAppStore.getState().story3d;
-  const vw = state.viewport.width;
-  const vh = state.viewport.height;
+  // Viewport at the story camera's reference distance. This is what state.viewport holds while the camera sits at
+  // z = cam.z, but it is computed here because the journey moves the camera (and R3F would recompute it from there).
+  const vh = 2 * Math.tan(((state.camera as THREE.PerspectiveCamera).fov * Math.PI) / 360) * cfg.camera.z;
+  const vw = vh * (state.size.width / state.size.height);
   const L = vw / vh > cfg.story.wideAspect ? cfg.story.wide : cfg.story.narrow;
   const availW = vw * L.widthFrac;
   const availH = vh * L.heightFrac;
@@ -344,6 +348,22 @@ function update(state: RootState, dt: number, a: Assets, s: { p: number; spin: n
   const glue = seg(p, 0.8, 0.82) * (1 - seg(p, 0.86, 0.9));
   a.m.glue.emissive.copy(a.glueInk).multiplyScalar(glue * (0.7 + 0.3 * Math.sin(t * 7)));
 
+  /* --- shipping journey: after the story the same carton lies down and joins the batch (lib/journey.ts) --- */
+  const P = useAppStore.getState().makingProgress;
+  if (P > SPLIT) {
+    leadPose(P, boxCount(low), LEAD);
+    rootG.visible = LEAD.visible;
+    rootG.position.x += fit * LEAD.x;
+    rootG.position.y += fit * LEAD.y;
+    rootG.position.z = fit * LEAD.z;
+    tiltG.rotation.x = lerp(UPRIGHT_TILT, -HALF_PI, LEAD.lay);
+    // the idle spin fades out so the pose is a pure function of progress again
+    yawG.rotation.y = Math.PI * 2 + YAW_FINAL * (1 - LEAD.lay) + s.spin * (1 - seg(P, SPLIT, SPLIT + 0.012));
+  } else {
+    rootG.visible = true;
+    rootG.position.z = 0;
+  }
+
   /* --- ground shadow --- */
   const sh = r.shadow.current;
   if (sh) {
@@ -353,6 +373,6 @@ function update(state: RootState, dt: number, a: Assets, s: { p: number; spin: n
     sh.position.set(0, y, 0);
     const sw = lerp(SHEET.w * 1.05, W * 2.1, foldAmt) * cfg.shadow.spread;
     sh.scale.set(sw, sw * 0.85, 1);
-    a.m.shadow.opacity = Math.min(1, 0.7 * a.look.shadow * cfg.shadow.opacity) * rise;
+    a.m.shadow.opacity = Math.min(1, 0.7 * a.look.shadow * cfg.shadow.opacity) * rise * (1 - seg(P, SPLIT, SPLIT + 0.03));
   }
 }

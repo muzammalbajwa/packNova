@@ -13,4 +13,5 @@ export const config: Story3DConfig = {
   light: { keyPos: [2, 4, 4], rimPos: [-5, 1.5, -2] },
   shadow: { opacity: 1, spread: 1 },
   board: { roughness: 0.82 },
+  map: { side: "left" },
 };
