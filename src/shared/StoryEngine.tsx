@@ -8,14 +8,18 @@ import { site } from "@/content/site";
 import { getLenis, trackProgress } from "@/lib/scroll";
 import { useAppStore } from "@/lib/store";
 import { track } from "@/lib/track";
-import { CTA_AT, STAGES, stageIndex } from "@/lib/making";
+import { CHAPTERS, CTA_AT, STAGES, chapterOf, stageIndex } from "@/lib/making";
 import { storyConfiguratorHref, storyWhatsappHref } from "@/lib/storyQuote";
 
 // The 3D chunk is shared by every template and only fetched when the section is about to scroll into view.
 const MakingScene = dynamic(() => import("@/components/canvas/making/MakingScene"), { ssr: false });
 
 const M = site.making;
-export const STAGE_IDS = STAGES.map((s) => s.id);
+export const STAGE_IDS: string[] = STAGES.map((s) => s.id);
+
+/** The two step-indicator chapters ("Made", "Shipped") with their copy and stage range. */
+export const CHAPTER_LIST = CHAPTERS.map((c, i) => ({ ...c, label: M.chapters[i].label, count: c.to - c.from + 1 }));
+export type Chapter = (typeof CHAPTER_LIST)[number];
 
 /** CTA targets and handlers every template wires into its own buttons. */
 export function useStoryLinks(base: string) {
@@ -37,16 +41,21 @@ export function useStoryLinks(base: string) {
 }
 
 export interface StoryApi {
-  /** Index (0-6) of the current stage. */
+  /** Index (0-11) of the current stage: 0-6 are the "Made" chapter, 7-11 the "Shipped" chapter. */
   stage: number;
-  /** True from the "ready" moment: show the full call to action. */
+  /** Index (0-1) of the chapter that contains the current stage. */
+  chapter: number;
+  chapters: Chapter[];
+  /** True from the "ready" moment (inside the last stage, "Delivered"): show the full call to action. */
   cta: boolean;
-  /** Subtle "Want this box? Get a quote" shows from the fold stage until the full CTA. */
+  /** Subtle "Want this box? Get a quote" shows from the fold stage to the end of the "Made" chapter. */
   showQuote: boolean;
   stages: typeof M.stages;
   stageIds: string[];
   /** Smooth-scroll to the clearest moment of stage `i` (the step indicator calls this). */
   goTo: (i: number) => void;
+  /** Smooth-scroll to the first stage of chapter `c` (used by a collapsed chapter chip). */
+  goToChapter: (c: number) => void;
   links: ReturnType<typeof useStoryLinks>;
 }
 
@@ -60,15 +69,15 @@ interface Props {
   behind?: ReactNode;
   /** Template-specific title, step copy, step indicator and CTA, drawn over the canvas. */
   overlay: ComponentType<StoryApi>;
-  /** Template-styled 7-step list for no WebGL / reduced motion (same copy and CTA). */
+  /** Template-styled 12-step list (two chapters) for no WebGL / reduced motion (same copy and CTA). */
   fallback: ReactNode;
 }
 
 /**
- * Headless "how your box is made" engine. It owns the lazy canvas, the pinned scroll (700vh
- * desktop, 450vh mobile), the progress and the stage state; templates only supply the layout
- * and styling through `overlay`, `behind` and `canvasClassName`. The model, the 7 stages and the
- * fold order are identical everywhere. The pinned frame exposes `--p` (0..1) and `data-stage`
+ * Headless "how your box is made, and shipped" engine. It owns the lazy canvas, the pinned scroll (1200vh
+ * desktop, 780vh mobile: the original 7-stage film plus the shipping journey), the progress and the stage
+ * state; templates only supply the layout and styling through `overlay`, `behind` and `canvasClassName`.
+ * The model, the 12 stages and the fold order are identical everywhere. The pinned frame exposes `--p` (0..1) and `data-stage`
  * so templates can style progress bars and states in plain CSS without per-frame React state.
  */
 export default function StoryEngine(props: Props) {
@@ -147,14 +156,21 @@ function Pinned({ base, canvasClassName, stickyClassName = "", behind, overlay: 
     track("story_step_click", { step: STAGE_IDS[i] });
     if (sectionRef.current) scrollToProgress(sectionRef.current, STAGES[i].anchor);
   }, []);
+  const goToChapter = useCallback((c: number) => {
+    track("story_chapter_click", { chapter: CHAPTERS[c].id });
+    if (sectionRef.current) scrollToProgress(sectionRef.current, STAGES[CHAPTERS[c].from].anchor);
+  }, []);
 
   const api: StoryApi = {
     stage,
+    chapter: chapterOf(stage),
+    chapters: CHAPTER_LIST,
     cta,
-    showQuote: stage >= 4 && !cta && stage < 6,
+    showQuote: stage >= 4 && stage <= 6,
     stages: M.stages,
     stageIds: STAGE_IDS,
     goTo,
+    goToChapter,
     links,
   };
 
@@ -164,7 +180,7 @@ function Pinned({ base, canvasClassName, stickyClassName = "", behind, overlay: 
       ref={setRefs}
       aria-label={M.eyebrow}
       // keep in sync with SCROLL_VH in lib/making.ts (Tailwind needs literal class names)
-      className="relative z-10 h-[450vh] md:h-[700vh]"
+      className="relative z-10 h-[780vh] md:h-[1200vh]"
     >
       <div ref={stickyRef} data-stage={stage} // opaque: the fixed hero canvas (the closed box) must never show through behind the story
       className={`sticky top-0 h-dvh overflow-hidden bg-[var(--bg)] ${stickyClassName}`} style={{ ["--p" as string]: 0 }}>

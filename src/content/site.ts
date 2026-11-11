@@ -16,7 +16,7 @@ const en = {
     tagline: "Packaging that makes your product unforgettable.",
     description: "Custom boxes, cartons and pouches, designed in 3D and made to order.",
     /** Used for absolute URLs (Open Graph). Replace with the real domain. */
-    url: "https://example.com",
+    url: "https://staging.artinstallation.uk",
   },
 
   contact: {
@@ -147,10 +147,23 @@ const en = {
       { step: "Fold", title: "Crease and fold", line: "Each panel folds along its crease: the sides first, then the flaps." },
       { step: "Glue", title: "Glue and close", line: "One glued seam holds the sides together, and the top tucks in." },
       { step: "Ship", title: "Ready to ship", line: "Your finished carton, ready to be packed and sent." },
+      // Chapter two: the finished box keeps going. Captions only describe what the animation shows.
+      { step: "Count", title: "Counted and checked", line: "The finished boxes are counted into a batch and checked." },
+      { step: "Pack", title: "Packed in a master carton", line: "The batch goes into a corrugated master carton, layer by layer, then it is sealed and labelled." },
+      { step: "Load", title: "Loaded on board", line: "The carton is loaded into the cargo hold." },
+      { step: "Fly", title: "On its way", line: "Your order leaves the factory and is on its way to you." },
+      { step: "Deliver", title: "Delivered to your door", line: "The carton arrives at your door." },
     ],
+    /** Step-indicator chapters: stages 1 to 7 are "Made", stages 8 to 12 are "Shipped". */
+    chapters: [
+      { id: "made", label: "Made" },
+      { id: "shipped", label: "Shipped" },
+    ],
+    /** Text drawn inside the 3D scene (shipping label, route map). */
+    scene: { labelTo: "TO: Your location", mapTo: "Your location" }, // the map and label also print brand.name
     quoteButton: "Want this box? Get a quote",
     cta: {
-      title: "Your box is ready. Let's make it real.",
+      title: "Ready to receive yours?",
       body: "Tell us the size and quantity and we will reply with a quote.",
       primary: "Open the configurator",
       secondary: "Chat on WhatsApp",

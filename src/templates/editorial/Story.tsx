@@ -2,8 +2,7 @@
 
 import { site } from "@/content/site";
 import StageArt from "@/components/ui/StageArt";
-import StoryEngine, { useStoryLinks, type StoryApi } from "@/shared/StoryEngine";
-import { STAGE_IDS } from "@/shared/StoryEngine";
+import StoryEngine, { CHAPTER_LIST, STAGE_IDS, useStoryLinks, type StoryApi } from "@/shared/StoryEngine";
 
 const M = site.making;
 const num = (i: number) => String(i + 1).padStart(2, "0");
@@ -37,7 +36,7 @@ function Cta({ links }: { links: StoryApi["links"] }) {
 
 /** Text left (big numeral, serif title), 3D on the right half, a thin vertical step rule. */
 function Overlay(api: StoryApi) {
-  const { stage, cta, stages, goTo, links, showQuote } = api;
+  const { stage, chapter, chapters, cta, stages, goTo, links, showQuote } = api;
   return (
     <>
       <div className="pointer-events-none relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-end px-6 pb-[7.75rem] md:justify-center md:pb-0">
@@ -84,9 +83,17 @@ function Overlay(api: StoryApi) {
           <div className="absolute left-2 right-2 top-3 h-px bg-[var(--line-strong)] md:inset-x-auto md:bottom-2 md:left-[0.55rem] md:right-auto md:top-2 md:h-auto md:w-px">
             <div className="h-full w-full origin-left bg-[var(--fg)] [transform:scaleX(var(--p))] md:origin-top md:[transform:scaleY(var(--p))]" />
           </div>
-          <ol className="relative flex justify-between md:flex-col md:gap-6">
+          <p className="mb-1 text-center font-display text-xs italic text-[var(--muted)] md:hidden">{chapters[chapter].label}</p>
+          <ol className="relative flex justify-between md:flex-col md:gap-3">
             {stages.map((c, i) => (
-              <li key={c.step}>
+              <li key={c.step} className={chapters.some((ch, k) => k > 0 && ch.from === i) ? "md:mt-3" : ""}>
+                {chapters.map((ch, k) =>
+                  ch.from === i ? (
+                    <button key={ch.id} type="button" onClick={() => api.goToChapter(k)} className={`mb-1 hidden w-full text-left font-display text-[11px] uppercase tracking-[0.2em] md:block ${k === chapter ? "text-[var(--fg)]" : "text-[var(--muted)] hover:text-[var(--fg)]"}`}>
+                      {ch.label}
+                    </button>
+                  ) : null,
+                )}
                 <button
                   type="button"
                   aria-current={i === stage ? "step" : undefined}
@@ -112,7 +119,7 @@ function Overlay(api: StoryApi) {
   );
 }
 
-/** No WebGL / reduced motion: the same seven steps as a quiet numbered list. */
+/** No WebGL / reduced motion: the same twelve steps, in two chapters, as a quiet numbered list. */
 function Fallback() {
   const links = useStoryLinks("/t/editorial");
   return (
@@ -120,18 +127,26 @@ function Fallback() {
       <div className="mx-auto max-w-7xl">
         <p className="eyebrow border-t border-[var(--fg)] pt-3">{M.eyebrow}</p>
         <h2 id="making-h" className="font-display mt-6 max-w-3xl text-5xl font-light leading-[0.98] tracking-[-0.025em] md:text-7xl">
-          From flat board to finished box.
+          From flat board to your door.
         </h2>
-        <ol className="mt-14 grid gap-px sm:grid-cols-2 lg:grid-cols-3">
-          {M.stages.map((s, i) => (
-            <li key={s.step} className="border-t border-[var(--line-strong)] py-8 pr-6">
-              <StageArt id={STAGE_IDS[i]} className="size-20" />
-              <p className="font-display mt-4 text-5xl font-extralight italic text-[var(--kraft-ink)]">{num(i)}</p>
-              <h3 className="font-display mt-2 text-2xl font-normal">{s.title}</h3>
-              <p className="mt-2 text-[var(--muted)]">{s.line}</p>
-            </li>
-          ))}
-        </ol>
+        {CHAPTER_LIST.map((ch) => (
+          <div key={ch.id} className="mt-14">
+            <p className="eyebrow border-t border-[var(--fg)] pt-3">{ch.label}</p>
+            <ol className="mt-4 grid gap-px sm:grid-cols-2 lg:grid-cols-3">
+              {M.stages.slice(ch.from, ch.to + 1).map((s, k) => {
+                const i = ch.from + k;
+                return (
+                  <li key={s.step} className="border-t border-[var(--line-strong)] py-8 pr-6">
+                    <StageArt id={STAGE_IDS[i]} className="size-20" />
+                    <p className="font-display mt-4 text-5xl font-extralight italic text-[var(--kraft-ink)]">{num(i)}</p>
+                    <h4 className="font-display mt-2 text-2xl font-normal">{s.title}</h4>
+                    <p className="mt-2 text-[var(--muted)]">{s.line}</p>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        ))}
         <div className="mt-12">
           <Cta links={links} />
         </div>

@@ -5,7 +5,7 @@ import { useFrame, type RootState } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAppStore } from "@/lib/store";
 import { THEMES, type Theme } from "@/lib/palette";
-import { FOLD, lin, seg } from "@/lib/making";
+import { FOLD, lin, seg, toLegacy } from "@/lib/making";
 import {
   PANELS, PANEL_BY_ID, CHILDREN, SHEET, W, H, D,
   panelGeometry, buildArtTextures, type PanelId,
@@ -241,7 +241,8 @@ function update(state: RootState, dt: number, a: Assets, s: { p: number; spin: n
   if (!rootG || !sheetG || !tiltG || !yawG) return;
 
   // Pure function of the scroll progress: no smoothing, so a jump to any stage draws that stage in the first frame.
-  s.p = useAppStore.getState().makingProgress;
+  // total story progress -> the original 7-stage timeline (a pure rescale; the carton rests at 1 once the journey starts)
+  s.p = toLegacy(useAppStore.getState().makingProgress);
   const p = s.p;
   const u = a.uniforms;
   const t = state.clock.elapsedTime;

@@ -2,7 +2,7 @@
 
 import { site } from "@/content/site";
 import StageArt from "@/components/ui/StageArt";
-import StoryEngine, { STAGE_IDS, useStoryLinks, type StoryApi } from "@/shared/StoryEngine";
+import StoryEngine, { CHAPTER_LIST, STAGE_IDS, useStoryLinks, type StoryApi } from "@/shared/StoryEngine";
 
 const M = site.making;
 const num = (i: number) => String(i + 1).padStart(2, "0");
@@ -26,7 +26,7 @@ function Cta({ links }: { links: StoryApi["links"] }) {
 
 /** Rounded card with the 3D box; caption bubble on the left; tappable stage chips along the bottom. */
 function Overlay(api: StoryApi) {
-  const { stage, cta, stages, goTo, links, showQuote } = api;
+  const { stage, chapter, chapters, cta, stages, goTo, links, showQuote } = api;
   const last = stage === stages.length - 1;
   return (
     <>
@@ -54,23 +54,47 @@ function Overlay(api: StoryApi) {
         <div className="mb-2 mx-auto h-1.5 max-w-3xl overflow-hidden rounded-full bg-[var(--wash)]">
           <div className="h-full origin-left rounded-full bg-[var(--accent)] [transform:scaleX(var(--p))]" />
         </div>
-        <ol className="mx-auto flex max-w-3xl justify-between gap-1 overflow-x-auto">
-          {stages.map((c, i) => (
-            <li key={c.step}>
-              <button
-                type="button"
-                aria-current={i === stage ? "step" : undefined}
-                aria-label={`${i + 1}. ${c.step}`}
-                onClick={() => goTo(i)}
-                className={`rounded-full px-3 py-2 text-sm font-bold transition-transform duration-300 [transition-timing-function:var(--spring)] ${
-                  i === stage ? "scale-110 bg-[var(--accent)] text-[var(--on-accent)]" : i < stage ? "bg-[var(--surface)] text-[var(--fg)] hover:scale-105" : "bg-[var(--wash)] text-[var(--muted)] hover:scale-105"
-                }`}
-              >
-                <span className="md:hidden">{i + 1}</span>
-                <span className="hidden md:inline">{c.step}</span>
-              </button>
-            </li>
-          ))}
+        <ol className="mx-auto flex max-w-3xl items-center justify-between gap-1 overflow-x-auto">
+          {/* the current chapter shows its step pills; the other one collapses into a single chip */}
+          {chapters.map((ch, c) =>
+            c === chapter ? (
+              <li key={ch.id} className="flex items-center gap-1">
+                <span className="mr-1 hidden rounded-full border-2 border-[var(--accent)] px-3 py-1.5 text-xs font-extrabold uppercase tracking-wide text-[var(--accent)] sm:inline">{ch.label}</span>
+                <ol className="flex gap-1">
+                  {stages.slice(ch.from, ch.to + 1).map((s, k) => {
+                    const i = ch.from + k;
+                    return (
+                      <li key={s.step}>
+                        <button
+                          type="button"
+                          aria-current={i === stage ? "step" : undefined}
+                          aria-label={`${i + 1}. ${s.step}`}
+                          onClick={() => goTo(i)}
+                          className={`rounded-full px-3 py-2 text-sm font-bold transition-transform duration-300 [transition-timing-function:var(--spring)] ${
+                            i === stage ? "scale-110 bg-[var(--accent)] text-[var(--on-accent)]" : i < stage ? "bg-[var(--surface)] text-[var(--fg)] hover:scale-105" : "bg-[var(--wash)] text-[var(--muted)] hover:scale-105"
+                          }`}
+                        >
+                          <span className="md:hidden">{i + 1}</span>
+                          <span className="hidden md:inline">{s.step}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </li>
+            ) : (
+              <li key={ch.id}>
+                <button
+                  type="button"
+                  aria-label={`${ch.label}: ${ch.count} steps`}
+                  onClick={() => api.goToChapter(c)}
+                  className={`rounded-full px-3 py-2 text-sm font-bold transition-transform duration-300 [transition-timing-function:var(--spring)] hover:scale-105 ${c < chapter ? "bg-[var(--surface)] text-[var(--fg)]" : "bg-[var(--wash)] text-[var(--muted)]"}`}
+                >
+                  {ch.label} <span className="opacity-60">· {ch.count}</span>
+                </button>
+              </li>
+            ),
+          )}
         </ol>
       </nav>
     </>
@@ -83,17 +107,25 @@ function Fallback() {
     <section id="making" aria-labelledby="making-h" className="relative z-10 bg-[var(--bg)] px-5 py-24 md:py-32">
       <div className="mx-auto max-w-6xl">
         <p className="w-fit rounded-full bg-[var(--accent)] px-4 py-1.5 text-sm font-bold text-[var(--on-accent)]">{M.eyebrow}</p>
-        <h2 id="making-h" className="font-display mt-5 max-w-3xl text-5xl font-extrabold leading-[0.95] tracking-[-0.03em] md:text-7xl">From flat board to finished box.</h2>
-        <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {M.stages.map((s, i) => (
-            <li key={s.step} className="rounded-[var(--r-card)] bg-[var(--surface)] p-6">
-              <StageArt id={STAGE_IDS[i]} className="size-20" />
-              <span className="mt-4 inline-grid size-10 place-items-center rounded-full bg-[var(--accent)] font-display text-lg font-extrabold text-[var(--on-accent)]">{num(i)}</span>
-              <h3 className="font-display mt-3 text-2xl font-bold tracking-tight">{s.title}</h3>
-              <p className="mt-2 text-[var(--muted)]">{s.line}</p>
-            </li>
-          ))}
-        </ol>
+        <h2 id="making-h" className="font-display mt-5 max-w-3xl text-5xl font-extrabold leading-[0.95] tracking-[-0.03em] md:text-7xl">From flat board to your door.</h2>
+        {CHAPTER_LIST.map((ch) => (
+          <div key={ch.id} className="mt-12">
+            <h3 className="font-display text-sm font-extrabold uppercase tracking-[0.2em] text-[var(--accent)]">{ch.label}</h3>
+            <ol className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {M.stages.slice(ch.from, ch.to + 1).map((s, k) => {
+                const i = ch.from + k;
+                return (
+                  <li key={s.step} className="rounded-[var(--r-card)] bg-[var(--surface)] p-6">
+                    <StageArt id={STAGE_IDS[i]} className="size-20" />
+                    <span className="mt-4 inline-grid size-10 place-items-center rounded-full bg-[var(--accent)] font-display text-lg font-extrabold text-[var(--on-accent)]">{num(i)}</span>
+                    <h4 className="font-display mt-3 text-2xl font-bold tracking-tight">{s.title}</h4>
+                    <p className="mt-2 text-[var(--muted)]">{s.line}</p>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        ))}
         <div className="mt-10 rounded-[2.5rem] bg-[var(--surface)] p-8"><Cta links={links} /></div>
       </div>
     </section>
