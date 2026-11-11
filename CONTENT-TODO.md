@@ -60,3 +60,8 @@ Hero eyebrow and scroll hint; the one-line description, spec line and "best for"
 ## 6. Colors
 
 Pick the final theme (`?theme=a|b|c|d`, compare with `?themes=1`) and make it the default in `src/lib/palette.ts` (`DEFAULT_THEME`), then re-run `node scripts/export-images.mjs --theme <id>`.
+
+## 7. Shipping-journey copy (stages 8 to 12), review and approve or rewrite
+
+All in `site.making` (`stages` 8 to 12, `chapters`, `scene`, `cta`): "Counted and checked", "Packed in a master carton", "Loaded on board", "On its way", "Delivered to your door", their one-line descriptions, the chapter names ("Made", "Shipped"), the new end CTA ("Ready to receive yours?") and the text printed inside the 3D scene (shipping label "TO: Your location", map end point "Your location"; the brand name also prints on the label and map).
+The scene shows a generic plane and van. No carrier, delivery time, tracking or price is mentioned or implied; keep it that way unless you have real facts.

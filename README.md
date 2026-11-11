@@ -59,10 +59,22 @@ Four palettes live in **one file**, `src/lib/palette.ts`: A "Ivory and Ink" (def
 
 ## How your box is made (scroll story)
 
-`MakingOf.tsx` is one pinned section (700vh desktop, 450vh mobile). A single progress value (0..1) is written to the zustand store by GSAP ScrollTrigger (`makingProgress`) and read with `getState()` in `useFrame`; React state changes only when the stage changes.
+The story is one pinned section (see "The shipping journey" below: 1200vh desktop, 780vh mobile; its first part is the original 700vh / 450vh film). A single progress value (0..1) is written to the zustand store by GSAP ScrollTrigger (`makingProgress`) and read with `getState()` in `useFrame`; React state changes only when the stage changes.
 `lib/making.ts` holds the stage ranges and fold windows; `lib/dieline.ts` is the dieline (flat sheet of hinged panels) and its canvas painters; `components/canvas/making/CartonModel.tsx` is the procedural model.
 It has its own lazily loaded canvas that renders only while on screen. Low tier: dpr 1, no sheen/foil shader, no stamp animation. No WebGL or reduced motion: a 7-step illustrated list with the same copy and CTA.
 Copy is in `site.making`.
+
+## The shipping journey (stages 8 to 12)
+
+The story continues after the finished box: **Count** (the carton joins a batch on a conveyor), **Pack** (layer by layer into a corrugated master carton, taped and labelled), **Load** (up a ramp into a cargo plane), **Fly** (take-off, clouds, route map, day to dusk) and **Deliver** (a van at a house, the carton at the door, then the big CTA).
+Total progress P (0..1) covers 1200vh desktop / 780vh mobile. The first `SPLIT` (0.58) of it is the original 7-stage film, rescaled with `toLegacy(P)` so the carton is unchanged; the rest is the journey.
+
+- `lib/journey.ts`: three-free pure functions of P (poses, timeline, camera key frames, a Hermite spline). No clocks, no smoothing.
+- `components/canvas/making/JourneyScene.tsx`: builds every object once at mount, then only writes transforms, colours and visibility each frame. Instanced boxes and clouds; sky via the renderer clear colour; map and sky ride the camera.
+- `components/canvas/making/CargoPlane.ts`: the plane behind a small `Vehicle` interface (`root`, `setGear`, `setHatch`); a ship would implement the same interface and the numbers in `VEHICLE`.
+- Colours come from each template's palette; the template config picks the map corner (`story3d.map.side`).
+- Step indicator: two chapters ("Made" 1-7, "Shipped" 8-12); `StoryApi` has `chapter`, `chapters`, `goToChapter`. No WebGL / reduced motion: a 12-step list in two chapters.
+- Checks: `scripts/legacy-compare.mjs` (first 7 stages pixel-identical to the pre-journey build), `story-sweep.mjs` (`--only-c --n 600` invariant, load independent), `cold-jump.mjs --points ...`, `journey-calls.mjs` (draw calls per stage), `journey-shots.mjs` (all 12 stages, every template and viewport).
 
 ## Conversion
 
