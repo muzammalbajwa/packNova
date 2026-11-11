@@ -17,7 +17,7 @@ const SPLIT = 0.58;
 // anchors of lib/making.ts (legacy anchors are rescaled by SPLIT)
 const STAGES = [
   ["board", 0.09 * SPLIT], ["print", 0.26 * SPLIT], ["finish", 0.385 * SPLIT], ["diecut", 0.535 * SPLIT], ["fold", 0.79 * SPLIT], ["glue", 0.915 * SPLIT], ["ship", 0.985 * SPLIT],
-  ["count", 0.655], ["pack", 0.755], ["load", 0.825], ["fly", 0.915], ["deliver", 0.99],
+  ["count", 0.655], ["pack", 0.725], ["load", 0.825], ["fly", 0.915], ["deliver", 0.99],
 ];
 
 for (const template of TEMPLATES) {

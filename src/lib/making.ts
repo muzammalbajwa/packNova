@@ -38,7 +38,7 @@ const LEGACY_STAGES: readonly (Omit<StageRange, "id"> & { id: StageId })[] = [
 export const STAGES: readonly StageRange[] = [
   ...LEGACY_STAGES.map((s) => ({ id: s.id, from: s.from * SPLIT, to: s.to * SPLIT, anchor: s.anchor * SPLIT })),
   { id: "count", from: SPLIT, to: 0.665, anchor: 0.655 },
-  { id: "pack", from: 0.665, to: 0.77, anchor: 0.755 },
+  { id: "pack", from: 0.665, to: 0.77, anchor: 0.725 },
   { id: "load", from: 0.77, to: 0.835, anchor: 0.825 },
   { id: "fly", from: 0.835, to: 0.93, anchor: 0.915 },
   { id: "deliver", from: 0.93, to: 1, anchor: 0.99 },
