@@ -1,0 +1,61 @@
+{
+  "when": "2026-11-11T14:28:35.526Z",
+  "template": "editorial",
+  "cpuThrottle": 4,
+  "mobile": false,
+  "tier": "mid",
+  "seconds": 30,
+  "loadAverageAtStart": 3.86,
+  "loadAverageAtEnd": 4.43,
+  "calls": 79,
+  "overall": {
+    "frames": 1787,
+    "avgFps": 59.6,
+    "p95ms": 16.7,
+    "p99ms": 16.8,
+    "over33ms": 2,
+    "over33pct": 0.1
+  },
+  "perStage": {
+    "count": {
+      "frames": 360,
+      "avgFps": 59.7,
+      "p95ms": 16.7,
+      "p99ms": 16.8,
+      "over33ms": 1,
+      "over33pct": 0.3
+    },
+    "pack": {
+      "frames": 442,
+      "avgFps": 58.9,
+      "p95ms": 16.8,
+      "p99ms": 33.3,
+      "over33ms": 1,
+      "over33pct": 0.2
+    },
+    "load": {
+      "frames": 277,
+      "avgFps": 59.8,
+      "p95ms": 16.8,
+      "p99ms": 16.8,
+      "over33ms": 0,
+      "over33pct": 0
+    },
+    "fly": {
+      "frames": 407,
+      "avgFps": 60,
+      "p95ms": 16.7,
+      "p99ms": 16.8,
+      "over33ms": 0,
+      "over33pct": 0
+    },
+    "deliver": {
+      "frames": 301,
+      "avgFps": 60,
+      "p95ms": 16.7,
+      "p99ms": 16.8,
+      "over33ms": 0,
+      "over33pct": 0
+    }
+  }
+}
