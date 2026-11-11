@@ -11,8 +11,10 @@ const BASE = arg("base", "http://127.0.0.1:8080");
 const TEMPLATE = arg("template", "cinematic");
 const CPU = Number(arg("cpu", 1));
 const MOBILE = process.argv.includes("--mobile");
+const ONLY_C = process.argv.includes("--only-c"); // invariant test only (load independent: no timing involved)
+const N_C = Number(arg("n", 300)); // progress values for the invariant test
 const load0 = +loadavg()[0].toFixed(2);
-if (load0 > 4 && !process.argv.includes("--force")) { console.error(`Load average ${load0} (> 4). Retry on a quiet machine or pass --force.`); process.exit(2); }
+if (!ONLY_C && load0 > 4 && !process.argv.includes("--force")) { console.error(`Load average ${load0} (> 4). Retry on a quiet machine or pass --force.`); process.exit(2); }
 
 const HOOK = `(()=>{
   window.__n = null; window.__renders = 0;
@@ -68,6 +70,7 @@ async function fresh() {
 
 console.log(`\nTest A  ${TEMPLATE} ${MOBILE ? "mobile" : "desktop"}  CPU ${CPU}x  load ${load0}`);
 const rowsA = [];
+if (!ONLY_C) {
 // top of the page -> end of the story (through the hero), fresh load per speed. Speeds in px/s.
 for (const [name, speed] of [["slow", 700], ["normal", 3500], ["very fast", 20000]]) {
   const c = await fresh();
@@ -93,14 +96,15 @@ for (const [name, speed] of [["slow", 700], ["normal", 3500], ["very fast", 2000
 console.table(rowsA);
 const passA = rowsA.every((r) => r.firstNonEmptyMs != null && r.firstNonEmptyMs < 1000) && rowsA.filter((r) => r.run.startsWith("sweep")).every((r) => r.emptyFrames === 0);
 console.log(`Test A: ${passA ? "PASS" : "FAIL"} (sweeps: zero empty pinned frames; every run: first non-empty < 1000 ms; warm jumps list empty frames inside the 400 ms window, incl. the first frame after the scroll)`);
+}
 
 // Test C: 300 progress values, is at least one opaque stage mesh inside the frustum?
 {
   const c = await fresh();
   await c.waitFor("window.__makingSet && window.__makingVisible", 30000);
-  const bad = JSON.parse(await c.ev(`(async()=>{ const bad=[]; for(let i=0;i<300;i++){ const p=i/299; window.__makingSet(p);
+  const bad = JSON.parse(await c.ev(`(async()=>{ const bad=[]; for(let i=0;i<${N_C};i++){ const p=i/${N_C - 1}; window.__makingSet(p);
     await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); if(!window.__makingVisible()) bad.push(+p.toFixed(3)); } return JSON.stringify(bad); })()`));
-  console.log(`\nTest C: ${bad.length === 0 ? "PASS" : "FAIL"}  300 progress values, failing: ${bad.length ? bad.join(",") : "none"}`);
+  console.log(`\nTest C: ${bad.length === 0 ? "PASS" : "FAIL"}  ${N_C} progress values, failing: ${bad.length ? bad.join(",") : "none"}`);
   c.kill();
 }
 process.exit(0);

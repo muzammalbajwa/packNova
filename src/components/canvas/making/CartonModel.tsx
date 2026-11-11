@@ -227,6 +227,8 @@ interface Refs {
 }
 
 const HALF_PI = Math.PI / 2;
+/** Panels that end up inside the closed carton (glue strip, dust flaps, tuck tab). */
+const HIDDEN_WHEN_CLOSED = ["glue", "dustTopL", "dustTopR", "tab", "dustBotL", "dustBotR"] as const;
 const LEAD: LeadPose = { x: 0, y: 0, z: 0, lay: 0, visible: true };
 const TABLE_TILT = -0.85; // sheet lies on a table, seen from above
 const UPRIGHT_TILT = -0.2; // finished carton: slightly looking down on it
@@ -357,11 +359,20 @@ function update(state: RootState, dt: number, a: Assets, s: { p: number; spin: n
     rootG.position.y += fit * LEAD.y;
     rootG.position.z = fit * LEAD.z;
     tiltG.rotation.x = lerp(UPRIGHT_TILT, -HALF_PI, LEAD.lay);
+    // inside the closed carton, never visible again: skip them (keeps the draw calls of the count/pack stages in budget)
+    for (const id of HIDDEN_WHEN_CLOSED) {
+      const m = r.groups.current[id]?.children[0];
+      if (m) m.visible = false;
+    }
     // the idle spin fades out so the pose is a pure function of progress again
     yawG.rotation.y = Math.PI * 2 + YAW_FINAL * (1 - LEAD.lay) + s.spin * (1 - seg(P, SPLIT, SPLIT + 0.012));
   } else {
     rootG.visible = true;
     rootG.position.z = 0;
+    for (const id of HIDDEN_WHEN_CLOSED) {
+      const m = r.groups.current[id]?.children[0];
+      if (m && !m.visible) m.visible = true;
+    }
   }
 
   /* --- ground shadow --- */

@@ -400,7 +400,7 @@ const CAM_KEYS: CamKey[] = [
   k(0.745, [3.6, -1.5, 0], -0.32, 0.3, 14, 7.6),
   k(0.77, [5.8, -1.4, 0], -0.4, 0.24, 14.5, 7.8),
   k(0.805, [11.5, -1.0, 0], -0.55, 0.2, 18, 9.5),
-  k(0.835, [18, 0.4, 0], -0.55, 0.16, 26, 12.5),
+  k(0.835, [18, 0.8, 0], -0.55, 0.16, 34, 16),
   // the subject sits a little above the plane, so the plane rides in the lower middle of the view, clear of the map
   k(0.86, planeC(0.86, 1, 3), -0.45, 0.12, 52, 25),
   k(0.89, planeC(0.89, 2, 4), -0.38, 0.1, 58, 28),

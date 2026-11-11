@@ -91,8 +91,12 @@ function build(theme: Theme, low: boolean) {
   disposables.push({ dispose: faces.dispose });
   const faceMat = (t: THREE.Texture) => std("#ffffff", { map: t, roughness: 0.85 });
   const plain = std(theme.kraft, { roughness: 0.92 });
-  const boxMats = [faceMat(faces.faces.right), faceMat(faces.faces.left), plain, plain, faceMat(faces.faces.front), faceMat(faces.faces.back)];
-  const boxes = new THREE.InstancedMesh(geo(new THREE.BoxGeometry(J.BOX.w, J.BOX.h, J.BOX.d)), boxMats, N - 1);
+  // 5 material groups instead of 6: top and bottom (faces 12..23 of a BoxGeometry) share the plain kraft material
+  const boxGeo = geo(new THREE.BoxGeometry(J.BOX.w, J.BOX.h, J.BOX.d));
+  boxGeo.clearGroups();
+  [[0, 6], [6, 6], [12, 12], [24, 6], [30, 6]].forEach(([start, count], i) => boxGeo.addGroup(start, count, i));
+  const boxMats = [faceMat(faces.faces.right), faceMat(faces.faces.left), plain, faceMat(faces.faces.front), faceMat(faces.faces.back)];
+  const boxes = new THREE.InstancedMesh(boxGeo, boxMats, N - 1);
   boxes.frustumCulled = false;
   boxes.count = 0;
   root.add(boxes);
@@ -102,12 +106,11 @@ function build(theme: Theme, low: boolean) {
   const corrNormal = low ? null : own(kraftNormal());
   if (corrNormal) corrNormal.repeat.set(2, 1);
   const corr = std(mixC(theme.kraft, "#000000", 0.14), { roughness: 0.95, normalMap: corrNormal ?? undefined });
-  const corrIn = std(mixC(theme.kraft, "#000000", 0.32), { roughness: 0.98 });
   const wallG = (w: number, h: number, d: number, x: number, y: number, z: number) => mesh(geo(new THREE.BoxGeometry(w, h, d)), corr, x, y, z);
   const flap = (w: number, d: number, px: number, py: number, pz: number, ox: number, oz: number, lift: number) => {
     const piv = new THREE.Group();
     piv.position.set(px, py, pz);
-    piv.add(mesh(geo(new THREE.BoxGeometry(w, 0.03, d)), [corr, corr, corr, corrIn, corr, corr], ox, lift, oz));
+    piv.add(mesh(geo(new THREE.BoxGeometry(w, 0.03, d)), corr, ox, lift, oz)); // one material: one draw call per flap
     return piv;
   };
   const top = M.h / 2;
