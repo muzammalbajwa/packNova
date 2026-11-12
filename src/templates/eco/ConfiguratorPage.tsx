@@ -9,7 +9,7 @@ import { BASE } from "./Home";
 
 export default function ConfiguratorPage() {
   return (
-    <TemplateFrame id="eco" base={BASE} config={config} fontClass={fontClass} scene={false}>
+    <TemplateFrame id="eco" base={BASE} config={config} fontClass={fontClass} scene={false} previewBack={false}>
       <Navbar base={BASE} onHome={false} />
       <main className="relative z-10 min-h-dvh bg-[var(--bg)]">
         <ConfiguratorClient base={BASE} />

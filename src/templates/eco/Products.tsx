@@ -1,35 +1,38 @@
 import { site } from "@/content/site";
 import ProductIcon from "@/components/ui/ProductIcon";
 import TrackedA from "@/components/ui/TrackedA";
+import { copy } from "./copy";
 
-/** Chunky rounded cards with a number sticker; the icon hops on hover. */
+/** A wide list with 1px rules. Each row is one link to the quote form; the icon keeps its hover animation. */
 export default function Products() {
-  const { products } = site;
+  const { items } = site.products;
+  const c = copy.products;
   return (
-    <section id="products" className="relative z-10 bg-[var(--bg)] px-5 py-24 md:py-36">
+    <section id="products" className="relative z-10 bg-[var(--bg)] px-6 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
-        <p className="w-fit rounded-full bg-[var(--accent)] px-4 py-1.5 text-sm font-bold text-[var(--on-accent)]">{products.eyebrow}</p>
-        <h2 data-reveal className="font-display mt-5 max-w-3xl text-5xl font-extrabold leading-[0.95] tracking-[-0.03em] md:text-7xl">{products.heading}</h2>
-        <ul className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {products.items.map((p, i) => (
-            <li key={p.id} data-reveal>
+        <div className="grid gap-4 md:grid-cols-[1fr_1.6fr] md:gap-16">
+          <h2 data-reveal="subtle" className="font-display text-4xl font-medium leading-[1.1] md:text-5xl">{c.heading}</h2>
+          <p data-reveal="subtle" className="max-w-md text-lg text-[var(--muted)] md:pt-3">{c.lead}</p>
+        </div>
+        <ul className="mt-12 border-t border-[var(--line-strong)]">
+          {items.map((p) => (
+            <li key={p.id} data-reveal="subtle" className="border-b border-[var(--line)]">
               <TrackedA
                 href="#quote"
                 event="product_card_quote"
                 data={{ product: p.id }}
                 prefill={{ product: p.name }}
-                className="group relative flex h-full flex-col rounded-[var(--r-card)] bg-[var(--surface)] p-7 transition-transform duration-500 [transition-timing-function:var(--spring)] hover:-translate-y-2 hover:rotate-[-1deg] hover:shadow-[0_26px_36px_-22px_rgba(0,0,0,0.7)] focus-visible:-translate-y-2"
+                className="group grid items-center gap-x-8 gap-y-3 py-6 transition-colors hover:bg-[var(--sand)] focus-visible:bg-[var(--sand)] md:grid-cols-[88px_1.3fr_1.4fr_auto] md:px-4"
               >
-                <span className="absolute -top-3 left-6 grid size-10 place-items-center rounded-full bg-[var(--accent)] font-display text-lg font-extrabold text-[var(--on-accent)] [transition-timing-function:var(--spring)] group-hover:rotate-12">{i + 1}</span>
-                <span className="blob mx-auto mt-4 grid size-32 place-items-center bg-[var(--bg)] text-[var(--accent)] transition-transform duration-500 [transition-timing-function:var(--spring)] group-hover:scale-110 group-hover:-rotate-6">
-                  <span className="size-20"><ProductIcon kind={p.icon} /></span>
+                <span className="block size-16 text-[var(--accent)] md:size-[72px]"><ProductIcon kind={p.icon} /></span>
+                <span>
+                  <span className="font-display block text-2xl font-medium leading-tight">{p.name}</span>
                 </span>
-                <h3 className="font-display mt-6 text-2xl font-bold tracking-tight">{p.name}</h3>
-                <p className="mt-1 text-sm font-semibold text-[var(--accent)]">{p.spec}</p>
-                <p className="mt-3 text-[var(--muted)]">{p.description}</p>
-                <ul className="mt-auto flex flex-wrap gap-1.5 pt-5">
-                  {p.bestFor.map((b) => (<li key={b} className="rounded-full bg-[var(--wash)] px-3 py-1 text-xs font-semibold">{b}</li>))}
-                </ul>
+                <span>
+                  <span className="block text-[var(--muted)]">{p.description}</span>
+                  <span className="mt-1 block text-sm text-[var(--muted)]"><span className="font-semibold text-[var(--kraft-ink)]">{c.bestFor}:</span> {p.bestFor.join(", ")}</span>
+                </span>
+                <span className="text-base font-semibold text-[var(--accent)] underline-offset-4 group-hover:underline">{c.action} →</span>
               </TrackedA>
             </li>
           ))}

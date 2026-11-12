@@ -1,28 +1,28 @@
 import { site } from "@/content/site";
 import QuoteForm from "@/components/sections/QuoteForm";
 import TrackedA from "@/components/ui/TrackedA";
+import { copy } from "./copy";
 
-/** A lime band with rounded top, headline left and a friendly form card right. */
+/** Forest green band: heading and contact lines on the left, the form on a cream panel on the right. */
 export default function QuoteSection() {
   const q = site.quote;
   const c = site.contact;
   return (
-    <section id="quote" className="relative z-10 overflow-hidden rounded-t-[3rem] bg-[var(--accent)] px-6 py-24 text-[var(--on-accent)] md:py-32">
-      <span className="morph pointer-events-none absolute -left-20 bottom-[-6rem] size-80 bg-[var(--on-accent)] opacity-10" aria-hidden />
-      <div className="relative mx-auto grid max-w-6xl gap-12 md:grid-cols-[1.1fr_1fr] md:items-start">
-        <div>
-          <p className="w-fit rounded-full bg-[var(--on-accent)] px-4 py-1.5 text-sm font-bold text-[var(--accent)]">{q.eyebrow}</p>
-          <h2 data-reveal className="font-display mt-5 text-[clamp(2.4rem,5.6vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.03em]">{q.heading}</h2>
-          <TrackedA event="quote_section_whatsapp" href={c.whatsappHref} className="mt-8 inline-flex rounded-full bg-[var(--on-accent)] px-6 py-3.5 text-base font-bold text-[var(--accent)]">
-            {q.whatsappCta}: {c.whatsapp} →
+    <section id="quote" className="relative z-10 bg-[var(--accent)] px-6 py-20 text-[var(--on-accent)] md:py-28">
+      <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[1fr_1.1fr] md:items-start md:gap-16">
+        <div data-reveal="subtle">
+          <h2 className="font-display text-4xl font-medium leading-[1.12] md:text-5xl">{copy.quote.heading}</h2>
+          <p className="mt-4 max-w-md text-lg opacity-90">{copy.quote.lead}</p>
+          <TrackedA event="quote_section_whatsapp" href={c.whatsappHref} className="mt-8 inline-flex rounded-[var(--r-btn)] border border-[var(--on-accent)] px-6 py-3 text-base font-semibold hover:bg-[var(--on-accent)] hover:text-[var(--accent)]">
+            {q.whatsappCta}: {c.whatsapp}
           </TrackedA>
-          <ul className="mt-6 space-y-1 text-sm font-semibold">
-            <li><a href={c.phoneHref}>{c.phone}</a></li>
-            <li><a href={`mailto:${c.email}`}>{c.email}</a></li>
+          <ul className="mt-6 space-y-1 text-base">
+            <li><a href={c.phoneHref} className="underline underline-offset-4">{c.phone}</a></li>
+            <li><a href={`mailto:${c.email}`} className="underline underline-offset-4">{c.email}</a></li>
             <li>{c.hours}</li>
           </ul>
         </div>
-        <div data-reveal><QuoteForm /></div>
+        <div data-reveal="subtle"><QuoteForm /></div>
       </div>
     </section>
   );

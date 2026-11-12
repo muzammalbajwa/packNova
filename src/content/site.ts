@@ -186,6 +186,15 @@ const en = {
   },
 
   /**
+   * Real photos ONLY. Both are empty on purpose: the eco template renders nothing until you add entries
+   * (files in /public, with alt text). Never use stock photos that pretend to be your factory or your products.
+   */
+  media: {
+    products: [] as { src: string; alt: string; width: number; height: number }[],
+    factory: null as { src: string; alt: string; width: number; height: number; caption?: string } | null,
+  },
+
+  /**
    * Real customer reviews and client names ONLY. Both lists are empty on purpose: the section
    * renders nothing until you add real entries (with permission to publish them).
    * Never add invented testimonials, statistics, client logos or certifications.

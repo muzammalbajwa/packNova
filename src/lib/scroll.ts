@@ -59,14 +59,25 @@ export function initReveal(reducedMotion: boolean): () => void {
   if (reducedMotion) return () => {};
   const items = gsap.utils.toArray<HTMLElement>("[data-reveal]");
   const below = items.filter((el) => el.getBoundingClientRect().top > window.innerHeight * 0.9);
-  gsap.set(below, { opacity: 0, y: 36 });
+  // data-reveal="subtle": one short fade and a small lift, no stagger (the eco template)
+  const subtle = below.filter((el) => el.dataset.reveal === "subtle");
+  const normal = below.filter((el) => el.dataset.reveal !== "subtle");
+  gsap.set(normal, { opacity: 0, y: 36 });
+  gsap.set(subtle, { opacity: 0, y: 8 });
 
-  const triggers = ScrollTrigger.batch(below, {
-    start: "top 90%",
-    once: true,
-    onEnter: (batch) =>
-      gsap.to(batch, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", stagger: 0.09, overwrite: true }),
-  });
+  const triggers = [
+    ...ScrollTrigger.batch(normal, {
+      start: "top 90%",
+      once: true,
+      onEnter: (batch) =>
+        gsap.to(batch, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", stagger: 0.09, overwrite: true }),
+    }),
+    ...ScrollTrigger.batch(subtle, {
+      start: "top 92%",
+      once: true,
+      onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 0.35, ease: "power1.out", overwrite: true }),
+    }),
+  ];
   return () => {
     triggers.forEach((t) => t.kill());
     gsap.set(items, { clearProps: "opacity,transform" });

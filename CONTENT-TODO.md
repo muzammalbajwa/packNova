@@ -65,3 +65,31 @@ Pick the final theme (`?theme=a|b|c|d`, compare with `?themes=1`) and make it th
 
 All in `site.making` (`stages` 8 to 12, `chapters`, `scene`, `cta`): "Counted and checked", "Packed in a master carton", "Loaded on board", "On its way", "Delivered to your door", their one-line descriptions, the chapter names ("Made", "Shipped"), the new end CTA ("Ready to receive yours?") and the text printed inside the 3D scene (shipping label "TO: Your location", map end point "Your location"; the brand name also prints on the label and map).
 The scene shows a generic plane and van. No carrier, delivery time, tracking or price is mentioned or implied; keep it that way unless you have real facts.
+
+## 8. Eco template refresh: needed from the owner
+
+The eco page (`src/templates/eco`) was redesigned and its headlines rewritten (`src/templates/eco/copy.ts`). Facts shared with the other templates still come from `site.ts`. A real packaging manufacturer states the following, and none of it is on the page yet because nothing may be invented. Each item is marked `TODO(owner)` in `src/templates/eco/copy.ts`.
+
+**Needed from the owner**
+
+- [ ] Board weight (GSM) and the board types you stock, per product line
+- [ ] Minimum order quantity, per product line
+- [ ] Typical lead time (production, and delivery)
+- [ ] Print methods and finishes you offer (offset, flexo, digital, lamination, foil, spot UV)
+- [ ] Factory location and years in business
+- [ ] The product spec lines (`products.items[].spec` in `site.ts`: "3, 5 and 7 ply", "Tamper-evident", ...) are not shown on the eco page any more because they were never confirmed; confirm them before they are shown anywhere
+- [ ] Real **product photos**: add them to `site.media.products` (files in `public/`, with `alt`, `width`, `height`). A "Our packaging" section appears by itself; it is hidden while the list is empty
+- [ ] A real **factory or team photo**: set `site.media.factory` (same fields, optional `caption`). A "Where it is made" section appears by itself; it is hidden while it is `null`
+- [ ] Real **customer logos and reviews**: `site.reviews.items` / `site.reviews.clients` (section hidden while empty; permission to publish needed)
+
+**Dummy contact details still in `site.ts` (kept on purpose, replace before launch)**
+
+| Value | Dummy | `site.ts` key |
+| --- | --- | --- |
+| Phone | +92 300 0000000 | `contact.phone`, `contact.phoneHref` |
+| WhatsApp | +92 300 0000000 | `contact.whatsapp`, `contact.whatsappHref` |
+| Email | hello@example.com | `contact.email` |
+| Address | Plot 00, Industrial Area, Lahore, Pakistan | `contact.address` |
+| Hours | Mon to Sat, 9:00 AM to 6:00 PM | `contact.hours` |
+| Social links | `#` | `social[]` |
+| Site URL | https://staging.artinstallation.uk (staging) | `brand.url` |

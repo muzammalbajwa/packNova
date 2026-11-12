@@ -16,6 +16,8 @@ interface Props {
   fontClass: string;
   /** False on pages without the hero/story canvas (the configurator brings its own preview). */
   scene?: boolean;
+  /** False hides the "Back to templates" link that ?preview=1 shows (the eco template ships without it). */
+  previewBack?: boolean;
   children: ReactNode;
 }
 
@@ -24,7 +26,7 @@ interface Props {
  * settings to the shared engine, boots device detection + the shared canvas, and adds the
  * conversion features that every template keeps (sticky quote, WhatsApp, preview link).
  */
-export default function TemplateFrame({ id, base, config, fontClass, scene = true, children }: Props) {
+export default function TemplateFrame({ id, base, config, fontClass, scene = true, previewBack = true, children }: Props) {
   useEffect(() => {
     document.documentElement.setAttribute("data-template", id);
     useAppStore.getState().setStory3D(config);
@@ -37,7 +39,7 @@ export default function TemplateFrame({ id, base, config, fontClass, scene = tru
       {scene && <Experience />}
       {children}
       <StickyCta base={base} />
-      <PreviewBack />
+      {previewBack && <PreviewBack />}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { config } from "./config";
 import { fontClass } from "./fonts";
 import ConfiguratorTeaser from "./ConfiguratorTeaser";
 import Footer from "./Footer";
+import { FactoryPhoto, ProductPhotos } from "./Photos";
 import Hero from "./Hero";
 import Navbar from "./Navbar";
 import Process from "./Process";
@@ -16,13 +17,15 @@ export const BASE = "/t/eco";
 
 export default function Home() {
   return (
-    <TemplateFrame id="eco" base={BASE} config={config} fontClass={fontClass}>
+    <TemplateFrame id="eco" base={BASE} config={config} fontClass={fontClass} previewBack={false}>
       <Navbar base={BASE} />
       <main className="relative z-10">
         <Hero base={BASE} />
         <Products />
+        <ProductPhotos />
         <Story base={BASE} />
         <Process />
+        <FactoryPhoto />
         <Reviews />
         <ConfiguratorTeaser base={BASE} />
         <QuoteSection />
