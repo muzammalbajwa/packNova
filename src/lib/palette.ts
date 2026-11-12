@@ -113,20 +113,21 @@ export const THEMES: Record<ThemeId, Theme> = {
     scene: { ...DARK_SCENE, rimColor: "#ffc766" },
   },
   c: {
+    // Eco: this is the dark STORY palette (deep forest). The cream page palette is ECO_PAGE below.
     id: "c",
-    name: "Forest and Lime",
+    name: "Forest and Kraft",
     dark: true,
-    bg: "#0E1F1A",
-    surface: "#15302A",
-    fg: "#F2EFE6",
-    muted: "#9DB3A9",
-    kraft: "#C8A27A",
-    kraftInk: "#C8A27A",
-    accent: "#C6F24E",
-    onAccent: "#0E1F1A",
-    printBlock: "#2e5d45",
+    bg: "#102A20",
+    surface: "#17372B",
+    fg: "#F5F0E6",
+    muted: "#B5C4B8",
+    kraft: "#B8803F",
+    kraftInk: "#D0A265",
+    accent: "#9DB8A0",
+    onAccent: "#102A20",
+    printBlock: "#1E4D3A",
     ink: PROCESS_INK,
-    scene: { ...DARK_SCENE, rimColor: "#c6f24e", rim: 1.1 },
+    scene: { ...DARK_SCENE, rimColor: "#cfe0d2", rim: 1.1 },
   },
   d: {
     id: "d",
@@ -144,6 +145,23 @@ export const THEMES: Record<ThemeId, Theme> = {
     scene: { ...LIGHT_SCENE, rimColor: "#9db0ff" },
   },
 };
+
+/**
+ * Eco's page (everything outside the pinned story) is light: cream, forest green, kraft, sage. The story section
+ * re-declares the dark THEMES.c tokens (see templates/eco/tokens.css, `.tone-dark`). scripts/contrast.mjs checks both.
+ */
+export const ECO_PAGE = {
+  bg: "#F5F0E6",
+  surface: "#FBF8F2",
+  sand: "#E9E0CF",
+  fg: "#17231D",
+  muted: "#4A5A50",
+  kraft: "#B8803F",
+  kraftInk: "#6F4A1E",
+  accent: "#1E4D3A",
+  onAccent: "#F5F0E6",
+  sage: "#9DB8A0",
+} as const;
 
 export const THEME_IDS = Object.keys(THEMES) as ThemeId[];
 export const DEFAULT_THEME: ThemeId = "a";

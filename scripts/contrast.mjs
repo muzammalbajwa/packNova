@@ -2,7 +2,7 @@
 // (src/lib/palette.ts), because the 3D scene reads the palette and the page reads the CSS.
 // Run: node scripts/contrast.mjs
 import { readFileSync } from "node:fs";
-import { THEMES, contrast } from "../src/lib/palette.ts";
+import { THEMES, ECO_PAGE, contrast } from "../src/lib/palette.ts";
 
 const TEMPLATES = { editorial: "a", cinematic: "b", industrial: "d", eco: "c" };
 const pairs = [
@@ -21,22 +21,40 @@ const pairs = [
 const tokenKeys = { "--bg": "bg", "--surface": "surface", "--fg": "fg", "--muted": "muted", "--kraft": "kraft", "--kraft-ink": "kraftInk", "--accent": "accent", "--on-accent": "onAccent" };
 
 let fail = 0;
-for (const [name, id] of Object.entries(TEMPLATES)) {
-  const t = THEMES[id];
-  console.log(`\n${name}  (palette ${id.toUpperCase()}: ${t.name})`);
-  for (const [label, a, b, min] of pairs) {
+
+/** Run every pair against a palette and compare the palette with the matching block of tokens.css. */
+function check(label, t, css, extraPairs = []) {
+  console.log(`\n${label}`);
+  for (const [name, a, b, min] of [...pairs, ...extraPairs]) {
     const r = contrast(t[a], t[b]);
     const ok = r >= min;
     if (!ok) fail++;
-    console.log(`  ${ok ? "PASS" : "FAIL"}  ${r.toFixed(2).padStart(5)}  (min ${min})  ${label}`);
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${r.toFixed(2).padStart(5)}  (min ${min})  ${name}`);
   }
-  const css = readFileSync(`src/templates/${name}/tokens.css`, "utf8");
   for (const [v, key] of Object.entries(tokenKeys)) {
     const m = css.match(new RegExp(`${v}:\\s*(#[0-9a-fA-F]{6})`));
     const same = m && m[1].toLowerCase() === t[key].toLowerCase();
     if (!same) { fail++; console.log(`  FAIL  tokens.css ${v} = ${m?.[1]} but palette ${key} = ${t[key]}`); }
   }
   console.log("  tokens.css matches palette");
+}
+
+for (const [name, id] of Object.entries(TEMPLATES)) {
+  const css = readFileSync(`src/templates/${name}/tokens.css`, "utf8");
+  if (name === "eco") {
+    // eco has a light page (ECO_PAGE) and a dark pinned story (THEMES.c, the `.tone-dark` block)
+    const [page, story] = css.split(".tone-dark");
+    check("eco page  (ECO_PAGE: cream, forest, kraft)", ECO_PAGE, page, [
+      ["text on sand", "fg", "sand", 4.5],
+      ["muted on sand", "muted", "sand", 4.5],
+      ["kraft-ink text on sand", "kraftInk", "sand", 4.5],
+      ["button label on accent", "onAccent", "accent", 4.5],
+      ["accent text on sand", "accent", "sand", 4.5],
+    ]);
+    check("eco story (THEMES.c: deep forest)", THEMES[id], story);
+    continue;
+  }
+  check(`${name}  (palette ${id.toUpperCase()}: ${THEMES[id].name})`, THEMES[id], css);
 }
 console.log(fail ? `\n${fail} failing check(s)` : "\nAll templates pass WCAG AA and match their palettes");
 process.exit(fail ? 1 : 0);

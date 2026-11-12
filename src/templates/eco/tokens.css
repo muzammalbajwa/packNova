@@ -1,44 +1,78 @@
-/* Playful Eco: deep green, lime stickers, big rounded shapes. Colors mirror THEMES.c in lib/palette.ts. */
+/*
+ * Eco: a cream page with forest green and kraft, and a deep-forest pinned story.
+ * Page colors mirror ECO_PAGE and story colors mirror THEMES.c in lib/palette.ts (scripts/contrast.mjs checks both).
+ */
 :root[data-template="eco"],
 div[data-template="eco"] {
-  --bg: #0e1f1a;
-  --surface: #15302a;
-  --fg: #f2efe6;
-  --muted: #9db3a9;
-  --kraft: #c8a27a;
-  --kraft-ink: #c8a27a;
-  --accent: #c6f24e;
-  --on-accent: #0e1f1a;
-  --r-card: 2rem;
-  --r-field: 1.1rem;
-  --r-btn: 9999px;
-  --f-display: var(--font-outfit), ui-rounded, system-ui, sans-serif;
-  --f-body: var(--font-nunito), ui-rounded, system-ui, sans-serif;
+  --bg: #f5f0e6;
+  --surface: #fbf8f2;
+  --sand: #e9e0cf;
+  --fg: #17231d;
+  --muted: #4a5a50;
+  --kraft: #b8803f;
+  --kraft-ink: #6f4a1e;
+  --accent: #1e4d3a;
+  --on-accent: #f5f0e6;
+  --sage: #9db8a0;
+  --r-card: 8px;
+  --r-field: 6px;
+  --r-btn: 6px;
+  --f-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --f-body: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --display-variation: normal;
-  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --line: color-mix(in srgb, var(--fg) 16%, transparent);
+  --line-strong: color-mix(in srgb, var(--fg) 40%, transparent);
+  --wash: color-mix(in srgb, var(--fg) 5%, transparent);
+  --field: var(--surface);
 }
 
-div[data-template="eco"] .blob {
-  border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%;
+/* Body text: 17px with a 1.6 line height. Set on the template root only, so rem units stay at 16px. */
+div[data-template="eco"] {
+  font-size: 17px;
+  line-height: 1.6;
 }
-@keyframes eco-wobble {
-  0%, 100% { transform: rotate(-4deg) scale(1); }
-  50% { transform: rotate(3deg) scale(1.04); }
+
+/* The pinned story stays dark so the kraft box stands out. Same names, dark values (THEMES.c). */
+div[data-template="eco"] .tone-dark {
+  --bg: #102a20;
+  --surface: #17372b;
+  --fg: #f5f0e6;
+  --muted: #b5c4b8;
+  --kraft: #b8803f;
+  --kraft-ink: #d0a265;
+  --accent: #9db8a0;
+  --on-accent: #102a20;
+  --line: color-mix(in srgb, var(--fg) 18%, transparent);
+  --line-strong: color-mix(in srgb, var(--fg) 45%, transparent);
+  --wash: color-mix(in srgb, var(--fg) 8%, transparent);
+  --field: color-mix(in srgb, var(--fg) 6%, var(--surface));
+  background: var(--bg);
+  color: var(--fg);
 }
-@keyframes eco-morph {
-  0%, 100% { border-radius: 62% 38% 55% 45% / 48% 58% 42% 52%; }
-  50% { border-radius: 40% 60% 42% 58% / 58% 40% 60% 42%; }
+
+/* Keyboard focus: a 2px ring in the accent, offset so it never touches the text. */
+div[data-template="eco"] :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
-div[data-template="eco"] .sticker {
-  animation: eco-wobble 5s ease-in-out infinite;
+
+/* One short fade and a small lift. Used for the story captions and the first paint of sections. */
+@keyframes eco-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
 }
-div[data-template="eco"] .morph {
-  animation: eco-morph 14s ease-in-out infinite;
+div[data-template="eco"] .fade-in {
+  animation: eco-fade 0.28s ease-out both;
 }
-@keyframes eco-pop {
-  0% { transform: translateY(14px) scale(0.92); opacity: 0; }
-  100% { transform: none; opacity: 1; }
+
+/* Shared sections that the eco page reuses (Reviews, forms) follow the same small radii and plain labels. */
+div[data-template="eco"] .eyebrow {
+  font-size: 0.9375rem;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 600;
+  color: var(--kraft-ink);
 }
-div[data-template="eco"] .pop {
-  animation: eco-pop 0.55s var(--spring) both;
+div[data-template="eco"] #reviews li {
+  border-radius: var(--r-card);
 }
