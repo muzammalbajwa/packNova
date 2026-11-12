@@ -8,6 +8,7 @@ import { launch, sleep } from "./lib/cdp.mjs";
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://localhost:8080");
 const TEMPLATE = arg("template", "editorial");
+const FLAT = TEMPLATE === "eco"; // eco: plain social image (no glow, sentence-case label, the page's own headline, wrapped)
 
 const c = await launch({ width: 1440, height: 900, dpr: 1 });
 await c.send("Page.navigate", { url: `${BASE}/t/${TEMPLATE}/?tier=high` });
@@ -15,6 +16,7 @@ await c.waitFor("window.__r3f && !document.querySelector('[role=status]') && doc
 await sleep(2500);
 
 const result = JSON.parse(await c.ev(`(async () => {
+  const FLAT = ${FLAT};
   window.scrollTo(0, 0);
   await new Promise((r) => setTimeout(r, 600));
   const st = window.__r3f;
@@ -44,6 +46,26 @@ const result = JSON.parse(await c.ev(`(async () => {
   const o = document.createElement("canvas"); o.width = 1200; o.height = 630;
   const g = o.getContext("2d");
   g.fillStyle = v("--bg"); g.fillRect(0, 0, 1200, 630);
+  if (FLAT) {
+    // soften the square edge of the render so the contact shadow does not end in a hard line
+    const m = document.createElement("canvas"); m.width = m.height = 600;
+    const mg = m.getContext("2d"); mg.drawImage(box, 0, 0, 600, 600);
+    mg.globalCompositeOperation = "destination-in";
+    const fade = mg.createRadialGradient(300, 300, 262, 300, 300, 300);
+    fade.addColorStop(0, "#000"); fade.addColorStop(1, "#0000");
+    mg.fillStyle = fade; mg.fillRect(0, 0, 600, 600);
+    g.drawImage(m, 590, 20, 600, 600);
+    g.fillStyle = v("--kraft-ink"); g.font = "600 26px " + font;
+    g.fillText(document.querySelector("[data-og-eyebrow]").textContent, 72, 170);
+    g.fillStyle = v("--fg"); g.font = "500 76px " + font;
+    // wrap the page's own h1 to the left column
+    let line = "", y = 262;
+    for (const word of document.querySelector("h1").textContent.trim().split(/\\s+/)) {
+      const t = line ? line + " " + word : word;
+      if (g.measureText(t).width > 500 && line) { g.fillText(line, 72, y); y += 86; line = word; } else line = t;
+    }
+    g.fillText(line, 72, y);
+  } else {
   const glow = g.createRadialGradient(900, 330, 20, 900, 330, 520);
   glow.addColorStop(0, v("--accent") + "33"); glow.addColorStop(1, v("--accent") + "00");
   g.fillStyle = glow; g.fillRect(0, 0, 1200, 630);
@@ -53,8 +75,9 @@ const result = JSON.parse(await c.ev(`(async () => {
   g.letterSpacing = "0px"; g.fillStyle = v("--fg"); g.font = "700 96px " + font;
   const words = ["Packaging", "with"]; g.fillText(words[0], 72, 262); g.fillText(words[1], 72, 352);
   g.fillStyle = v("--kraft-ink"); g.fillText("presence.", 72, 442);
+  }
   g.fillStyle = v("--muted"); g.font = "400 28px " + font;
-  g.fillText(document.title.split("|")[0].trim(), 72, 540);
+  g.fillText(document.title.split("|")[0].trim(), 72, FLAT ? 570 : 540);
   const og = o.toDataURL("image/png");
 
   gl.setPixelRatio(pr); gl.setSize(w0, h0, false); camera.aspect = w0 / h0; camera.zoom = 1; camera.updateProjectionMatrix();
