@@ -195,8 +195,8 @@ const CLOSE_TEXT: Record<LidKind, [string, string]> = {
   magnet: ["Magnet closure", "A hidden magnet in the lid snaps shut against the base."],
   shoulder: ["Lid over a shoulder", "A raised neck inside the base holds the lid snug."],
   gable: ["Gable top, with a handle", "The top folds into a roof shape with a handle you can carry it by."],
-  pillow: ["Pillow closing", "The ends curve and meet in the middle, forming a soft pillow shape."],
-  flap: ["Flap closed", "A single flap folds over and locks in a slot."],
+  pillow: ["Curved sides, then crimped ends", "The sides curve in to the pillow shape, then each end is pressed flat along an arched crimp."],
+  flap: ["Two inner flaps, then two outer flaps", "The two short flaps fold in first. The two long flaps fold over them and meet in the middle."],
   none: ["Closed", "The carton closes with its own flaps."],
 };
 
@@ -514,7 +514,7 @@ const ENTRIES: Entry[] = [
     short: "Curved-end cartons for favours, jewelry and small gifts.",
     what: "A small carton whose ends curve and meet like a pillow. It is light, flat when shipped and pretty enough to need no wrapping.",
     recipe: "folding-carton",
-    skin: sk({ material: "color", base: "#e9e0cf", accent: "#1e4d3a", second: KRAFT, print: "dots", lid: "pillow", ratio: [1, 0.5, 0.6] }),
+    skin: sk({ material: "color", base: "#e9e0cf", accent: "#1e4d3a", second: KRAFT, print: "dots", lid: "pillow", ratio: [1, 0.6, 0.3] }),
     materials: "Paperboard or kraft board",
     uses: ["Wedding and party favours", "Jewelry", "Small gifts", "Sample products"],
     finishes: ["Printed outside", "Matte coating", "Window (optional)"],

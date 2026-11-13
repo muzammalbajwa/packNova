@@ -2,6 +2,7 @@ import * as THREE from "three";
 import type { RecipeCtx, RecipeFactory } from "../types";
 import { Pool, PI2, blobShadow, fitDistance, lerp, lin, orbit, seg, sheetTexture, skinMats, steel } from "../kit";
 import { buildChain, chainLayout, type ChainSpec } from "../chain";
+import { createPillow } from "./pillow";
 
 const N = 6; // print, die-cut, fold lines, glue, close, pack
 const ROOF = (30 * Math.PI) / 180; // gable roof slope
@@ -15,24 +16,28 @@ const tmpS = new THREE.Vector3();
  * one seam, closed (tuck lid, or a gabled roof with a handle), then packed with others.
  * The skin chooses the variation: window cut-out, gable top. Pillow and flap styles close like a tuck here.
  */
-const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
+const create: RecipeFactory = (ctx: RecipeCtx) => {
+  if (ctx.skin.lid === "pillow") return createPillow(ctx);
+  const { skin, low } = ctx;
   const pool = new Pool();
   const k = 1.7 / Math.max(...skin.ratio);
   const L = skin.ratio[0] * k;
   const D = skin.ratio[1] * k;
   const H = skin.ratio[2] * k;
   const gable = skin.lid === "gable";
+  const flap = skin.lid === "flap"; // two inner flaps, then two outer flaps (top and bottom)
+  const fl = D / 2;
   const t = 0.022;
   const roofD = D / 2 / Math.cos(ROOF);
   const rise = (D / 2) * Math.tan(ROOF);
   const handleD = Math.min(0.42, D * 0.55);
   const spec: ChainSpec = {
     widths: [L, D, L, D], H, t, glueW: Math.min(0.2, D * 0.45), margin: 0.16,
-    top: gable ? [roofD, rise, roofD, rise] : [0, 0, D, 0],
+    top: gable ? [roofD, rise, roofD, rise] : flap ? [fl, fl, fl, fl] : [0, 0, D, 0],
     skipTop: gable ? [false, true, false, true] : undefined,
-    bottom: [D * 0.3, 0, D, 0],
-    topLayer: [0, 0, 1, 0], bottomLayer: [0, 0, 1, 0],
-    tuckTop: gable ? [handleD, 0, handleD, 0] : [0, 0, Math.min(0.42 * D, 0.5), 0],
+    bottom: flap ? [fl, fl, fl, fl] : [D * 0.3, 0, D, 0],
+    topLayer: flap ? [1, 0, 1, 0] : [0, 0, 1, 0], bottomLayer: flap ? [1, 0, 1, 0] : [0, 0, 1, 0],
+    tuckTop: gable ? [handleD, 0, handleD, 0] : flap ? [0, 0, 0, 0] : [0, 0, Math.min(0.42 * D, 0.5), 0],
     tuckBottom: [0, 0, 0, 0],
     window: skin.window ? { x: L * 0.16, y: H * 0.28, w: L * 0.68, h: H * 0.42 } : undefined,
   };
@@ -148,10 +153,23 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
       film.position.set(spec.window!.x + spec.window!.w / 2, spec.window!.y + spec.window!.h / 2, -t - 0.03 * (1 - seg(t3, 0, 0.3)));
     }
     // 4: bottom, then the top
-    const fb = seg(t4, 0, 0.3);
-    c.setBottom(0, fb);
-    c.setBottom(2, seg(t4, 0.08, 0.38));
-    if (gable) {
+    if (flap) {
+      // bottom: the two inner (short) flaps, then the two outer (long) flaps; then the same at the top
+      c.setBottom(1, seg(t4, 0, 0.12));
+      c.setBottom(3, seg(t4, 0, 0.12));
+      c.setBottom(0, seg(t4, 0.1, 0.24));
+      c.setBottom(2, seg(t4, 0.1, 0.24));
+      c.setTop(1, seg(t4, 0.4, 0.58));
+      c.setTop(3, seg(t4, 0.4, 0.58));
+      c.setTop(0, seg(t4, 0.56, 0.78));
+      c.setTop(2, seg(t4, 0.56, 0.78));
+    } else {
+      c.setBottom(0, seg(t4, 0, 0.3));
+      c.setBottom(2, seg(t4, 0.08, 0.38));
+    }
+    if (flap) {
+      // handled above
+    } else if (gable) {
       const ang = PI2 - ROOF;
       const fr = seg(t4, 0.35, 0.75);
       for (const i of [0, 2]) {
