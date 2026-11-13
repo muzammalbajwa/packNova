@@ -75,7 +75,7 @@ ALL copy, brand and contact values: `brand`, `contact`, `social`, `seo`, `footer
 | `deviceTier.ts` | Classifies `none` (no WebGL) / `low` / `mid` / `high`; DPR range, shadows, post-processing (high only), geometry `detail` 0..2. Overridable with `?tier=`. |
 | `store.ts` | zustand: `profile`, `reducedMotion`, loader `progress`/`ready`, scene `zones`/`sceneActive`, `heroProgress`, `makingProgress`, `themeId`, `story3d`, `quotePrefill`. |
 | `scroll.ts` | Lenis + ScrollTrigger init, reveal animations, `trackProgress`. |
-| `palette.ts` | Four palettes A "Ivory and Ink" (default), B "Midnight and Gold", C "Forest and Lime", D "Paper and Cobalt". One object drives CSS variables (generated in `layout.tsx`), 3D lights, kraft color, shadows, foil/die-line inks and the loader. `DEFAULT_THEME` lives here. |
+| `palette.ts` | Four palettes A "Ivory and Ink" (default), B "Midnight and Gold", C "Forest and Kraft" (eco story; eco page colors are `ECO_PAGE`), D "Paper and Cobalt". One object drives CSS variables (generated in `layout.tsx`), 3D lights, kraft color, shadows, foil/die-line inks and the loader. `DEFAULT_THEME` lives here. |
 | `making.ts` | `STAGES` (board, print, finish, diecut, fold, glue, ship) with from/to/anchor ranges, `CTA_AT` 0.94, `QUOTE_BUTTON_AT` 0.55, `FOLD` windows per hinge, `seg`/`lin` helpers. |
 | `dieline.ts` | Flat sheet of hinged panels and its canvas painters (logo printed on the carton uses `brand.name`). |
 | `textures.ts` | Procedural canvas textures and PBR materials (kraft, white, black, corrugation relief, logo and shipping-label decals). |
@@ -191,3 +191,10 @@ Outcome: This file, written from the codebase, README/DEPLOY/CONTENT-TODO/PHONE-
 - Do not add invented testimonials, stats, prices, certifications or client logos.
 - Do not deploy, push, or commit unless asked. `next dev` rewrites the block in `AGENTS.md`; leave it.
 - Keep the 3D bundle out of non-3D pages and keep the performance budget in section 4.
+
+### Eco refresh (2026-11-13)
+- Eco page is cream/forest/kraft/sage (`ECO_PAGE` in `lib/palette.ts`, mirrored in `templates/eco/tokens.css`); the pinned story re-declares the dark palette C through the `.tone-dark` class (`stickyClassName`). `scripts/contrast.mjs` checks both blocks.
+- Fonts: Newsreader 500/600 (headings) + Source Sans 3 (body), `templates/eco/fonts.ts`. No eyebrow chips, 6 to 8 px radii, 1px rules, list-style products and process.
+- Eco-only wording lives in `templates/eco/copy.ts` (owner TODOs marked `TODO(owner)`, listed in CONTENT-TODO.md section 8); `site.media` holds the empty photo slots.
+- `data-reveal="subtle"` (lib/scroll.ts) is the one short fade; `TemplateFrame previewBack={false}` hides the preview link.
+- `scripts/refresh-shots.mjs` takes the page-walk screenshots (`docs/screenshots/refresh/{before,after}`). `scripts/export-images.mjs --template eco` writes a flat social image.

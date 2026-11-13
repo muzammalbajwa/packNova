@@ -50,7 +50,7 @@ Append `?tier=low|mid|high|none` to the URL to force a device tier while testing
 
 ## Themes
 
-Four palettes live in **one file**, `src/lib/palette.ts`: A "Ivory and Ink" (default, light), B "Midnight and Gold", C "Forest and Lime", D "Paper and Cobalt".
+Four palettes live in **one file**, `src/lib/palette.ts`: A "Ivory and Ink" (default, light), B "Midnight and Gold", C "Forest and Kraft" (eco: this is its dark story palette; the cream page palette is `ECO_PAGE` in the same file), D "Paper and Cobalt".
 `layout.tsx` generates the CSS variables from it, and the 3D lights, kraft color, shadows, foil/die-line inks and the loader read the same object, so a theme switch changes everything.
 
 - `?theme=a|b|c|d` picks a theme (remembered in `localStorage`); add `?themes=1` for a small floating switcher.
