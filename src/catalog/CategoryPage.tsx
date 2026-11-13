@@ -57,6 +57,28 @@ export default function CategoryPage({ page }: { page: CatalogPage }) {
         </div>
       </section>
 
+      {page.variants && (
+        <section aria-labelledby="var-h" className="border-t border-[var(--line)] px-6 py-16 md:py-24">
+          <div className="mx-auto max-w-6xl">
+            <h2 id="var-h" className={h2}>Styles</h2>
+            <ul className="mt-6 grid gap-px border border-[var(--line)] bg-[var(--line)] sm:grid-cols-2 lg:grid-cols-4">
+              {page.variants.map((href) => {
+                const v = PAGE_BY_HREF[href];
+                return v ? (
+                  <li key={href} className="bg-[var(--bg)]">
+                    <Link href={href} className="group block h-full p-5 hover:bg-[var(--sand)]">
+                      <span className="font-display text-xl font-medium">{v.title}</span>
+                      <span className="mt-1 block text-[var(--muted)]">{v.short}</span>
+                      <span className="mt-3 block font-semibold text-[var(--accent)] group-hover:underline underline-offset-4">See the style →</span>
+                    </Link>
+                  </li>
+                ) : null;
+              })}
+            </ul>
+          </div>
+        </section>
+      )}
+
       <section aria-labelledby="faq-h" className="border-t border-[var(--line)] px-6 py-16 md:py-24">
         <div className="mx-auto max-w-3xl">
           <h2 id="faq-h" className={h2}>Questions</h2>

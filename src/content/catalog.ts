@@ -1,5 +1,5 @@
 /**
- * The single source of truth for every product page behind the nav bar (29 pages in 4 groups).
+ * The single source of truth for every product page behind the nav bar (31 pages in 4 groups).
  * Each page = one process `recipe` (the 3D "how it is made" film) + one `skin` (material, colors, print, size, props).
  * This file has no three.js import: the nav, the hub pages and the sitemap read it without loading any 3D code.
  *
@@ -73,6 +73,8 @@ export interface CatalogPage {
   steps: ProcessStep[];
   /** hrefs of related pages. */
   related: string[];
+  /** Overview pages list their styles here (hrefs). */
+  variants?: string[];
   /** Handed to the quote form. */
   quote: { product: string; note: string };
 }
@@ -247,6 +249,7 @@ interface Entry {
   extra: Faq;
   notes?: Record<string, string>;
   related: string[];
+  variants?: string[];
 }
 
 const ENTRIES: Entry[] = [
@@ -479,6 +482,33 @@ const ENTRIES: Entry[] = [
     related: ["/material/retail-boxes/", "/industry/display-boxes/", "/industry/food-boxes/"],
   },
   {
+    slug: "folding-cartons", group: "shape-and-style", title: "Folding Cartons", noun: "folding carton",
+    headline: "One flat sheet, many ways to close it.",
+    short: "Printed cartons that ship flat and fold up on your line.",
+    what: "The folding carton is the everyday retail box: printed on one flat sheet, cut and creased, then folded and glued. It ships flat, so it stores and travels cheaply. The style you pick (tuck, window, pillow or gable) changes how it closes and how it looks.",
+    recipe: "folding-carton",
+    skin: sk({ material: "white", base: "#efe8d8", accent: FOREST, second: KRAFT, print: "band", lid: "tuck", ratio: [0.9, 0.6, 1.3] }),
+    materials: "Paperboard or kraft board, coated or uncoated",
+    uses: ["Cosmetics and health", "Food and gifts", "Small electronics", "Retail products"],
+    finishes: ["Matte or gloss coating", "Foil", "Spot UV", "Embossing", "Window film"],
+    extra: { q: "How do I pick a style?", a: "Choose the closing for how the product is used. A tuck is the simplest, a window shows the product, a pillow suits small light gifts and a gable adds a handle. Tell us what is going in and we will suggest one." },
+    related: ["/material/retail-boxes/", "/material/kraft-boxes/", "/industry/cosmetic-boxes/"],
+    variants: ["/shape-and-style/tuck-boxes/", "/shape-and-style/window-boxes/", "/shape-and-style/pillow-boxes/", "/shape-and-style/gable-boxes/"],
+  },
+  {
+    slug: "poly-and-courier-bags", group: "shape-and-style", title: "Poly & Courier Bags", noun: "courier bag",
+    headline: "Light, sealed and ready to post.",
+    short: "Printed poly mailers and tamper-evident courier bags.",
+    what: "Thin, strong bags for clothing and soft goods that are posted rather than shelved. They are light, waterproof and seal shut with a peel-off strip, so the parcel shows if it was opened on the way.",
+    recipe: "pouch",
+    skin: sk({ material: "film", base: "#dfe5e1", accent: FOREST, second: KRAFT, print: "wordmark", ratio: [1.1, 0.04, 1.4] }),
+    materials: "Poly film, matte or gloss, single or co-extruded layers",
+    uses: ["Clothing and textiles", "Online stores", "Couriers and returns", "Soft goods"],
+    finishes: ["Matte or gloss film", "Peel-and-seal strip", "Tamper-evident seal", "One to four colors"],
+    extra: { q: "Are the bags waterproof?", a: "Poly film keeps out rain and splashes. If your goods are very sensitive to moisture, tell us and we will suggest a thicker film." },
+    related: ["/industry/mylar-bags/", "/shape-and-style/paper-bags/", "/industry/apparel-boxes/"],
+  },
+  {
     slug: "pillow-boxes", group: "shape-and-style", title: "Pillow Boxes", noun: "pillow box",
     headline: "A soft shape for small gifts.",
     short: "Curved-end cartons for favours, jewelry and small gifts.",
@@ -684,6 +714,7 @@ export const PAGES: readonly CatalogPage[] = ENTRIES.map((e): CatalogPage => ({
   skin: e.skin,
   steps: stepsFor(e.recipe, e.skin, e.noun, e.notes ?? {}),
   related: e.related,
+  variants: e.variants,
   quote: { product: e.title, note: `I am interested in: ${e.title}.` },
 }));
 
@@ -719,15 +750,12 @@ export const quoteHref = (product?: string, note?: string) => {
   return s ? `${ROUTES.quote}?${s}` : ROUTES.quote;
 };
 
-/**
- * The six homepage categories (site.products.items ids) and the page each one opens.
- * There is no page for "Poly & Courier Bags" yet, so it opens Mylar Bags (flexible film packaging).
- */
+/** The six homepage categories (site.products.items ids) and the page each one opens. */
 export const HOME_CATEGORY_HREF: Record<string, string> = {
   corrugated: "/material/corrugated-boxes/",
-  folding: "/material/retail-boxes/",
+  folding: "/shape-and-style/folding-cartons/",
   rigid: "/material/rigid-boxes/",
   pouches: "/industry/mylar-bags/",
-  courier: "/industry/mylar-bags/",
+  courier: "/shape-and-style/poly-and-courier-bags/",
   eco: "/shape-and-style/paper-bags/",
 };

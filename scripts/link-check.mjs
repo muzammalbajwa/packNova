@@ -33,6 +33,23 @@ for (const file of html) {
     if (hash && !pathPart && !ids.has(hash)) bad.push(`${page} -> ${href} (missing id)`);
   }
 }
+// the six homepage categories must each open their own page (no two share one, none opens an unrelated page)
+const home = readFileSync(join(OUT, "index.html"), "utf8");
+const sec = home.slice(home.indexOf('id="products"'), home.indexOf("</section>", home.indexOf('id="products"')));
+const cats = [...sec.matchAll(/<a[^>]*href="([^"]+)"[^>]*>[\s\S]*?<span class="font-display[^>]*>([^<]+)</g)].map((m) => [m[2], m[1]]);
+const want = {
+  "Corrugated Shipping Boxes": "/material/corrugated-boxes/",
+  "Folding Cartons": "/shape-and-style/folding-cartons/",
+  "Rigid Gift Boxes": "/material/rigid-boxes/",
+  "Flexible Pouches": "/industry/mylar-bags/",
+  "Poly & Courier Bags": "/shape-and-style/poly-and-courier-bags/",
+  "Eco & Paper Packaging": "/shape-and-style/paper-bags/",
+};
+for (const [name, href] of Object.entries(want)) {
+  const got = cats.find((c) => c[0].replaceAll("&amp;", "&") === name)?.[1];
+  if (got !== href) bad.push(`home category "${name}" opens ${got ?? "nothing"}, expected ${href}`);
+}
+if (new Set(cats.map((c) => c[1])).size !== cats.length) bad.push("two homepage categories open the same page");
 console.log(`${html.length} pages, ${links} internal links, ${bad.length} broken`);
 for (const b of [...new Set(bad)].slice(0, 40)) console.log("  " + b);
 process.exit(bad.length ? 1 : 0);

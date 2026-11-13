@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { site } from "@/content/site";
 import { NAV, quoteHref as quoteLink } from "@/content/catalog";
 import Logo from "@/components/ui/Logo";
+import { getLenis } from "@/lib/scroll";
 import { track } from "@/lib/track";
 import { useHideOnScroll } from "@/shared/useHideOnScroll";
 
@@ -49,6 +50,24 @@ export default function Navbar({ base: _base, onHome: _onHome }: { base?: string
       document.removeEventListener("keydown", onKey);
     };
   }, []);
+
+  // while the mobile menu is open the page behind it does not scroll (Lenis is paused too)
+  useEffect(() => {
+    if (!mobile) return;
+    const html = document.documentElement;
+    const prev = html.style.overflow;
+    html.style.overflow = "hidden";
+    getLenis()?.stop();
+    return () => {
+      html.style.overflow = prev;
+      getLenis()?.start();
+    };
+  }, [mobile]);
+
+  // a route change closes the menu
+  useEffect(() => {
+    setMobile(false); // eslint-disable-line react-hooks/set-state-in-effect
+  }, [path]);
 
   const pick = (menu: string, item: string) => {
     track("nav_menu_click", { menu, item });
@@ -132,7 +151,7 @@ export default function Navbar({ base: _base, onHome: _onHome }: { base?: string
 
         {/* mobile menu */}
         {mobile && (
-          <div id="eco-mobile-menu" className="fade-in max-h-[calc(100dvh-6.25rem)] overflow-y-auto border-t border-[var(--line)] bg-[var(--bg)] px-6 pb-6 lg:hidden">
+          <div id="eco-mobile-menu" className="fade-in max-h-[calc(100dvh-6.25rem)] overflow-y-auto overscroll-contain border-t border-[var(--line)] bg-[var(--bg)] px-6 pb-6 lg:hidden">
             <ul>
               {NAV.map((e, i) => (
                 <li key={e.label} className="border-b border-[var(--line)]">
