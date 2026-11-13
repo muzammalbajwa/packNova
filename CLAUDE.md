@@ -198,3 +198,6 @@ Outcome: This file, written from the codebase, README/DEPLOY/CONTENT-TODO/PHONE-
 - Eco-only wording lives in `templates/eco/copy.ts` (owner TODOs marked `TODO(owner)`, listed in CONTENT-TODO.md section 8); `site.media` holds the empty photo slots.
 - `data-reveal="subtle"` (lib/scroll.ts) is the one short fade; `TemplateFrame previewBack={false}` hides the preview link.
 - `scripts/refresh-shots.mjs` takes the page-walk screenshots (`docs/screenshots/refresh/{before,after}`). `scripts/export-images.mjs --template eco` writes a flat social image.
+
+### Cargo plane rebuild (2026-11-13)
+- `components/canvas/making/CargoPlane.ts` builds the plane procedurally: lathe nose and nacelles, lofted wings/fin/stabilizers (rounded leading edges, hinge lines, rudder panel), T-tail, engines on pylons, an upswept tail door that swings up as the hatch (`setHatch`), gear that retracts (`setGear`). Geometry is merged per material: 12 meshes, about 6.4k triangles. The `Vehicle` interface, hold size and wheel-to-ground height are unchanged, so stage timing and cameras are untouched. Review shots: `docs/screenshots/plane/` (`model/` = the plane alone from 6 angles).
