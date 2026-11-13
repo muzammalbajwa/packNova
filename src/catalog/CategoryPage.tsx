@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { GROUP_BY_ID, PAGE_BY_HREF, quoteHref, ROUTES, type CatalogPage } from "@/content/catalog";
 import Crumbs from "./Crumbs";
+import PrefetchLink from "./PrefetchLink";
 import ProductFilm from "./ProductFilm";
 import ProductPoster from "./ProductPoster";
 import Shell from "./Shell";
@@ -66,11 +67,11 @@ export default function CategoryPage({ page }: { page: CatalogPage }) {
                 const v = PAGE_BY_HREF[href];
                 return v ? (
                   <li key={href} className="bg-[var(--bg)]">
-                    <Link href={href} className="group block h-full p-5 hover:bg-[var(--sand)]">
+                    <PrefetchLink recipe={v.recipe} href={href} className="group block h-full p-5 hover:bg-[var(--sand)]">
                       <span className="font-display text-xl font-medium">{v.title}</span>
                       <span className="mt-1 block text-[var(--muted)]">{v.short}</span>
                       <span className="mt-3 block font-semibold text-[var(--accent)] group-hover:underline underline-offset-4">See the style →</span>
-                    </Link>
+                    </PrefetchLink>
                   </li>
                 ) : null;
               })}
@@ -114,10 +115,10 @@ export default function CategoryPage({ page }: { page: CatalogPage }) {
               const r = PAGE_BY_HREF[href];
               return r ? (
                 <li key={href} className="bg-[var(--bg)]">
-                  <Link href={href} className="block h-full p-5 hover:bg-[var(--sand)]">
+                  <PrefetchLink recipe={r.recipe} href={href} className="block h-full p-5 hover:bg-[var(--sand)]">
                     <span className="font-display text-xl font-medium">{r.title}</span>
                     <span className="mt-1 block text-[var(--muted)]">{r.short}</span>
-                  </Link>
+                  </PrefetchLink>
                 </li>
               ) : null;
             })}

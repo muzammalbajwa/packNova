@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import PrefetchLink from "@/catalog/PrefetchLink";
 import { usePathname } from "next/navigation";
 import { site } from "@/content/site";
 import { NAV, quoteHref as quoteLink } from "@/content/catalog";
@@ -117,9 +118,9 @@ export default function Navbar({ base: _base, onHome: _onHome }: { base?: string
                       <ul className="fade-in absolute left-0 top-full z-10 w-[min(32rem,90vw)] columns-2 gap-x-6 rounded-[var(--r-card)] border border-[var(--line-strong)] bg-[var(--surface)] p-3 shadow-[0_12px_28px_-18px_rgba(23,35,29,0.5)]">
                         {e.items.map((item) => (
                           <li key={item.href} className="break-inside-avoid">
-                            <Link href={item.href} onClick={() => pick(e.label, item.label)} aria-current={here(item.href) ? "page" : undefined} className="block rounded-[var(--r-field)] px-3 py-2 text-[var(--fg)] hover:bg-[var(--sand)] aria-[current=page]:font-semibold">
+                            <PrefetchLink recipe={item.recipe} href={item.href} onClick={() => pick(e.label, item.label)} aria-current={here(item.href) ? "page" : undefined} className="block rounded-[var(--r-field)] px-3 py-2 text-[var(--fg)] hover:bg-[var(--sand)] aria-[current=page]:font-semibold">
                               {item.label}
-                            </Link>
+                            </PrefetchLink>
                           </li>
                         ))}
                         <li className="mt-1 break-inside-avoid border-t border-[var(--line)] pt-1">
@@ -165,7 +166,7 @@ export default function Navbar({ base: _base, onHome: _onHome }: { base?: string
                         <ul className="grid grid-cols-2 gap-x-4 pb-3">
                           {e.items.map((item) => (
                             <li key={item.href}>
-                              <Link href={item.href} onClick={() => pick(e.label, item.label)} className="block py-2 text-[var(--muted)]">{item.label}</Link>
+                              <PrefetchLink recipe={item.recipe} href={item.href} onClick={() => pick(e.label, item.label)} className="block py-2 text-[var(--muted)]">{item.label}</PrefetchLink>
                             </li>
                           ))}
                           <li className="col-span-2"><Link href={e.href!} onClick={() => pick(e.label, "all")} className="block py-2 font-semibold text-[var(--accent)]">All {e.label.toLowerCase()} →</Link></li>

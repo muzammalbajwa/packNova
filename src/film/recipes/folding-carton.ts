@@ -207,4 +207,7 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
   };
 };
 
+/** Marker string, so tests can tell which chunk holds this recipe. */
+export const RECIPE_ID = "film-recipe:folding-carton";
+
 export default create;

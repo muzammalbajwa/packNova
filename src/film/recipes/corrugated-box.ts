@@ -184,4 +184,7 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
   return { root, update, dispose() { pool.dispose(); others.dispose(); } };
 };
 
+/** Marker string, so tests can tell which chunk holds this recipe. */
+export const RECIPE_ID = "film-recipe:corrugated-box";
+
 export default create;
