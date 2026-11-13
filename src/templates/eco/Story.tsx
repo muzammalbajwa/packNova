@@ -102,8 +102,8 @@ function Overlay(api: StoryApi) {
   );
 }
 
-function Fallback() {
-  const links = useStoryLinks("/t/eco");
+function Fallback({ base }: { base: string }) {
+  const links = useStoryLinks(base);
   return (
     <section id="making" aria-labelledby="making-h" className="tone-dark relative z-10 px-6 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
@@ -142,7 +142,7 @@ export default function Story({ base }: { base: string }) {
       stickyClassName="tone-dark"
       canvasClassName="absolute inset-x-3 top-16 h-[42%] overflow-hidden rounded-[var(--r-card)] border border-[var(--line)] bg-[var(--surface)] md:inset-x-auto md:bottom-24 md:right-6 md:top-20 md:h-auto md:w-[56%]"
       overlay={Overlay}
-      fallback={<Fallback />}
+      fallback={<Fallback base={base} />}
     />
   );
 }

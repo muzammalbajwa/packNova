@@ -13,7 +13,8 @@ import Products from "./Products";
 import QuoteSection from "./QuoteSection";
 import Story from "./Story";
 
-export const BASE = "/t/eco";
+/** Empty: eco is the site root, so links are "/" and "/configurator/". The /t/eco/ route still works. */
+export const BASE = "";
 
 export default function Home() {
   return (
