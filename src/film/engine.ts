@@ -4,6 +4,8 @@ import type { RecipeInstance } from "./types";
 declare global {
   interface Window {
     /** Film renderer (dev / ?perf=1 / tests): __film.renderer.info.render.calls */
+    /** Releases the film renderer's WebGL context at once (pages that create their own canvas call this first). */
+    __filmDestroy?: () => void;
     __film?: { renderer: THREE.WebGLRenderer; scene: THREE.Scene; camera: THREE.PerspectiveCamera; set: (p: number) => void; visible: () => boolean };
   }
 }
@@ -26,6 +28,7 @@ class Engine {
   private ro: ResizeObserver | null = null;
   private maxDpr = 1.5;
   firstFrame: (() => void) | null = null;
+  private destroyTimer = 0;
 
   constructor() {
     const r = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
@@ -47,6 +50,7 @@ class Engine {
   }
 
   attach(host: HTMLElement, maxDpr: number) {
+    window.clearTimeout(this.destroyTimer);
     this.host = host;
     this.maxDpr = maxDpr;
     host.appendChild(this.renderer.domElement);
@@ -70,6 +74,28 @@ class Engine {
     this.renderer.renderLists.dispose();
     this.host = null;
     this.firstFrame = null;
+    // Another film page attaches within a moment (and keeps the renderer). If none does, free the WebGL context.
+    this.destroyTimer = window.setTimeout(() => this.destroy(), 150);
+  }
+
+  /** Disposes the renderer and its context. The next getEngine() builds a new one. */
+  destroy() {
+    window.clearTimeout(this.destroyTimer);
+    if (this.recipe) {
+      this.scene.remove(this.recipe.root);
+      this.recipe.dispose();
+      this.recipe = null;
+    }
+    this.ro?.disconnect();
+    cancelAnimationFrame(this.raf);
+    this.raf = 0;
+    this.renderer.domElement.remove();
+    this.renderer.dispose();
+    this.renderer.forceContextLoss();
+    this.host = null;
+    delete window.__film;
+    delete window.__filmDestroy;
+    if (engine === this) engine = null;
   }
 
   /** Mount a recipe: warm every shader and texture while it is fully visible, then draw the first frame. */
@@ -158,5 +184,12 @@ class Engine {
 }
 
 let engine: Engine | null = null;
-export const getEngine = () => (engine ??= new Engine());
+export function getEngine() {
+  if (!engine) {
+    engine = new Engine();
+    const e = engine;
+    window.__filmDestroy = () => e.destroy();
+  }
+  return engine;
+}
 export type { Engine };

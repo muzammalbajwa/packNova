@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { quoteHref, type CatalogPage } from "@/content/catalog";
-import { RECIPE_LOADERS, hasFilm, loadEngine } from "@/film/loaders";
+import { RECIPE_LOADERS, hasFilm, loadEngine, waitForOtherContexts } from "@/film/loaders";
 import { detectDevice } from "@/lib/deviceTier";
 import { trackProgress } from "@/lib/scroll";
 import ProductPoster from "./ProductPoster";
@@ -64,7 +64,7 @@ function Pinned({ page }: { page: CatalogPage }) {
     let detach: (() => void) | null = null;
     const profile = detectDevice();
     const start = async () => {
-      const [{ getEngine }, mod] = await Promise.all([loadEngine(), RECIPE_LOADERS[page.recipe]!()]);
+      const [{ getEngine }, mod] = await Promise.all([loadEngine(), RECIPE_LOADERS[page.recipe]!(), waitForOtherContexts()]);
       if (dead || !hostRef.current) return;
       const eng = getEngine();
       eng.attach(hostRef.current, profile.dpr[1]);
@@ -74,9 +74,10 @@ function Pinned({ page }: { page: CatalogPage }) {
       await eng.mount(mod.default({ skin: page.skin, steps: page.steps, low: profile.tier === "low" }));
       detach = () => eng.detach();
     };
+    const warm = !!window.__film; // the renderer from the previous film page is still alive: no need to wait for idle time
     const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (h: number) => void };
-    const h = w.requestIdleCallback ? w.requestIdleCallback(() => void start(), { timeout: 1500 }) : window.setTimeout(() => void start(), 200);
-    const ric = !!w.requestIdleCallback;
+    const h = warm ? window.setTimeout(() => void start(), 0) : w.requestIdleCallback ? w.requestIdleCallback(() => void start(), { timeout: 1500 }) : window.setTimeout(() => void start(), 200);
+    const ric = !warm && !!w.requestIdleCallback;
     return () => {
       dead = true;
       if (ric) w.cancelIdleCallback?.(h);

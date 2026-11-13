@@ -40,6 +40,7 @@ function Studio({ initial, base }: { initial: Spec; base: string }) {
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.__filmDestroy?.(); // one WebGL context at a time: free the product film's before the preview canvas is created
     useAppStore.getState().setProfile(detectDevice(), reduced);
   }, []);
 
