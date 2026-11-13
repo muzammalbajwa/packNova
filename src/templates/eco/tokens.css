@@ -76,3 +76,8 @@ div[data-template="eco"] .eyebrow {
 div[data-template="eco"] #reviews li {
   border-radius: var(--r-card);
 }
+
+/* Anchor jumps stop below the fixed header (contact bar + main bar). */
+div[data-template="eco"] section[id] {
+  scroll-margin-top: 6.5rem;
+}
