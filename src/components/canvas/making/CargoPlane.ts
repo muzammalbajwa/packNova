@@ -24,7 +24,7 @@ export const PLANE_SPEC = {
   fin: { rootTE: 0.945, rootChord: 8.0, tipChord: 4.8, height: 8.2, sweepDeg: 35, rootY: 1.8, rootThick: 0.95, tipThick: 0.36, rudder: 0.3 },
   stab: { rootChord: 4.4, tipChord: 1.2, halfSpan: 9.4, sweepDeg: 20, dihedralDeg: 4, rootThick: 0.5, tipThick: 0.2 },
   wing: { rootCenter: 0.47, rootChord: 9.6, tipChord: 3.4, halfSpan: 21.6, sweepDeg: 27, dihedralDeg: 3, rootY: -1.25, rootZ: 2.6, rootThick: 1.15, tipThick: 0.3 },
-  engines: { u: [0.28, 0.62], length: 4.8, drop: 2.05, ahead: 1.55 }, // spanwise stations (0..1), nacelle length, drop under the wing, intake ahead of the wing leading edge
+  engines: { u: [0.28, 0.62], length: 4.8, drop: 1.35, ahead: 1.55 }, // spanwise stations (0..1), nacelle length, drop under the wing, intake ahead of the wing leading edge
   door: { center: 0.65, width: 3.6, sill: -1.75, top: 1.25, recess: 0.4 }, // side cargo door (+Z side), main deck behind the wing root
   gear: { main: 0.47, nose: 0.08, mainZ: 2.55 },
 };

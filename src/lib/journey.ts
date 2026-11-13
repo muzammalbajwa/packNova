@@ -7,6 +7,7 @@
  * every object live in one world that is placed by `frameFor`: its origin is the finished carton's centre at the end
  * of the "Made" chapter, so stage 7 hands over to stage 8 with nothing moving on screen.
  */
+import { PLANE_SPEC, planeLayout } from "@/components/canvas/making/CargoPlane";
 import { BOX_CM, SPLIT, STAGES, lin, seg } from "./making";
 
 export type V3 = [number, number, number];
@@ -34,11 +35,31 @@ export const LIE_Y = BELT.top + BOX.d / 2;
 export const MASTER = { cx: 6.4, w: 2.6, l: 3.8, h: 1.9, wall: 0.05 };
 export const MASTER_Y = FLOOR_Y + MASTER.h / 2;
 /**
- * The cargo vehicle (a plane today). The stage logic only uses these numbers and the `Vehicle` interface of
- * CargoPlane.ts, so a cargo ship can replace the plane by providing the same spec and a new builder.
- * Parked nose-right with its aft hatch toward the loader; local origin = hatch centre on the vehicle's axis.
+ * The cargo vehicle (a plane today). The stage logic only uses these numbers, the loading-door numbers below and the
+ * `Vehicle` interface of CargoPlane.ts, so a cargo ship could replace the plane by providing the same.
+ * Parked nose-right; the plane's local origin is the centre of its fuselage, placed at parkX + centerX.
  */
-export const VEHICLE = { parkX: 15, parkY: 1.1, R: 3.1, len: 30, holdLen: 24, floorY: -2.1, centerX: 15 };
+export const VEHICLE = { parkX: 15, parkY: 1.1, centerX: 15, R: PLANE_SPEC.R };
+const LY = planeLayout();
+
+/**
+ * Loading (stage 10). The plane is loaded through the side cargo door on the +z side (facing the camera). The master
+ * carton rides a short roller conveyor, then a scissor-lift high-loader raises it to the door sill; the platform
+ * extends to the door and the carton slides in. Everything is derived from the plane's own spec.
+ */
+export const LOAD = {
+  planeX: VEHICLE.parkX + VEHICLE.centerX, // world x of the fuselage centre when parked
+  doorX: VEHICLE.parkX + VEHICLE.centerX + LY.door.x,
+  sillY: VEHICLE.parkY + PLANE_SPEC.door.sill, // door sill (world): the platform rises to it
+  skinZ: PLANE_SPEC.R * Math.sin(LY.door.phiSill), // fuselage skin at the sill
+  clipZ: 2.45, // carton fragments behind this plane (inside the hold) are discarded
+  inZ: 1.0, // carton centre when it is fully inside
+  liftZ: 8.4, // platform centre while loading
+  deck: { w: 4.4, d: 4.8, thick: 0.28 },
+  reach: 3.7, // how far the platform extension slides toward the door
+  conveyorTop: FLOOR_Y + 0.3, // roller conveyors and the collapsed platform top
+};
+export const HOLD_FLOOR_Y = LOAD.sillY;
 export const HOUSE_X = 262;
 export const HOUSE = { w: 14, h: 7.5, d: 9, doorX: 3 };
 export const ROAD_Z = 10.5;
@@ -266,10 +287,28 @@ export interface CartonState {
 }
 
 const FLAP_OPEN = 2.2;
-const RAMP = { x0: 9, x1: 15 };
-/** World height of the hold floor (the loader ramp ends here). */
-export const HOLD_FLOOR_Y = VEHICLE.parkY + VEHICLE.floorY; // -1.0
-const HOLD_CARTON_Y = HOLD_FLOOR_Y + MASTER.h / 2;
+
+/** Scissor-lift high-loader: platform height, extension, drive-away. u = progress through the Load stage. */
+export interface LiftState {
+  x: number;
+  z: number;
+  /** World y of the platform top. */
+  deckTop: number;
+  /** 0..1 platform extension toward the door. */
+  ext: number;
+  visible: boolean;
+}
+export function liftState(P: number, out: LiftState): LiftState {
+  const u = lin(P, R.load[0], R.load[1]);
+  const rise = ease(lin(u, 0.38, 0.58)) * (1 - ease(lin(u, 0.82, 0.93)));
+  out.deckTop = LOAD.conveyorTop + rise * (LOAD.sillY - LOAD.conveyorTop);
+  out.ext = ease(lin(u, 0.56, 0.62)) * (1 - ease(lin(u, 0.8, 0.86)));
+  out.x = LOAD.doorX;
+  out.z = LOAD.liftZ + 16 * ease(lin(u, 0.9, 1));
+  out.visible = P > R.load[0] - 0.03 && P < R.load[1] + 0.004;
+  return out;
+}
+const LIFT_TMP: LiftState = { x: 0, z: 0, deckTop: 0, ext: 0, visible: false };
 
 export function masterState(P: number, out: CartonState): CartonState {
   const u9 = lin(P, R.pack[0], R.pack[1]);
@@ -286,13 +325,17 @@ export function masterState(P: number, out: CartonState): CartonState {
     out.x = MASTER.cx;
     out.y = MASTER_Y;
   } else if (P < R.deliver[0]) {
-    const s = ease(lin(lin(P, R.load[0], R.load[1]), 0.04, 0.8));
-    const x = lerp(MASTER.cx, 19.2, s);
-    const ramp = lin(x, RAMP.x0, RAMP.x1); // linear: the carton follows the ramp surface
-    out.x = x;
-    out.y = lerp(MASTER_Y, HOLD_CARTON_Y, ramp);
-    out.rotZ = 0.35 * ease(lin(x, RAMP.x0 - 0.5, RAMP.x0 + 0.5)) * (1 - ease(lin(x, RAMP.x1 - 0.5, RAMP.x1 + 0.5)));
-    out.visible = P < R.load[1] - 0.003;
+    // the carton: across to the feeder, along it to the lift, up with the platform, in through the door
+    const u = lin(P, R.load[0], R.load[1]);
+    const a = ease(lin(u, 0, 0.12));
+    const b = ease(lin(u, 0.12, 0.38));
+    const d = ease(lin(u, 0.6, 0.8));
+    liftState(P, LIFT_TMP);
+    out.x = lerp(MASTER.cx, LOAD.doorX, b);
+    out.z = lerp(lerp(0, LOAD.liftZ, a), LOAD.inZ, d);
+    out.y = MASTER_Y + (LOAD.conveyorTop - FLOOR_Y) * ease(lin(u, 0.04, 0.12)) + (LIFT_TMP.deckTop - LOAD.conveyorTop);
+    out.rotZ = 0;
+    out.visible = u < 0.84;
   } else {
     // delivered: from the van's rear to the doorstep, at half size (the house is big)
     const t = ease(lin(P, 0.962, 0.982));
@@ -352,8 +395,11 @@ export function planePose(P: number, out: PlanePose): PlanePose {
   out.pitch = FL[3];
   out.roll = FL[4];
   out.yaw = FL[5];
-  out.gear = 1 - ease(lin(u, 0.46, 0.56));
-  out.visible = P > R.load[0] - 0.01 && P < 0.945;
+  // the plane taxis in from the right while the camera pans over to the loading bay (before the Fly stage)
+  out.x += 90 * (1 - ease(lin(P, R.load[0] - 0.035, R.load[0] + 0.02)));
+  // gear: down on the ground, up once airborne, down again for the landing at the end of the flight
+  out.gear = Math.max(1 - ease(lin(u, 0.46, 0.56)), ease(lin(P, 0.918, 0.942)));
+  out.visible = P > R.load[0] - 0.04 && P < 0.945;
   return out;
 }
 const PP: PlanePose = { x: 0, y: 0, z: 0, pitch: 0, roll: 0, yaw: 0, gear: 1, visible: true };
@@ -398,8 +444,10 @@ const CAM_KEYS: CamKey[] = [
   k(0.665, [0.2, -0.6, 0], -0.3, 0.5, 8.8, 5.8),
   k(0.7, [3.4, -1.7, 0], -0.3, 0.42, 14, 7.6),
   k(0.745, [3.6, -1.5, 0], -0.32, 0.3, 14, 7.6),
-  k(0.77, [5.8, -1.4, 0], -0.4, 0.24, 14.5, 7.8),
-  k(0.805, [11.5, -0.6, 0], -0.55, 0.2, 18, 12),
+  // loading: carton on the conveyor, the lift, the side door: all in frame, never the empty rear of the plane
+  k(0.77, [9.5, -1.3, 3.2], -0.45, 0.26, 22, 12),
+  k(0.79, [15, -0.4, 4.4], -0.55, 0.24, 30, 15.5),
+  k(0.805, [18.5, 0.3, 4.2], -0.55, 0.22, 33, 17),
   k(0.835, [18, 1.4, 0], -0.55, 0.16, 34, 20),
   // the subject sits a little above the plane, so the plane rides in the lower middle of the view, clear of the map
   k(0.86, planeC(0.86, 1, 3), -0.45, 0.12, 52, 25),

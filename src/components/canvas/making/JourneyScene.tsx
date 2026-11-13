@@ -120,9 +120,15 @@ function build(theme: Theme, low: boolean) {
   const majorN = flap(M.w / 2, M.l, -M.w / 2, top, 0, M.w / 4, 0, 0.05);
   const tapePivot = new THREE.Group();
   tapePivot.position.set(0, top + 0.1, -M.l / 2);
-  tapePivot.add(mesh(geo(new THREE.BoxGeometry(0.4, 0.025, M.l)), std(accent, { roughness: 0.4 }), 0, 0, M.l / 2));
+  const tapeMat = std(accent, { roughness: 0.4 });
+  tapePivot.add(mesh(geo(new THREE.BoxGeometry(0.4, 0.025, M.l)), tapeMat, 0, 0, M.l / 2));
   const labelTex = own(labelTexture(theme));
-  const label = mesh(geo(new THREE.PlaneGeometry(1.25, 0.83)), std("#ffffff", { map: labelTex, roughness: 0.6 }), 0.45, 0.34, M.l / 2 + 0.03);
+  const labelMat = std("#ffffff", { map: labelTex, roughness: 0.6 });
+  const label = mesh(geo(new THREE.PlaneGeometry(1.25, 0.83)), labelMat, 0.45, 0.34, M.l / 2 + 0.03);
+  // While the carton slides through the side door, everything behind the fuselage skin plane (inside the hold) is clipped
+  // away. The plane is a world-space z plane; it only moves in during loading (see apply), otherwise it clips nothing.
+  const clipPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 1e6);
+  for (const mt of [corr, tapeMat, labelMat]) mt.clippingPlanes = [clipPlane];
   const gMaster = group(
     wallG(M.w, M.wall, M.l, 0, -M.h / 2 + M.wall / 2, 0),
     wallG(M.wall, M.h, M.l, M.w / 2 - M.wall / 2, 0, 0),
@@ -133,15 +139,62 @@ function build(theme: Theme, low: boolean) {
   );
   root.add(gMaster);
 
-  /* ------------------------------------------------------------- loader ramp (load) */
-  const rampShape = new THREE.Shape([new THREE.Vector2(9, J.FLOOR_Y), new THREE.Vector2(15, J.FLOOR_Y), new THREE.Vector2(15, J.HOLD_FLOOR_Y), new THREE.Vector2(9, J.FLOOR_Y + 0.12)]);
-  const rampGeo = geo(new THREE.ExtrudeGeometry(rampShape, { depth: 4.6, bevelEnabled: false }));
-  rampGeo.translate(0, 0, -2.3);
-  const gLoader = group(mesh(rampGeo, std(asphalt, { roughness: 0.9 })));
-  root.add(gLoader);
+  /* -------------------------------- loading (load): roller conveyors and a scissor-lift high-loader */
+  const LD = J.LOAD;
+  const cTop = LD.conveyorTop;
+  const rollerMat = std(mixC(asphalt, "#ffffff", 0.4), { roughness: 0.55 });
+  const feedX0 = M.cx - 2.2;
+  const feedX1 = LD.doorX - LD.deck.w / 2 - 0.1;
+  const feedW = 4.4;
+  const crossZ0 = 1.5;
+  const crossZ1 = LD.liftZ - feedW / 2 + 0.2;
+  const rollGeoZ = geo(new THREE.CylinderGeometry(0.14, 0.14, feedW - 0.3, 8).rotateX(Math.PI / 2));
+  const rollGeoX = geo(new THREE.CylinderGeometry(0.14, 0.14, 3.4, 8).rotateZ(Math.PI / 2));
+  const feedRollers: { p: [number, number, number] }[] = [];
+  for (let x = feedX0 + 0.3; x < feedX1; x += 0.7) feedRollers.push({ p: [x, cTop - 0.14, LD.liftZ] });
+  const crossRollers: { p: [number, number, number] }[] = [];
+  for (let z = crossZ0 + 0.35; z < crossZ1; z += 0.7) crossRollers.push({ p: [M.cx, cTop - 0.14, z] });
+  const gLoad = group(
+    instanced(rollGeoZ, rollerMat, feedRollers),
+    instanced(rollGeoX, rollerMat, crossRollers),
+    mesh(geo(new THREE.BoxGeometry(feedX1 - feedX0, 0.14, feedW)), bedMat, (feedX0 + feedX1) / 2, cTop - 0.34, LD.liftZ),
+    mesh(geo(new THREE.BoxGeometry(3.6, 0.14, crossZ1 - crossZ0)), bedMat, M.cx, cTop - 0.34, (crossZ0 + crossZ1) / 2),
+    instanced(geo(new THREE.BoxGeometry(feedX1 - feedX0, 0.22, 0.14)), railMat, [{ p: [(feedX0 + feedX1) / 2, cTop - 0.12, LD.liftZ + feedW / 2 - 0.05] }, { p: [(feedX0 + feedX1) / 2, cTop - 0.12, LD.liftZ - feedW / 2 + 0.05] }]),
+    instanced(geo(new THREE.BoxGeometry(0.14, 0.22, crossZ1 - crossZ0)), railMat, [{ p: [M.cx + 1.75, cTop - 0.12, (crossZ0 + crossZ1) / 2] }, { p: [M.cx - 1.75, cTop - 0.12, (crossZ0 + crossZ1) / 2] }]),
+  );
+  root.add(gLoad);
+
+  // the high-loader: origin on the ground under the platform centre; the truck sits behind it (+z), clear of the wing
+  const liftAccent = std(accent, { roughness: 0.55 });
+  const liftDark = std(mixC(theme.bg, theme.fg, dark ? 0.12 : 0.78), { roughness: 0.8 });
+  const deckMat = std(shade, { roughness: 0.7 });
+  const deckG = new THREE.Group(); // origin = the platform's top surface
+  const extG = new THREE.Group();
+  const D = LD.deck;
+  deckG.add(mesh(geo(new THREE.BoxGeometry(D.w, D.thick, D.d)), deckMat, 0, -D.thick / 2 - 0.01, 0));
+  extG.add(mesh(geo(new THREE.BoxGeometry(D.w - 0.5, 0.18, 4.0)), deckMat, 0, -0.09, 0));
+  deckG.add(extG);
+  // safety rail: posts and bars on the back and the two sides (the door side stays open); one instanced box mesh
+  const rail: { p: [number, number, number]; s: [number, number, number] }[] = [];
+  const rw = D.w / 2 - 0.1, rd = D.d / 2 - 0.1;
+  for (const [x, z] of [[-rw, rd], [rw, rd], [-rw, 0], [rw, 0], [-rw, -rd], [rw, -rd], [0, rd]] as [number, number][]) rail.push({ p: [x, 0.55, z], s: [0.1, 1.1, 0.1] });
+  rail.push({ p: [0, 1.1, rd], s: [D.w - 0.1, 0.08, 0.08] }, { p: [-rw, 1.1, 0], s: [0.08, 0.08, D.d - 0.1] }, { p: [rw, 1.1, 0], s: [0.08, 0.08, D.d - 0.1] });
+  rail.push({ p: [0, 0.55, rd], s: [D.w - 0.1, 0.06, 0.06] }, { p: [-rw, 0.55, 0], s: [0.06, 0.06, D.d - 0.1] }, { p: [rw, 0.55, 0], s: [0.06, 0.06, D.d - 0.1] });
+  deckG.add(instanced(geo(new THREE.BoxGeometry(1, 1, 1)), liftAccent, rail));
+  const barGeo = geo(new THREE.BoxGeometry(3.4, 0.2, 0.22));
+  const liftBars = new THREE.InstancedMesh(barGeo, liftDark, 12);
+  liftBars.frustumCulled = false;
+  const truck = group(
+    mesh(geo(new THREE.BoxGeometry(6.2, 0.9, 3.4)), liftAccent, -2.1, J.FLOOR_Y + 0.95, 4.1),
+    mesh(geo(new THREE.BoxGeometry(2.0, 1.1, 3.0)), deckMat, 0.2, J.FLOOR_Y + 1.95, 4.1),
+    mesh(geo(new THREE.BoxGeometry(1.6, 0.2, 5.6)), liftDark, -0.2, J.FLOOR_Y + 0.35, 1.8),
+    instanced(geo(new THREE.CylinderGeometry(0.55, 0.55, 0.5, 14).rotateX(Math.PI / 2)), liftDark, [-4.2, -0.1].flatMap((x) => [2.5, 5.7].map((z) => ({ p: [x, J.FLOOR_Y + 0.55, z] as [number, number, number] })))),
+  );
+  const gLift = group(truck, liftBars, deckG);
+  root.add(gLift);
 
   /* ------------------------------------------------------------------- cargo plane */
-  const vehicle: Vehicle = createCargoPlane({ body, shade, accent, dark: mixC(theme.bg, theme.fg, dark ? 0.12 : 0.78), inner: mixC(theme.bg, theme.fg, dark ? 0.1 : 0.55) }, low);
+  const vehicle: Vehicle = createCargoPlane({ body, shade, accent, dark: mixC(theme.bg, theme.fg, dark ? 0.12 : 0.78), inner: mixC(theme.bg, theme.fg, dark ? 0.1 : 0.55) }, low, typeof location !== "undefined" && new URLSearchParams(location.search).get("debug") === "plane");
   const planeRoot = vehicle.root;
   root.add(planeRoot);
 
@@ -316,7 +369,7 @@ function build(theme: Theme, low: boolean) {
   };
 
   return {
-    root, hud, vehicle, planeRoot, boxes, gBelt, beltTop, beltTex, scanMat, gMaster, gLoader, gGround, gVillage, gVan,
+    root, hud, vehicle, planeRoot, boxes, gBelt, beltTop, beltTex, scanMat, gMaster, gLoad, gLift, deckG, extG, liftBars, clipPlane, gGround, gVillage, gVan,
     minorP, minorN, majorP, majorN, tapePivot, label,
     groundMat, runwayMat, dashMat, cloudMat, cloudMesh, clouds, puffs, skyGeo, skyMat, sky, mapG, card, cardMat, dots, marker, pin, ring, ringMat,
     shBelt, shMaster, shPlane, shVan, shHouse, winMat, colors, N, bez, B,
@@ -331,6 +384,7 @@ export type Journey = ReturnType<typeof build>;
 const FRAME: J.Frame = { fit: 1, x: 0, y: 0, vw: 1, vh: 1, ox: 0, oy: 0, fw: 0.8, fh: 0.8, aspect: 1, tanHalf: 0.3 };
 const CAM: J.CamPose = { px: 0, py: 0, pz: 0, tx: 0, ty: 0, tz: 0, dist: 1 };
 const MST: J.CartonState = { x: 0, y: 0, z: 0, rotZ: 0, scale: 1, visible: true, minor: 0, major: 0, tape: 0, label: 0 };
+const LIFT: J.LiftState = { x: 0, z: 0, deckTop: 0, ext: 0, visible: false };
 const PL: J.PlanePose = { x: 0, y: 0, z: 0, pitch: 0, roll: 0, yaw: 0, gear: 1, visible: true };
 const VAN = { x: 0, visible: false };
 const V3A: J.V3 = [0, 0, 0];
@@ -429,13 +483,38 @@ function apply(j: Journey, P: number, state: { camera: THREE.Camera; size: { wid
     j.label.scale.setScalar(Math.max(0.001, MST.label));
     j.label.visible = MST.label > 0.002;
   }
-  j.gLoader.visible = P > RR.pack[0] + 0.05 && P < RR.fly[0] + 0.04;
+  j.gLoad.visible = P > RR.pack[0] + 0.05 && P < RR.fly[0] + 0.04;
+  /* ---- the high-loader (platform height, reach, drive-away) and the clip plane of the carton ---- */
+  J.liftState(P, LIFT);
+  j.gLift.visible = LIFT.visible;
+  if (LIFT.visible) {
+    j.gLift.position.set(LIFT.x, 0, LIFT.z);
+    j.deckG.position.y = LIFT.deckTop;
+    j.extG.position.z = -J.LOAD.reach * LIFT.ext - 0.2;
+    const baseY = J.FLOOR_Y;
+    const gap = Math.max(0, LIFT.deckTop - J.LOAD.deck.thick - 0.01 - baseY);
+    const dy = gap / 3;
+    const th = Math.asin(Math.min(0.98, dy / 3.4));
+    let i = 0;
+    for (let set = -1; set <= 1; set += 2) {
+      for (let lv = 0; lv < 3; lv++) {
+        for (let b = -1; b <= 1; b += 2) {
+          MAT4.makeRotationZ(b * th);
+          MAT4.setPosition(0, baseY + (lv + 0.5) * dy, set * 1.7);
+          j.liftBars.setMatrixAt(i++, MAT4);
+        }
+      }
+    }
+    j.liftBars.instanceMatrix.needsUpdate = true;
+  }
+  const loading = MST.visible && P >= RR.load[0] && P < RR.load[1];
+  j.clipPlane.constant = loading ? -(f.fit * J.LOAD.clipZ) : 1e6;
 
   /* ---- plane ---- */
   J.planePose(P, PL);
   j.planeRoot.visible = PL.visible;
   if (PL.visible) {
-    j.planeRoot.position.set(PL.x, PL.y, PL.z);
+    j.planeRoot.position.set(PL.x + J.VEHICLE.centerX, PL.y, PL.z);
     j.planeRoot.rotation.set(PL.roll, PL.yaw, PL.pitch, "YZX");
     j.vehicle.setGear(PL.gear);
     j.vehicle.setHatch(J.hatchClosed(P));
@@ -455,7 +534,7 @@ function apply(j: Journey, P: number, state: { camera: THREE.Camera; size: { wid
   };
   sh(j.shBelt, beltOn, 1 - seg(P, RR.pack[1], RR.load[0] + 0.03));
   sh(j.shMaster, MST.visible && P < RR.load[0] + 0.02, 1);
-  j.shMaster.o.position.x = MST.x;
+  j.shMaster.o.position.set(MST.x, J.FLOOR_Y + 0.04, MST.z);
   sh(j.shPlane, PL.visible, 1 - seg(PL.y, 2, 14));
   j.shPlane.o.position.set(PL.x + J.VEHICLE.centerX, J.FLOOR_Y + 0.04, PL.z);
   j.shPlane.o.scale.set(50 + PL.y * 0.4, 1, 17 + PL.y * 0.2);
@@ -572,6 +651,10 @@ export default function JourneyScene({ low }: { low: boolean }) {
   const journey = useMemo(() => build(THEMES[themeId], low), [themeId, low]);
   const get = useThree((s) => s.get);
   useEffect(() => () => journey.dispose(), [journey]);
+  // the carton's clip plane (loading) needs local clipping; set before the warm-up compiles the materials
+  useEffect(() => {
+    get().gl.localClippingEnabled = true;
+  }, [get]);
   // fog colour follows the sky; created here so every material compiles with it in the warm-up
   useEffect(() => {
     const { scene } = get();
