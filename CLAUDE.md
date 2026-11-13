@@ -201,3 +201,9 @@ Outcome: This file, written from the codebase, README/DEPLOY/CONTENT-TODO/PHONE-
 
 ### Cargo plane rebuild (2026-11-13)
 - `components/canvas/making/CargoPlane.ts` builds the plane procedurally: lathe nose and nacelles, lofted wings/fin/stabilizers (rounded leading edges, hinge lines, rudder panel), T-tail, engines on pylons, an upswept tail door that swings up as the hatch (`setHatch`), gear that retracts (`setGear`). Geometry is merged per material: 12 meshes, about 6.4k triangles. The `Vehicle` interface, hold size and wheel-to-ground height are unchanged, so stage timing and cameras are untouched. Review shots: `docs/screenshots/plane/` (`model/` = the plane alone from 6 angles).
+
+### Plane v2 and side-door loading (2026-11-13)
+- `CargoPlane.ts` is built from one `PLANE_SPEC` (fractions of the fuselage length L = 48) with named anchors; wings, stabilizers, engines and gear are built once on +Z and mirrored by a group (scale.z = -1). It imports only `three`, so `node scripts/plane-test.mjs` builds it in plain Node and asserts mirror symmetry, the T-tail at the tail tip, pylons touching the wing, wing root at 0.40 to 0.55 L and the side door on the skin. `?debug=plane` draws the anchors as axes.
+- No rear ramp: the plane is loaded through a side cargo door on the +Z side. Stage 10 (`journey.ts`: `LOAD`, `liftState`, `masterState`): carton across a roller conveyor, along the feeder to a scissor-lift high-loader, up to the door sill, in through the door; door closes, lift lowers and drives away. The carton's materials carry a world-space clip plane (`localClippingEnabled`) that is only active while loading, so the part inside the hold is cut cleanly at the skin.
+- The plane taxis in from the right just before the Load stage (so it never pops in) and its gear extends again for the landing at the end of Fly.
+- Review tools: `scripts/load-shots.mjs` (Load stage at 8 points), screenshots in `docs/screenshots/plane-v2/`.
