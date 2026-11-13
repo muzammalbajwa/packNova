@@ -1,0 +1,81 @@
+{
+ "load0": 3.24560546875,
+ "load1": 5.015625,
+ "rows": [
+  {
+   "path": "/industry/jewelry-boxes/",
+   "mode": "desktop",
+   "cpu": 1,
+   "frames": 719,
+   "fps": 60,
+   "p99ms": 16.8,
+   "maxms": 16.8,
+   "over33": 0,
+   "filmDraws": 719,
+   "drawAvgMs": 0.3,
+   "drawP99Ms": 0.9,
+   "calls": 20,
+   "tris": 168
+  },
+  {
+   "path": "/material/corrugated-boxes/",
+   "mode": "desktop",
+   "cpu": 1,
+   "frames": 719,
+   "fps": 60,
+   "p99ms": 16.8,
+   "maxms": 16.8,
+   "over33": 0,
+   "filmDraws": 719,
+   "drawAvgMs": 0.35,
+   "drawP99Ms": 0.7,
+   "calls": 41,
+   "tris": 228
+  },
+  {
+   "path": "/event/halloween/",
+   "mode": "desktop",
+   "cpu": 1,
+   "frames": 719,
+   "fps": 60,
+   "p99ms": 16.8,
+   "maxms": 16.8,
+   "over33": 0,
+   "filmDraws": 719,
+   "drawAvgMs": 0.32,
+   "drawP99Ms": 0.7,
+   "calls": 26,
+   "tris": 266
+  },
+  {
+   "path": "/shape-and-style/pillow-boxes/",
+   "mode": "desktop",
+   "cpu": 1,
+   "frames": 719,
+   "fps": 60,
+   "p99ms": 16.8,
+   "maxms": 16.8,
+   "over33": 0,
+   "filmDraws": 719,
+   "drawAvgMs": 0.38,
+   "drawP99Ms": 0.9,
+   "calls": 3,
+   "tris": 9200
+  },
+  {
+   "path": "/industry/bakery-and-cake/",
+   "mode": "desktop",
+   "cpu": 1,
+   "frames": 719,
+   "fps": 60,
+   "p99ms": 16.8,
+   "maxms": 16.8,
+   "over33": 0,
+   "filmDraws": 719,
+   "drawAvgMs": 0.31,
+   "drawP99Ms": 0.6,
+   "calls": 34,
+   "tris": 264
+  }
+ ]
+}
