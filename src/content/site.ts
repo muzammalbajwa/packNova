@@ -52,24 +52,6 @@ const en = {
     cta: "Get a quote",
   },
 
-  /**
-   * Mega-menu used by the eco template (the other templates keep `nav.links`). The category names follow the owner's
-   * reference menu; none of them has its own page yet, so each item opens the quote form with a note.
-   * TODO(owner): confirm these are really the categories you make, remove the ones you do not, and add pages later.
-   */
-  navMenu: [
-    { label: "Home", hash: "top" },
-    {
-      label: "Industry",
-      items: ["Apparel Boxes", "Bakery & Cake", "Mylar Bags", "Chocolate Boxes", "Health Boxes", "Jewelry Boxes", "Food Boxes", "Display Boxes", "Pizza Boxes", "Candle Boxes", "Cosmetic Boxes", "Electronic Boxes"],
-    },
-    { label: "Shape & style", items: ["Window Boxes", "Tuck Boxes", "Gable Boxes", "Hang Tags", "Trays and Sleeves", "Pillow Boxes", "Paper Bags", "Labels & Stickers"] },
-    { label: "Material", items: ["Rigid Boxes", "Corrugated Boxes", "Kraft Boxes", "Retail Boxes"] },
-    { label: "Event", items: ["Halloween", "Christmas", "Brand Anniversary", "Thanksgiving", "New Year"] },
-    { label: "Contact us", hash: "contact" },
-  ] as { label: string; hash?: string; items?: string[] }[],
-  navNote: "I am interested in:",
-
   hero: {
     eyebrow: "Custom packaging, made to order",
     headline: "Packaging with presence.",

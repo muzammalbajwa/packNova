@@ -1,8 +1,10 @@
 import { site } from "@/content/site";
 import Logo from "@/components/ui/Logo";
-import { templateHref } from "@/shared/links";
+import Link from "next/link";
+import { GROUPS, HOME_CATEGORY_HREF, ROUTES } from "@/content/catalog";
 
-export default function Footer({ base, onHome = true }: { base: string; onHome?: boolean }) {
+export default function Footer({ base: _b, onHome: _o }: { base?: string; onHome?: boolean } = {}) {
+  void _b; void _o;
   const { footer, contact } = site;
   const link = "hover:text-[var(--fg)] hover:underline underline-offset-4";
   return (
@@ -17,11 +19,11 @@ export default function Footer({ base, onHome = true }: { base: string; onHome?:
         </div>
         <div>
           <h3 className="font-display mb-3 text-lg font-semibold">{footer.productsTitle}</h3>
-          <ul className="space-y-2 text-[var(--muted)]">{site.products.items.map((p) => (<li key={p.id}><a href={templateHref(base, { hash: "products" }, onHome)} className={link}>{p.name}</a></li>))}</ul>
+          <ul className="space-y-2 text-[var(--muted)]">{site.products.items.map((p) => (<li key={p.id}><Link href={HOME_CATEGORY_HREF[p.id]} className={link}>{p.name}</Link></li>))}</ul>
         </div>
         <div>
           <h3 className="font-display mb-3 text-lg font-semibold">{footer.companyTitle}</h3>
-          <ul className="space-y-2 text-[var(--muted)]">{site.nav.links.map((l) => (<li key={l.label}><a href={templateHref(base, l, onHome)} className={link}>{l.label}</a></li>))}</ul>
+          <ul className="space-y-2 text-[var(--muted)]">{[...GROUPS.map((g) => ({ label: g.label, href: g.href })), { label: "Design your box", href: ROUTES.configurator }, { label: "Get a quote", href: ROUTES.quote }, { label: "Contact us", href: ROUTES.contact }].map((l) => (<li key={l.label}><Link href={l.href} className={link}>{l.label}</Link></li>))}</ul>
         </div>
         <div>
           <h3 className="font-display mb-3 text-lg font-semibold">{footer.contactTitle}</h3>

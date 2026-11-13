@@ -1,6 +1,7 @@
 import { site } from "@/content/site";
 import ProductIcon from "@/components/ui/ProductIcon";
-import TrackedA from "@/components/ui/TrackedA";
+import Link from "next/link";
+import { HOME_CATEGORY_HREF } from "@/content/catalog";
 import { copy } from "./copy";
 
 /** A wide list with 1px rules. Each row is one link to the quote form; the icon keeps its hover animation. */
@@ -17,11 +18,8 @@ export default function Products() {
         <ul className="mt-12 border-t border-[var(--line-strong)]">
           {items.map((p) => (
             <li key={p.id} data-reveal="subtle" className="border-b border-[var(--line)]">
-              <TrackedA
-                href="#quote"
-                event="product_card_quote"
-                data={{ product: p.id }}
-                prefill={{ product: p.name }}
+              <Link
+                href={HOME_CATEGORY_HREF[p.id]}
                 className="group grid items-center gap-x-8 gap-y-3 py-6 transition-colors hover:bg-[var(--sand)] focus-visible:bg-[var(--sand)] md:grid-cols-[88px_1.3fr_1.4fr_auto] md:px-4"
               >
                 <span className="block size-16 text-[var(--accent)] md:size-[72px]"><ProductIcon kind={p.icon} /></span>
@@ -33,7 +31,7 @@ export default function Products() {
                   <span className="mt-1 block text-sm text-[var(--muted)]"><span className="font-semibold text-[var(--kraft-ink)]">{c.bestFor}:</span> {p.bestFor.join(", ")}</span>
                 </span>
                 <span className="text-base font-semibold text-[var(--accent)] underline-offset-4 group-hover:underline">{c.action} →</span>
-              </TrackedA>
+              </Link>
             </li>
           ))}
         </ul>

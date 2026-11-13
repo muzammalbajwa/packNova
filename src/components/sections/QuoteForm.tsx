@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { site } from "@/content/site";
 import { useAppStore } from "@/lib/store";
 import { track } from "@/lib/track";
@@ -23,6 +23,14 @@ export default function QuoteForm() {
   const prefill = useAppStore((s) => s.quotePrefill);
   const [text, setText] = useState<string | null>(null);
   const [vals, setVals] = useState<Record<string, string>>({}); // kept so "Edit request" does not lose input
+
+  // /quote/?product=...&note=... (product pages and the configurator link here) fills the form
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const product = q.get("product") ?? undefined;
+    const note = q.get("note") ?? undefined;
+    if (product || note) useAppStore.getState().setQuotePrefill({ product, note });
+  }, []);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -66,9 +74,9 @@ export default function QuoteForm() {
             <option value="" disabled>
               {f.productPlaceholder}
             </option>
-            {site.products.items.map((p) => (
-              <option key={p.id} value={p.name}>
-                {p.name}
+            {[...new Set([...site.products.items.map((p) => p.name), ...(product ? [product] : [])])].map((name) => (
+              <option key={name} value={name}>
+                {name}
               </option>
             ))}
           </select>

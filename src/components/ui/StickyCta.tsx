@@ -22,7 +22,7 @@ function WhatsAppGlyph() {
 export default function StickyCta({ base = "" }: { base?: string }) {
   const path = usePathname().replace(/\/$/, "");
   const onHome = path === base || path === "";
-  const quoteHref = onHome ? "#quote" : `${base}/#quote`;
+  const quoteHref = onHome ? "#quote" : base === "" ? "/quote/" : `${base}/#quote`;
   const wa = whatsappUrl(site.quote.messageIntro);
   const label = site.nav.cta;
 
