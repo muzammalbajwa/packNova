@@ -107,8 +107,13 @@ class Engine {
   private draw = () => {
     this.raf = 0;
     if (!this.recipe || !this.host) return;
+    const t0 = window.__perfOn ? performance.now() : 0; // ?perf=1 only: record the CPU time of this draw
     this.recipe.update(this.p, this.camera);
     this.renderer.render(this.scene, this.camera);
+    if (t0) {
+      const m = window.__filmMs;
+      if (m) m.buf[m.n++ % m.buf.length] = performance.now() - t0;
+    }
     if (this.firstFrame) {
       const f = this.firstFrame;
       this.firstFrame = null;
