@@ -8,6 +8,7 @@ import { brand, contact, navCta, social } from "@/content/siteCore";
 import { NAV, quoteHref as quoteLink } from "@/content/navData";
 import Logo from "@/components/ui/Logo";
 import { getLenis } from "@/lib/lenisRef";
+import { warmConfigurator, warmEngine } from "@/film/loaders";
 import { track } from "@/lib/track";
 import { useHideOnScroll } from "@/shared/useHideOnScroll";
 
@@ -104,7 +105,7 @@ export default function Navbar({ base: _base, onHome: _onHome }: { base?: string
 
           <ul ref={wrap} className="hidden items-center gap-1 text-base lg:flex">
             {NAV.map((e, i) => (
-              <li key={e.label} className="relative" onMouseEnter={() => e.items && setOpen(i)} onMouseLeave={() => setOpen((o) => (o === i ? null : o))}
+              <li key={e.label} className="relative" onPointerEnter={() => (e.href === "/configurator/" ? warmConfigurator() : e.items && warmEngine())} onFocus={() => (e.href === "/configurator/" ? warmConfigurator() : e.items && warmEngine())} onTouchStart={() => (e.href === "/configurator/" ? warmConfigurator() : e.items && warmEngine())} onMouseEnter={() => e.items && setOpen(i)} onMouseLeave={() => setOpen((o) => (o === i ? null : o))}
                   onBlur={(ev) => { if (!ev.currentTarget.contains(ev.relatedTarget as Node)) setOpen((o) => (o === i ? null : o)); }}>
                 {e.items ? (
                   <>

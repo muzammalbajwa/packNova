@@ -19,6 +19,20 @@ export const hasFilm = (r: RecipeId) => r in RECIPE_LOADERS;
 
 export const loadEngine = () => import("./engine");
 
+let engineWarm = false;
+/** Start downloading the shared 3D chunk (three.js and the film engine) without starting anything: used at idle time and when a menu item is hovered or touched. */
+export function warmEngine() {
+  if (engineWarm) return;
+  engineWarm = true;
+  void loadEngine();
+}
+
+/** Same, plus the configurator's own code (for the "Design your box" menu item). */
+export function warmConfigurator() {
+  warmEngine();
+  void import("./configurator");
+}
+
 const warmed = new Set<string>();
 /** Start downloading the film engine and the recipe of a page (called when a nav item or card is hovered or touched). */
 export function prefetchFilm(recipe: RecipeId) {

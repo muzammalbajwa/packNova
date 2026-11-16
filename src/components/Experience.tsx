@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { warmEngine } from "@/film/loaders";
 import { detectDevice } from "@/lib/deviceTier";
 import { initReveal, initScroll } from "@/lib/scroll";
 import { useAppStore } from "@/lib/store";
@@ -31,6 +32,14 @@ export default function Experience() {
       timers.push(setTimeout(setReady, 500)); // 2D fallback is instant
     }
     timers.push(setTimeout(setReady, 8000)); // failsafe: never trap the user
+
+    // Once the homepage has settled, fetch the shared 3D chunk in idle time so the first product film opens without a wait.
+    // Only on devices that can run it, and not on slow or data-saving connections.
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    if (profile.webgl && !conn?.saveData && !/2g/.test(conn?.effectiveType ?? "")) {
+      const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+      timers.push(setTimeout(() => (w.requestIdleCallback ? w.requestIdleCallback(warmEngine, { timeout: 4000 }) : warmEngine()), 6000));
+    }
 
     return () => {
       cleanupReveal();
