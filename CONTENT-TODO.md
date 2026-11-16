@@ -93,3 +93,16 @@ The eco page (`src/templates/eco`) was redesigned and its headlines rewritten (`
 | Hours | Mon to Sat, 9:00 AM to 6:00 PM | `contact.hours` |
 | Social links | `#` | `social[]` |
 | Site URL | https://staging.artinstallation.uk (staging) | `brand.url` |
+
+## 9. Quote and contact pages (Phase 5)
+
+Everything here is placeholder and says "confirmed with the quote". Nothing invents a price, a minimum order, a lead time or a reply time.
+
+- [ ] **Structured data (LocalBusiness JSON-LD on `/contact/`, built in `src/lib/jsonld.ts`)** uses DUMMY values: name, phone, email and address from `site.ts`, hours from `contact.hours`, and **made-up map coordinates** (`geo` in `src/content/contactPage.ts`: 31.5204, 74.3587 is only the middle of Lahore). Replace all of them. Social links are included only when they start with `http`.
+- [ ] **Map link**: `mapsHref` in `src/content/contactPage.ts` is a Google Maps search for "Industrial Area Lahore Pakistan". Use the real address or a place link. The map picture is a placeholder drawing (`components/contact/MapPlaceholder.tsx`); replace it with a real screenshot or keep it.
+- [ ] **FAQ** (`src/content/contactPage.ts`, 8 questions): every answer defers to the quote. Replace with your real minimum order, sample policy, lead time, delivery and payment terms when you have them.
+- [ ] **Reply time**: the success message (`site.quote.sent` in `site.ts`) promises no time on purpose. Add one only if you can keep it.
+- [ ] **Form service**: not connected. Choose Formspree, Web3Forms or a Cloudflare Worker, set `NEXT_PUBLIC_QUOTE_ENDPOINT` (README, "Connecting a form service"). Until then only the WhatsApp and email buttons appear.
+- [ ] **Privacy text** (`src/content/quoteWizard.ts`, `privacy`): plain description of what the form does. Have it reviewed (and add your form provider's name and a privacy policy page) before you connect a form service or collect real requests.
+- [ ] **Quote page wording** (`src/content/quoteWizard.ts`), the product and material lists (they come from the catalog and `lib/box.ts`), the country-code list (`lib/quote.ts`, Pakistan first): review.
+- [ ] **WhatsApp message text** (`site.quote.messageIntro` and labels in `site.ts`): the first line of every request.

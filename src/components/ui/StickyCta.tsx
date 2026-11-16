@@ -25,6 +25,7 @@ export default function StickyCta({ base = "" }: { base?: string }) {
   const quoteHref = onHome ? "#quote" : base === "" ? "/quote/" : `${base}/#quote`;
   const wa = whatsappUrl(site.quote.messageIntro);
   const label = site.nav.cta;
+  if (path === "/quote") return null; // the quote form has its own buttons; the bar would cover them on phones
 
   const quote = (place: string) => () => track("sticky_quote_click", { place });
   const chat = (place: string) => () => track("whatsapp_float_click", { place });

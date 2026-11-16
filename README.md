@@ -112,3 +112,39 @@ No setState in `useFrame` (mutate refs); reuse geometries/materials; instance re
 | Hero GLB | < 3 MB |
 | Draw calls | < 100 |
 | Frame rate | 60 fps desktop, 30 fps low-end phones |
+
+## Quote and contact forms (no backend)
+
+`/quote/` (five steps) and `/contact/` build one readable message and let the visitor send it on WhatsApp or by email
+(`wa.me` and `mailto:` links, number and address from `src/content/site.ts`). Nothing is stored on the website. The draft of a
+quote lives in the visitor's own browser (`localStorage`) and is deleted after sending. The text of the quote page is in
+`src/content/quoteWizard.ts`, the contact page text and FAQ in `src/content/contactPage.ts`, the success line in `site.ts` (`quote.sent`).
+
+### Connecting a form service (optional)
+
+One function, `submitQuote()` in `src/lib/submitQuote.ts`, posts JSON to the URL in **`NEXT_PUBLIC_QUOTE_ENDPOINT`**. When that variable is
+set at build time, a "Send request" button appears next to the WhatsApp and email buttons (with a real success and error state, a hidden
+honeypot field and a time-to-fill check). When it is empty, only WhatsApp and email appear. The values are baked into the JavaScript at build
+time, so they are public: never put a secret in them.
+
+The JSON body: `message` (the readable summary), `name`, `phone`, `email`, `fields` (product, quantity, ...), `_gotcha` (honeypot, always empty
+for people) and `_elapsed_ms`.
+
+- **Formspree**: create a form at formspree.io (Settings, Email: your address). Set `NEXT_PUBLIC_QUOTE_ENDPOINT=https://formspree.io/f/<your-form-id>`.
+  Formspree reads `_gotcha` as its honeypot and replies with JSON. Nothing else to set.
+- **Web3Forms**: get an access key at web3forms.com. Set `NEXT_PUBLIC_QUOTE_ENDPOINT=https://api.web3forms.com/submit` and
+  `NEXT_PUBLIC_QUOTE_ACCESS_KEY=<your-access-key>` (it is sent as `access_key`). Set the "from name" and spam options in their dashboard.
+- **Cloudflare Worker**: create a Worker that accepts a JSON `POST`, answers the browser's `OPTIONS` request with
+  `Access-Control-Allow-Origin: <your site>` and `Access-Control-Allow-Headers: content-type, accept`, rejects bodies where `_gotcha` is not empty,
+  sends the `message` to your inbox (for example with MailChannels or Resend from the Worker) and returns `{"ok":true}`. Set
+  `NEXT_PUBLIC_QUOTE_ENDPOINT=https://<worker>.<account>.workers.dev/`. Keep any API keys inside the Worker, not in these variables.
+
+Where to set them:
+
+- **GitHub Actions** (`.github/workflows/deploy.yml` already passes them to the build): repository Settings, Secrets and variables, Actions,
+  New repository secret: `NEXT_PUBLIC_QUOTE_ENDPOINT` and (Web3Forms only) `NEXT_PUBLIC_QUOTE_ACCESS_KEY`. Then run the workflow again.
+- **Cloudflare Pages**: Settings, Environment variables, the same two names. **Local build**: `NEXT_PUBLIC_QUOTE_ENDPOINT=... npm run build`.
+
+Tests: `node scripts/quote-unit.mjs` (summary builder, links, phone and URL parsing, validation, `submitQuote` against a local mock), and
+`node scripts/quote-e2e.mjs --mock-dir <dir>` (browser: every step, keyboard-only walk, and a site built against a mock endpoint on :8099;
+see the header of the file for how to build that copy).

@@ -1,0 +1,12 @@
+Phase 5: /quote/ and /contact/ (measured 2026-11-16)
+
+Initial JS (gzip): /quote/ 252.3 kB, /contact/ 254.5 kB (limit 255). Steps 2 to 5 of the quote form, the send buttons and the configurator
+size tables are separate lazy chunks. Homepage 259.8 kB (limit 260), /configurator/ 256.6 kB (limit 262), a film page 251.2 kB.
+No 3D code: the network log of both pages was checked against every JS file for WebGLRenderer / recipe markers: none; no canvas, no iframe.
+
+Lighthouse 12, mobile emulation, served by scripts/serve.mjs (brotli), machine load 3.2 to 3.6:
+  /quote/    performance 95, accessibility 100, best practices 100, SEO 66   FCP 0.9 s  LCP 2.7 s  TBT 130 ms  CLS 0  TTI 3.2 s
+  /contact/  performance 94, accessibility 100, best practices 100, SEO 66   FCP 0.9 s  LCP 2.9 s  TBT 120 ms  CLS 0  TTI 3.2 s
+SEO 66 is only "page is blocked from indexing": noindex is on purpose while this is staging.
+
+Tests: node scripts/quote-unit.mjs (96 checks), node scripts/quote-e2e.mjs --mock-dir <dir> (74 checks), node scripts/configurator-test.mjs.

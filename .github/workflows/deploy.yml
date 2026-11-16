@@ -23,6 +23,10 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+        env:
+          # Optional. Leave the secrets unset and the quote and contact forms show only the WhatsApp and email buttons.
+          NEXT_PUBLIC_QUOTE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_QUOTE_ENDPOINT }}
+          NEXT_PUBLIC_QUOTE_ACCESS_KEY: ${{ secrets.NEXT_PUBLIC_QUOTE_ACCESS_KEY }}
 
       - name: Set up SSH
         env:

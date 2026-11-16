@@ -10,7 +10,7 @@ import { loadEngine, waitForOtherContexts } from "@/film/loaders";
 import type { Preview } from "@/film/configurator";
 import {
   ARTWORK_NOTE, MATERIALS, PALETTE, PRINT_LABEL, QUANTITIES, TYPES, TYPE_BY_ID, boxSkin, clampDims, configToParams, defaultColor, defaultConfig, describe, fmt, fromUnit,
-  isHex, previewRatio, summaryLines, toUnit, withType, type BoxConfig, type PrintArea, type Unit,
+  isHex, paramsToConfig, previewRatio, summaryLines, toUnit, withType, type BoxConfig, type PrintArea, type Unit,
 } from "@/lib/box";
 import { detectDevice } from "@/lib/deviceTier";
 import { useDebouncedValue } from "@/lib/useDebounced";
@@ -74,6 +74,12 @@ export default function ConfiguratorApp() {
   const set = useCallback((patch: Partial<BoxConfig>) => setCfg((c) => ({ ...c, ...patch })), []);
   const setDim = useCallback((k: "l" | "w" | "h", cm: number) => setCfg((c) => ({ ...c, ...clampDims(c.type, { l: c.l, w: c.w, h: c.h, [k]: cm }) })), []);
   const t = TYPE_BY_ID[cfg.type];
+
+  // arriving from the quote page ("Change in configurator") or a shared link: start from the design in the URL
+  useEffect(() => {
+    const c = paramsToConfig(new URLSearchParams(window.location.search));
+    if (c) setCfg(c); // eslint-disable-line react-hooks/set-state-in-effect
+  }, []);
 
   // 3D: its own chunks, started in idle time; the film renderer and the recipe code are shared with the product pages
   useEffect(() => {

@@ -29,6 +29,8 @@ const en = {
     hours: "Mon to Sat, 9:00 AM to 6:00 PM",
   },
 
+  /** The contact page text (heading, FAQ) is in src/content/contactPage.ts. */
+
   social: [
     { name: "Instagram", href: "#" },
     { name: "Facebook", href: "#" },
@@ -290,6 +292,12 @@ const en = {
     },
     emailSubject: "Quote request",
     whatsappCta: "Or message us on WhatsApp",
+    /** Short lines kept here so they are easy to find. The rest of the quote wizard text is in src/content/quoteWizard.ts. */
+    /** After "Send request" worked (a form service is connected). TODO(owner): add a real reply time only when you can keep it. It is left out on purpose. */
+    sent: {
+      title: "Thank you. We have your request.",
+      body: "We will contact you using the method you chose. Please also send your artwork on WhatsApp or by email.",
+    },
   },
 
   footer: {
