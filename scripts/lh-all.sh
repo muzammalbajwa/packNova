@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Lighthouse mobile and desktop for the main routes, one after the other, each waiting for the machine load to be under 3.5.
+# bash scripts/lh-all.sh > docs/lighthouse/phase6-table.txt   (site on :8080, built)
+cd "$(dirname "$0")/.."
+PAGES="/ /material/rigid-boxes/ /material/corrugated-boxes/ /shape-and-style/tuck-boxes/ /shape-and-style/paper-bags/ /industry/mylar-bags/ /shape-and-style/hang-tags/ /shape-and-style/trays-and-sleeves/ /configurator/ /quote/ /contact/"
+mkdir -p docs/lighthouse
+for mode in mobile desktop; do
+  for p in $PAGES; do
+    for i in $(seq 1 12); do l=$(sysctl -n vm.loadavg | awk '{print $2}'); [ "$(echo "$l < 3.5" | bc)" = 1 ] && break; sleep 15; done
+    n=$(echo "$p" | tr '/' '_'); bash scripts/lh.sh "$p" "$mode" "docs/lighthouse/p6-$mode$n.json"
+  done
+done
+echo LH_ALL_DONE

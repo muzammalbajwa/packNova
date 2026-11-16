@@ -5,7 +5,7 @@ URL="http://127.0.0.1:8080$1"; MODE="${2:-mobile}"; OUT="${3:-/tmp/lh-$$.json}"
 export PATH="${NODE22_BIN:-$HOME/.nvm/versions/node/v22.23.4/bin}:$PATH"
 L0=$(sysctl -n vm.loadavg | awk '{print $2}')
 FF="--form-factor=mobile"; [ "$MODE" = "desktop" ] && FF="--preset=desktop"
-npx --yes lighthouse@12 "$URL" $FF --quiet --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--headless=new" --output=json --output-path="$OUT" >/dev/null 2>&1
+npx --yes lighthouse@12 "$URL" $FF --quiet --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--headless=new --use-angle=metal --enable-unsafe-swiftshader" --output=json --output-path="$OUT" >/dev/null 2>&1
 L1=$(sysctl -n vm.loadavg | awk '{print $2}')
 python3 - "$OUT" "$1" "$MODE" "$L0" "$L1" <<'PY'
 import json,sys
