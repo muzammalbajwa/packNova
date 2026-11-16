@@ -1,0 +1,71 @@
+{
+ "mode": "mobile",
+ "cpu": 4,
+ "rows": [
+  {
+   "type": "tuck",
+   "maxFrameMs": 116.7,
+   "medianMaxMs": 83.4,
+   "p99Ms": 16.8,
+   "all": [
+    83.2,
+    83.3,
+    83.4,
+    99.9,
+    116.7
+   ]
+  },
+  {
+   "type": "rigid",
+   "maxFrameMs": 116.6,
+   "medianMaxMs": 100,
+   "p99Ms": 16.8,
+   "all": [
+    99.9,
+    100,
+    100,
+    100,
+    116.6
+   ]
+  },
+  {
+   "type": "mailer",
+   "maxFrameMs": 133.4,
+   "medianMaxMs": 116.7,
+   "p99Ms": 16.8,
+   "all": [
+    116.6,
+    116.6,
+    116.7,
+    133.4,
+    133.4
+   ]
+  },
+  {
+   "type": "bag",
+   "maxFrameMs": 116.7,
+   "medianMaxMs": 99.9,
+   "p99Ms": 16.8,
+   "all": [
+    83.3,
+    83.3,
+    99.9,
+    100,
+    116.7
+   ]
+  },
+  {
+   "type": "pouch",
+   "maxFrameMs": 116.7,
+   "medianMaxMs": 100.1,
+   "p99Ms": 33.3,
+   "all": [
+    83.3,
+    100,
+    100.1,
+    116.7,
+    116.7
+   ]
+  }
+ ]
+}

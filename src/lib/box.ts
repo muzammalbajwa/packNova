@@ -231,6 +231,7 @@ export function boxSkin(c: BoxConfig, logo?: CanvasImageSource): Skin {
     foil: c.foil,
     props: [],
     logo,
+    fastBlank: true,
     finish: { gloss: c.surface === "gloss", emboss: c.emboss },
     innerColor: c.print === "outside" ? undefined : accent,
     flute: c.material === "flute-b" ? 6 : c.material === "flute-e" ? 14 : undefined,

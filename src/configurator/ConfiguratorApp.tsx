@@ -122,10 +122,13 @@ export default function ConfiguratorApp() {
         el.style.top = `${y.toFixed(1)}%`;
         el.style.opacity = on ? "1" : "0";
       };
+      const t0 = performance.now();
       const pv = await mod.createPreview(settled, { low: lowRef.current, logo: logo?.canvas, reduced: reducedRef.current, request: () => engRef.current?.request(), labels });
       if (id !== buildId.current || engRef.current !== eng) { pv.instance.dispose(); return; }
       previewRef.current = { pv, type: settled.type };
+      const t1 = performance.now();
       await eng.mount(pv.instance);
+      (window as unknown as { __cfgBuild?: { build: number; mount: number }[] }).__cfgBuild?.push({ build: t1 - t0, mount: performance.now() - t1 }); // ?perf timing for the tests
     })();
   }, [booted, settled, logo]);
 

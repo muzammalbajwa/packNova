@@ -16,6 +16,8 @@ declare global {
  * so the next page does not rebuild the scene or create a new GL context.
  * Rendering is on demand: a frame is drawn when progress, size or the recipe changes (never in a loop).
  */
+const nextFrame = () => new Promise<void>((res) => requestAnimationFrame(() => res()));
+
 class Engine {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
@@ -61,6 +63,7 @@ class Engine {
   }
 
   detach() {
+    this.mountId++; // cancels a mount that is still uploading textures
     this.ro?.disconnect();
     this.ro = null;
     cancelAnimationFrame(this.raf);
@@ -80,6 +83,7 @@ class Engine {
 
   /** Disposes the renderer and its context. The next getEngine() builds a new one. */
   destroy() {
+    this.mountId++;
     window.clearTimeout(this.destroyTimer);
     if (this.recipe) {
       this.scene.remove(this.recipe.root);
@@ -98,25 +102,54 @@ class Engine {
     if (engine === this) engine = null;
   }
 
-  /** Mount a recipe: warm every shader and texture while it is fully visible, then draw the first frame. */
+  private mountId = 0;
+  /** Where a recipe waits while its shaders are compiled; never drawn. */
+  private warm = new THREE.Scene();
+
+  /**
+   * Mount a recipe. The textures of the new recipe are uploaded one per frame while the previous recipe keeps drawing, so no
+   * single frame carries the whole upload; then, in one light frame, the old recipe is swapped for the new one, with every
+   * shader warmed while it is fully visible. A newer mount (or a detach) cancels one that is still waiting.
+   */
   async mount(r: RecipeInstance) {
-    if (this.recipe) {
-      this.scene.remove(this.recipe.root);
-      this.recipe.dispose();
+    const id = ++this.mountId;
+    const texs = new Set<THREE.Texture>();
+    r.root.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh || !m.material) return;
+      for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
+        for (const v of Object.values(mat)) if (v && (v as THREE.Texture).isTexture) texs.add(v as THREE.Texture);
+        for (const t of (mat.userData?.extraTextures as THREE.Texture[] | undefined) ?? []) texs.add(t);
+      }
+    });
+    for (const t of texs) {
+      this.renderer.initTexture(t);
+      await nextFrame();
+      if (id !== this.mountId) {
+        r.dispose();
+        return;
+      }
     }
+    // warm every shader of the new recipe off to the side (it is not in the drawn scene yet), in a frame of its own
+    r.update(0, this.camera);
+    r.root.traverse((o) => (o.visible = true));
+    this.warm.add(r.root);
+    this.renderer.compile(this.warm, this.camera, this.scene);
+    await nextFrame();
+    if (id !== this.mountId) {
+      r.dispose();
+      return;
+    }
+    // the swap itself: remove the old, add the new (this moves it out of the warm-up scene), set its pose
+    const t0 = performance.now();
+    const old = this.recipe;
+    if (old) this.scene.remove(old.root);
     this.recipe = r;
     this.scene.add(r.root);
-    r.update(0, this.camera);
-    r.root.traverse((o) => (o.visible = true)); // warm-up: everything on, one compile
-    this.renderer.compile(this.scene, this.camera);
-    r.root.traverse((o) => ((o as THREE.Mesh).isMesh && (o as THREE.Mesh).material && this.initTextures(o as THREE.Mesh)));
-    r.update(this.p, this.camera); // restores the visibility of this progress
+    r.update(this.p, this.camera);
     this.request();
-  }
-
-  private initTextures(m: THREE.Mesh) {
-    const mats = Array.isArray(m.material) ? m.material : [m.material];
-    for (const mat of mats) for (const v of Object.values(mat)) if (v && (v as THREE.Texture).isTexture) this.renderer.initTexture(v as THREE.Texture);
+    (window as unknown as { __swapMs?: number[] }).__swapMs?.push(performance.now() - t0); // tests only
+    if (old) requestAnimationFrame(() => old.dispose()); // freeing the old geometry and textures: another frame
   }
 
   setProgress(p: number) {

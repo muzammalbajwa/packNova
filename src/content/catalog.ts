@@ -36,6 +36,8 @@ export interface Skin {
   card?: CardLook;
   /** Configurator only: the visitor's logo (kept in the browser), drawn instead of the wordmark. */
   logo?: CanvasImageSource;
+  /** Configurator only: the unprinted sheet is never shown, so it gets a 4 px swatch instead of a full texture. */
+  fastBlank?: boolean;
   /** Configurator only: gloss coat and embossed print as visual hints. */
   finish?: { gloss?: boolean; emboss?: boolean };
   /** Configurator only: colour of the inside faces (inside print). */

@@ -37,20 +37,36 @@ export interface SheetArt { SW: number; SH: number; fronts: Rect[]; sides: Rect[
 const css = (c: THREE.ColorRepresentation) => "#" + new THREE.Color(c).getHexString();
 const mix = (a: string, b: string, t: number) => "#" + new THREE.Color(a).lerp(new THREE.Color(b), t).getHexString();
 
-/** Paper / board grain over the whole canvas. */
-function grain(g: CanvasRenderingContext2D, w: number, h: number, material: Skin["material"]) {
+const grainTiles = new Map<string, HTMLCanvasElement>();
+const TILE = 512;
+
+/** One tile of speckle (and, for kraft, fine stripes) per material, painted once and reused: far cheaper than thousands of specks per sheet. */
+function grainTile(material: Skin["material"]) {
+  let t = grainTiles.get(material);
+  if (t) return t;
+  t = document.createElement("canvas");
+  t.width = t.height = TILE;
+  const g = t.getContext("2d")!;
   const r = rng(material.length * 31 + 7);
-  const n = material === "kraft" ? 5200 : 2600;
+  const n = Math.round((material === "kraft" ? 5200 : 2600) * 0.45);
   for (let i = 0; i < n; i++) {
     g.fillStyle = r() > 0.5 ? "rgba(60,40,15,0.10)" : "rgba(255,245,225,0.10)";
-    g.fillRect(r() * w, r() * h, 1 + r() * 2, 1);
+    g.fillRect(r() * TILE, r() * TILE, 1 + r() * 2, 1);
   }
   if (material === "kraft") {
-    for (let y = 0; y < h; y += 6) {
+    for (let y = 0; y < TILE; y += 6) {
       g.fillStyle = (y / 6) % 2 ? "rgba(90,60,25,0.05)" : "rgba(255,230,190,0.04)";
-      g.fillRect(0, y, w, 3);
+      g.fillRect(0, y, TILE, 3);
     }
   }
+  grainTiles.set(material, t);
+  return t;
+}
+
+/** Paper / board grain over the whole canvas. */
+function grain(g: CanvasRenderingContext2D, w: number, h: number, material: Skin["material"]) {
+  const t = grainTile(material);
+  for (let y = 0; y < h; y += TILE) for (let x = 0; x < w; x += TILE) g.drawImage(t, x, y);
 }
 
 /**
@@ -58,6 +74,17 @@ function grain(g: CanvasRenderingContext2D, w: number, h: number, material: Skin
  * (`fronts` get the brand mark, `sides` the secondary art). `blank` skips the print (the unprinted sheet).
  */
 export function sheetTexture(pool: Pool, skin: Skin, art: SheetArt, blank: boolean, low: boolean): THREE.CanvasTexture {
+  if (blank && skin.fastBlank) {
+    // the unprinted sheet is never shown (the print wipe is finished): a flat swatch instead of a second full-size texture
+    const c = document.createElement("canvas");
+    c.width = c.height = 4;
+    const g = c.getContext("2d")!;
+    g.fillStyle = skin.base;
+    g.fillRect(0, 0, 4, 4);
+    const t = pool.add(new THREE.CanvasTexture(c));
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }
   const px = (low ? 640 : 1024) / Math.max(art.SW, art.SH);
   const W = Math.max(8, Math.round(art.SW * px));
   const H = Math.max(8, Math.round(art.SH * px));
@@ -197,7 +224,9 @@ export function skinMats(pool: Pool, skin: Skin, printTex: THREE.Texture, blankT
   const uReveal = { value: 1 };
   const uScan = { value: 0 };
   const uBlank = { value: blankTex };
+  const extra = [blankTex]; // used through a uniform, so the engine cannot find it by itself: listed for the warm-up
   const outer = pool.add(new THREE.MeshStandardMaterial({ map: printTex, roughness: skin.finish?.gloss ? 0.2 : ROUGH[skin.material], metalness: skin.material === "black" ? 0.08 : 0 }));
+  outer.userData.extraTextures = extra;
   if (skin.finish?.emboss) {
     outer.bumpMap = printTex;
     outer.bumpScale = 1.6;
