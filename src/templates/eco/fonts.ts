@@ -1,8 +1,20 @@
-import { Newsreader, Source_Sans_3 } from "next/font/google";
+import localFont from "next/font/local";
 
-// Headings: Newsreader, a text serif with a calm, printed-matter feel (weights 500 and 600 only).
-// Body: Source Sans 3, a humanist sans that stays clear at 17 to 18 px.
-const display = Newsreader({ subsets: ["latin"], weight: ["500", "600"], variable: "--font-display", display: "swap" });
-const body = Source_Sans_3({ subsets: ["latin"], variable: "--font-body", display: "swap" });
+// Self-hosted and trimmed (scripts/make-fonts.py): Latin only, only the weights the site uses.
+//   Headings: Newsreader, weights 500 to 600 (34 kB). Body: Source Sans 3, weights 400 to 700 (22 kB).
+// next/font adds a fallback font with adjusted size and metrics, so the text does not jump when the font arrives (no layout shift).
+// To change a font, rebuild the file with scripts/make-fonts.py. Urdu text later: add an Urdu font here and in --font-display / --font-body.
+const display = localFont({
+  src: [{ path: "./fonts/newsreader-500-600.woff2", weight: "500 600", style: "normal" }],
+  variable: "--font-display",
+  display: "swap",
+  adjustFontFallback: "Times New Roman",
+});
+const body = localFont({
+  src: [{ path: "./fonts/sourcesans3-400-700.woff2", weight: "400 700", style: "normal" }],
+  variable: "--font-body",
+  display: "swap",
+  adjustFontFallback: "Arial",
+});
 
 export const fontClass = `${display.variable} ${body.variable}`;
