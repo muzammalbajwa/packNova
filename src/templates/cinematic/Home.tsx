@@ -18,7 +18,7 @@ export default function Home() {
   return (
     <TemplateFrame id="cinematic" base={BASE} config={config} fontClass={fontClass}>
       <Navbar base={BASE} />
-      <main className="relative z-10">
+      <main id="main" tabIndex={-1} className="relative z-10 outline-none">
         <Hero base={BASE} />
         <Story base={BASE} />
         <Products />

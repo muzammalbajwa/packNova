@@ -46,7 +46,12 @@ const cacheControl = (url) =>
 createServer(async (req, res) => {
   const file = await resolveFile(req.url ?? "/");
   if (!file) {
-    res.writeHead(404, { "content-type": "text/plain" }).end("Not found");
+    // like the real host (ErrorDocument 404 /404.html): the site's own 404 page with a 404 status
+    try {
+      res.writeHead(404, { "content-type": "text/html; charset=utf-8" }).end(await readFile(join(ROOT, "404.html")));
+    } catch {
+      res.writeHead(404, { "content-type": "text/plain" }).end("Not found");
+    }
     return;
   }
   const ext = extname(file);

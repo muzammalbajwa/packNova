@@ -16,6 +16,7 @@ export default function PageFrame({ id, fontClass, children }: { id: string; fon
     <div data-template={id} className={`${fontClass} [font-family:var(--f-body)] min-h-dvh bg-[var(--bg)] pb-[calc(4.5rem+env(safe-area-inset-bottom))] text-[var(--fg)] xl:pb-0`}>
       {/* sets the attribute before first paint so the page background matches (no flash) */}
       <script dangerouslySetInnerHTML={{ __html: `document.documentElement.setAttribute("data-template",${JSON.stringify(id)})` }} />
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-[var(--r-btn)] focus:bg-[var(--accent)] focus:px-4 focus:py-2 focus:font-semibold focus:text-[var(--on-accent)]">Skip to main content</a>
       {children}
       <StickyCta base="" />
     </div>

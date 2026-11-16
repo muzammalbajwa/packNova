@@ -11,7 +11,7 @@ export default function ConfiguratorPage() {
   return (
     <TemplateFrame id="cinematic" base={BASE} config={config} fontClass={fontClass} scene={false}>
       <Navbar base={BASE} onHome={false} />
-      <main className="relative z-10 min-h-dvh bg-[var(--bg)]">
+      <main id="main" tabIndex={-1} className="relative z-10 min-h-dvh bg-[var(--bg)] outline-none">
         <ConfiguratorClient base={BASE} />
       </main>
       <Footer base={BASE} onHome={false} />

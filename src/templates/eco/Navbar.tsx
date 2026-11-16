@@ -105,7 +105,22 @@ export default function Navbar({ base: _base, onHome: _onHome }: { base?: string
 
           <ul ref={wrap} className="hidden items-center gap-1 text-base lg:flex">
             {NAV.map((e, i) => (
-              <li key={e.label} className="relative" onPointerEnter={() => (e.href === "/configurator/" ? warmConfigurator() : e.items && warmEngine())} onFocus={() => (e.href === "/configurator/" ? warmConfigurator() : e.items && warmEngine())} onTouchStart={() => (e.href === "/configurator/" ? warmConfigurator() : e.items && warmEngine())} onMouseEnter={() => e.items && setOpen(i)} onMouseLeave={() => setOpen((o) => (o === i ? null : o))}
+              <li key={e.label} className="relative" onPointerEnter={() => (e.href === "/configurator/" ? warmConfigurator() : e.items && warmEngine())} onFocus={() => (e.href === "/configurator/" ? warmConfigurator() : e.items && warmEngine())} onTouchStart={() => (e.href === "/configurator/" ? warmConfigurator() : e.items && warmEngine())} onKeyDown={(ev) => {
+                    if (!e.items) return;
+                    const root = ev.currentTarget; // read now: React clears currentTarget once the handler returns
+                    const links = () => [...root.querySelectorAll<HTMLElement>("ul a")];
+                    const trigger = root.querySelector<HTMLElement>("button");
+                    if (ev.key === "Escape" && open === i) { trigger?.focus(); return; } // the global handler then closes it
+                    if (ev.key === "ArrowDown" && open !== i) { ev.preventDefault(); setOpen(i); requestAnimationFrame(() => links()[0]?.focus()); return; }
+                    if (open !== i) return;
+                    const l = links();
+                    const at = l.indexOf(document.activeElement as HTMLElement);
+                    if (ev.key === "ArrowDown") { ev.preventDefault(); l[(at + 1) % l.length]?.focus(); }
+                    else if (ev.key === "ArrowUp") { ev.preventDefault(); if (at <= 0) trigger?.focus(); else l[at - 1]?.focus(); }
+                    else if (ev.key === "Home") { ev.preventDefault(); l[0]?.focus(); }
+                    else if (ev.key === "End") { ev.preventDefault(); l[l.length - 1]?.focus(); }
+                  }}
+                  onMouseEnter={() => e.items && setOpen(i)} onMouseLeave={() => setOpen((o) => (o === i ? null : o))}
                   onBlur={(ev) => { if (!ev.currentTarget.contains(ev.relatedTarget as Node)) setOpen((o) => (o === i ? null : o)); }}>
                 {e.items ? (
                   <>

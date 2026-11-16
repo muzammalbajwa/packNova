@@ -10,7 +10,7 @@ export default function Shell({ children }: { children: ReactNode }) {
   return (
     <PageFrame id="eco" fontClass={fontClass}>
       <Navbar />
-      <main className="relative z-10 bg-[var(--bg)] pt-[6.25rem]">{children}</main>
+      <main id="main" tabIndex={-1} className="relative z-10 bg-[var(--bg)] pt-[6.25rem] outline-none">{children}</main>
       <Footer />
     </PageFrame>
   );

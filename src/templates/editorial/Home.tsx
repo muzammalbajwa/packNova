@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <TemplateFrame id="editorial" base={BASE} config={config} fontClass={fontClass}>
       <Navbar base={BASE} />
-      <main className="relative z-10">
+      <main id="main" tabIndex={-1} className="relative z-10 outline-none">
         <Hero base={BASE} />
         <Ticker />
         <Products />

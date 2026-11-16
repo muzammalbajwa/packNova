@@ -20,7 +20,7 @@ export default function Home() {
   return (
     <TemplateFrame id="eco" base={BASE} config={config} fontClass={fontClass} previewBack={false}>
       <Navbar base={BASE} />
-      <main className="relative z-10">
+      <main id="main" tabIndex={-1} className="relative z-10 outline-none">
         <Hero base={BASE} />
         <Products />
         <ProductPhotos />

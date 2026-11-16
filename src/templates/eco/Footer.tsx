@@ -18,15 +18,15 @@ export default function Footer({ base: _b, onHome: _o }: { base?: string; onHome
           </ul>
         </div>
         <div>
-          <h3 className="font-display mb-3 text-lg font-semibold">{footer.productsTitle}</h3>
+          <h2 className="font-display mb-3 text-lg font-semibold">{footer.productsTitle}</h2>
           <ul className="space-y-2 text-[var(--muted)]">{site.products.items.map((p) => (<li key={p.id}><Link href={HOME_CATEGORY_HREF[p.id]} className={link}>{p.name}</Link></li>))}</ul>
         </div>
         <div>
-          <h3 className="font-display mb-3 text-lg font-semibold">{footer.companyTitle}</h3>
+          <h2 className="font-display mb-3 text-lg font-semibold">{footer.companyTitle}</h2>
           <ul className="space-y-2 text-[var(--muted)]">{[...GROUPS.map((g) => ({ label: g.label, href: g.href })), { label: "Design your box", href: ROUTES.configurator }, { label: "Get a quote", href: ROUTES.quote }, { label: "Contact us", href: ROUTES.contact }].map((l) => (<li key={l.label}><Link href={l.href} className={link}>{l.label}</Link></li>))}</ul>
         </div>
         <div>
-          <h3 className="font-display mb-3 text-lg font-semibold">{footer.contactTitle}</h3>
+          <h2 className="font-display mb-3 text-lg font-semibold">{footer.contactTitle}</h2>
           <ul className="space-y-2 text-[var(--muted)]">
             <li><a href={contact.phoneHref} className={link}>{contact.phone}</a></li>
             <li><a href={contact.whatsappHref} className={link}>WhatsApp: {contact.whatsapp}</a></li>
@@ -36,7 +36,7 @@ export default function Footer({ base: _b, onHome: _o }: { base?: string; onHome
           </ul>
         </div>
       </div>
-      <p className="mx-auto mt-12 max-w-6xl border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">© {new Date().getFullYear()} {site.brand.name}. {footer.rights}</p>
+      <p className="mx-auto mt-12 max-w-6xl border-t border-[var(--line)] pt-6 text-sm text-[var(--muted)]">© {new Date().getFullYear()} {site.brand.name}. {footer.rights} <Link href="/privacy/" className="ml-3 underline underline-offset-4 hover:text-[var(--fg)]">Privacy policy</Link> <Link href="/terms/" className="ml-3 underline underline-offset-4 hover:text-[var(--fg)]">Terms</Link></p>
     </footer>
   );
 }
