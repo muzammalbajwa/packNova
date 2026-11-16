@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { watchContext } from "@/lib/contextLoss";
+import ContextWatch from "../ContextWatch";
 import { useAppStore } from "@/lib/store";
 import SceneLights from "../SceneLights";
 import CartonModel from "./CartonModel";
@@ -110,8 +110,7 @@ export default function MakingScene({ active }: { active: boolean }) {
       camera={{ position: [0, 0, cam.z], fov: cam.fov, near: cam.z - 4, far: cam.z + 7 }}
       onCreated={(state) => {
         window.__glMaking = state.gl;
-        // the story is a pure function of scroll progress: after a lost context it only needs one redraw when the context returns
-        watchContext(state.gl.domElement, { onRestored: () => state.invalidate() });
+        (window as unknown as { __makingR3F?: unknown }).__makingR3F = state; // test hook (scripts/roundtrip-test.mjs)
         window.__makingSet = (p) => useAppStore.getState().setMakingProgress(p);
         const frustum = new THREE.Frustum();
         const m4 = new THREE.Matrix4();
@@ -138,6 +137,7 @@ export default function MakingScene({ active }: { active: boolean }) {
       }}
       aria-hidden
     >
+      <ContextWatch flag={false} />
       <SceneLights low={low} />
       <CartonModel low={low} reducedMotion={reduced} />
       <JourneyScene low={low} />

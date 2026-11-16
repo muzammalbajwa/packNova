@@ -96,6 +96,8 @@ class Engine {
     this.renderer.renderLists.dispose();
     this.host = null;
     this.firstFrame = null;
+    this.onLost = null; // the page that set these is gone
+    this.onRestored = null;
     // Another film page attaches within a moment (and keeps the renderer). If none does, free the WebGL context.
     this.destroyTimer = window.setTimeout(() => this.destroy(), 150);
   }

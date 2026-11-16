@@ -16,7 +16,9 @@ await sleep(3500);
 const ctxAlive = `(()=>{ const alive = window.__ctxs.filter(g => !g.isContextLost() && g.canvas.isConnected); return alive.length; })()`;
 // 'alive' counts contexts that are not lost. A canvas removed from the DOM but not lost still holds a context, so count those too.
 const aliveAll = `(()=>window.__ctxs.filter(g => !g.isContextLost()).length)()`;
-const stats = `(()=>{ const f=window.__film; return f ? { geos:f.renderer.info.memory.geometries, texs:f.renderer.info.memory.textures, progs:f.renderer.info.programs.length } : null; })()`;
+const stats = `(()=>{ const f=window.__film; if(!f) return null; let objs=0; f.scene.traverse(()=>objs++); return { geos:f.renderer.info.memory.geometries, texs:f.renderer.info.memory.textures, progs:f.renderer.info.programs.length, objs }; })()`;
+// the homepage scenes (hero and story), counted by objects and visible meshes: a ghost object from an earlier visit shows up here
+const homeScenes = `(()=>{ const c=(sc)=>{ let o=0,m=0,v=0; sc.traverse(x=>{o++; if(x.isMesh||x.isInstancedMesh){m++; let vis=true; for(let n=x;n;n=n.parent) if(!n.visible) vis=false; if(vis) v++;}}); return o+'/'+m+'/'+v; }; return JSON.stringify({ hero: window.__r3f? c(window.__r3f.scene):null, story: window.__makingR3F? c(window.__makingR3F.scene):null, poster: (()=>{const im=document.querySelector('img[fetchpriority=high]'); return im?getComputedStyle(im).opacity:null})() }); })()`;
 const goTo = async (target) => {
   const found = await c.ev(`(async()=>{
     const sel = 'a[href="${target}"]';
@@ -42,6 +44,7 @@ for (let i = 0; i < SEQ.length; i++) {
   else if (SEQ[i] !== "/") await c.waitFor("window.__film && document.querySelector('#how canvas') && getComputedStyle(document.querySelector('#how canvas').parentElement).opacity === '1'", 30000);
   await sleep(SEQ[i] === "/" ? 3500 : 1500);
   const s = await c.ev(stats);
+  const hs = SEQ[i] === "/" ? JSON.parse(await c.ev(homeScenes)) : null;
   await c.send("HeapProfiler.collectGarbage");
   const heap = (await c.send("Runtime.getHeapUsage")).usedSize / 1048576;
   const alive = await c.ev(aliveAll);
@@ -51,7 +54,7 @@ for (let i = 0; i < SEQ.length; i++) {
   maxAlive = Math.max(maxAlive, mx);
   bothSeen ||= both;
   show(i + 1, SEQ[i], s, `${alive} (max ${mx} during the transition)`, both, heap);
-  rows.push({ path: SEQ[i], s: s && { ...s, heap } });
+  rows.push({ path: SEQ[i], s: s && { ...s, heap }, hs });
 }
 // growth: compare film pages visited more than once
 const byPath = {};
@@ -60,8 +63,18 @@ for (const [p, list] of Object.entries(byPath)) {
   const g = list.map((x) => x.geos), t = list.map((x) => x.texs);
   const grew = list.length > 1 && (g[g.length - 1] > g[0] || t[t.length - 1] > t[0]);
   const h = list.map((x) => x.heap.toFixed(1));
-  console.log(`${grew ? "FAIL" : "PASS"}  ${p}: geometries ${g.join(" -> ")}, textures ${t.join(" -> ")}, programs ${list.map((x) => x.progs).join(" -> ")}, heap MB ${h.join(" -> ")}`);
-  ok &&= !grew;
+  const o = list.map((x) => x.objs);
+  const grewObjs = list.length > 1 && o[o.length - 1] > o[0];
+  console.log(`${grew || grewObjs ? "FAIL" : "PASS"}  ${p}: scene objects ${o.join(" -> ")}, geometries ${g.join(" -> ")}, textures ${t.join(" -> ")}, programs ${list.map((x) => x.progs).join(" -> ")}, heap MB ${h.join(" -> ")}`);
+  ok &&= !grew && !grewObjs;
+}
+// the homepage scenes must be identical on every visit (same objects, same visible meshes) and the poster must be hidden
+const homes = rows.filter((r) => r.hs).map((r) => r.hs);
+if (homes.length > 1) {
+  const base = JSON.stringify([homes[0].hero, homes[0].story]);
+  const bad = homes.filter((h) => JSON.stringify([h.hero, h.story]) !== base || h.poster !== "0");
+  console.log(`${bad.length ? "FAIL" : "PASS"}  homepage scenes on every visit: ${homes.map((h) => `hero ${h.hero} story ${h.story} poster ${h.poster}`).join(" | ")}`);
+  ok &&= !bad.length;
 }
 console.log(`${bothSeen ? "FAIL" : "PASS"}  homepage engine and film renderer were never alive together`);
 console.log(`${maxAlive <= 2 ? "PASS" : "FAIL"}  most WebGL contexts alive at once: ${maxAlive}`);

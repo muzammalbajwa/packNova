@@ -11,6 +11,8 @@ import SceneLoader from "./canvas/SceneLoader";
 /** Boots device detection, smooth scroll, the loader and the 3D canvas. */
 export default function Experience() {
   useEffect(() => {
+    // The store outlives this component (client-side navigation): start every mount from the initial scene state.
+    useAppStore.setState({ heroProgress: 0, makingProgress: 0, glLost: false });
     const { setProfile, setProgress, setReady } = useAppStore.getState();
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const profile = detectDevice();

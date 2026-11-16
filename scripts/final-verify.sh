@@ -23,6 +23,8 @@ for l in sys.stdin:
     if l.startswith('{'):
         d=json.loads(l); print(f\"{d['path']:42} avg {d['fps']:5} fps  p99 {d['p99ms']:5} ms  max {d['maxms']:6} ms  >33ms: {d['over33']}  draw cpu avg {d['drawAvgMs']} ms\")
     elif 'load' in l: print(l.strip())"
+sec "scene lifecycle: home round trips (reduced motion, exact pixels) and normal motion"; node scripts/roundtrip-test.mjs --only home --rounds 10 --reduced 1 2>&1 | grep -E "FAIL|passed|FAILED"; node scripts/roundtrip-test.mjs --only home --rounds 10 2>&1 | grep -E "FAIL|passed|FAILED"
+sec "scene lifecycle: every film page, leave and return, A to B, Back and Forward"; node scripts/roundtrip-test.mjs --only film 2>&1 | grep -E "FAIL|passed|FAILED"
 sec "20 navigations: renderer geometries, textures, programs, JS heap"; R="/material/rigid-boxes/,/material/corrugated-boxes/,/shape-and-style/tuck-boxes/,/shape-and-style/pillow-boxes/,/shape-and-style/paper-bags/,/industry/mylar-bags/,/shape-and-style/hang-tags/,/shape-and-style/trays-and-sleeves/,/event/halloween/"; node scripts/leak-test.mjs --seq "$R,/,$R,/" 2>&1 | tail -34
 sec "menus (mobile menu), prefetch"; node scripts/menu-test.mjs 2>&1 | tail -12; node scripts/prefetch-test.mjs 2>&1 | tail -3
 sec "accessibility (keyboard, focus, reduced motion, headings)"; node --no-warnings scripts/a11y-test.mjs 2>&1 | tail -45

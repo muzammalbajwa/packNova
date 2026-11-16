@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { Canvas, useThree, type RootState } from "@react-three/fiber";
 import { useProgress } from "@react-three/drei";
-import { watchContext } from "@/lib/contextLoss";
+import ContextWatch from "./ContextWatch";
 import { useAppStore } from "@/lib/store";
 import Box3D from "./Box3D";
 import SceneLights from "./SceneLights";
@@ -70,19 +70,12 @@ export default function Scene() {
       onCreated={(state) => {
         window.__gl = state.gl;
         window.__r3f = state;
-        // a lost WebGL context: show the poster again; when it is given back, draw again
-        watchContext(state.gl.domElement, {
-          onLost: () => useAppStore.setState({ glLost: true }),
-          onRestored: () => {
-            useAppStore.setState({ glLost: false });
-            state.invalidate();
-          },
-        });
       }}
     >
       <SceneLights low={profile.tier === "low"} />
       <Box3D detail={profile.detail} reducedMotion={reducedMotion} />
       <DemandInvalidator />
+      <ContextWatch />
       <ReadySignal />
     </Canvas>
   );

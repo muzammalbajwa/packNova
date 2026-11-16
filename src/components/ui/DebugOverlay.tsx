@@ -28,6 +28,23 @@ function pct(buf: Float32Array, n: number, p: number) {
   return sorted[Math.min(len - 1, Math.floor(len * p))];
 }
 
+/** Objects in a three.js scene (every Object3D, and how many are meshes / visible meshes). Counted twice a second, not per frame. */
+function sceneCount(scene: import("three").Object3D | undefined | null) {
+  if (!scene) return "-";
+  let objects = 0, meshes = 0, visible = 0;
+  scene.traverse((o) => {
+    objects++;
+    const m = o as import("three").Mesh;
+    if (m.isMesh) {
+      meshes++;
+      let v = true;
+      for (let n: import("three").Object3D | null = o; n; n = n.parent) if (!n.visible) v = false;
+      if (v) visible++;
+    }
+  });
+  return `${objects} objects, ${visible}/${meshes} meshes`;
+}
+
 /**
  * Live stats, shown only with ?perf=1 (or ?debug=1). It works in every build (dev, staging, production) and does nothing
  * when the flag is absent: this component returns null and nothing here runs. It writes to the DOM directly
@@ -75,6 +92,7 @@ function Overlay() {
             `film   draw avg ${fmAvg.toFixed(2)} ms  p99 ${fm ? pct(fm.buf, fm.n, 0.99).toFixed(2) : "-"} ms  (${fmN} draws)`,
             `gl     ${which}: calls ${gl ? gl.info.render.calls : "-"}  tris ${gl ? gl.info.render.triangles : "-"}`,
             `memory geometries ${gl ? gl.info.memory.geometries : "-"}  textures ${gl ? gl.info.memory.textures : "-"}  heap ${mem ? (mem.usedJSHeapSize / 1048576).toFixed(0) + " MB" : "n/a"}`,
+            `scene  film ${film && window.__film ? sceneCount(window.__film.scene) : "-"} | hero ${sceneCount(window.__r3f?.scene)} | story ${sceneCount((window as unknown as { __makingR3F?: { scene: import("three").Object3D } }).__makingR3F?.scene)}`,
             `tier   ${p?.tier ?? "-"}  dpr ${window.devicePixelRatio}  webgl ${p ? (p.webgl ? "yes" : "no") : "-"}`,
           ].join("\n");
         }

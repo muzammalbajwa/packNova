@@ -309,7 +309,9 @@ export function rectGeo(pool: Pool, x: number, y: number, w: number, h: number, 
 }
 
 /** Soft contact shadow (one texture for the lifetime of the page). */
+/** One soft-shadow texture shared by every shadow blob, freed together with the last recipe that uses it (nothing outlives the page). */
 let shadowTex: THREE.CanvasTexture | null = null;
+let shadowUsers = 0;
 export function shadowTexture() {
   if (shadowTex) return shadowTex;
   const c = document.createElement("canvas");
@@ -325,6 +327,15 @@ export function shadowTexture() {
 }
 
 export function blobShadow(pool: Pool): THREE.Mesh {
+  shadowUsers++;
+  pool.add({
+    dispose() {
+      if (--shadowUsers === 0) {
+        shadowTex?.dispose();
+        shadowTex = null;
+      }
+    },
+  });
   const m = new THREE.Mesh(
     pool.add(new THREE.PlaneGeometry(1, 1)),
     pool.add(new THREE.MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false })),

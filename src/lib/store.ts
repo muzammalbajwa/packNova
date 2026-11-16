@@ -71,3 +71,6 @@ export const useAppStore = create<AppState>((set) => ({
   setMakingProgress: (makingProgress) => set({ makingProgress }),
   setQuotePrefill: (quotePrefill) => set({ quotePrefill }),
 }));
+
+// Test and ?perf hook: the scene lifecycle tests read the store from the page (scripts/roundtrip-test.mjs).
+if (typeof window !== "undefined") (window as unknown as { __appStore?: typeof useAppStore }).__appStore = useAppStore;
