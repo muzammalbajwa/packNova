@@ -350,10 +350,11 @@ export default function ConfiguratorApp() {
         {qtyBlock}
       </form>
 
-      <div className="grid gap-6 lg:sticky lg:top-24">
-        <section aria-label="Preview">
+      {/* on a phone the stage comes first (right under the headline) and the summary after the form; from lg it is the sticky right column */}
+      <div className="contents lg:sticky lg:top-24 lg:grid lg:gap-6">
+        <section aria-label="Preview" className="order-first lg:order-none">
           <div className="relative overflow-hidden rounded-[var(--r-card)] border border-[var(--line)] bg-[var(--surface)]">
-            <div className="relative aspect-[5/4] w-full max-h-[30rem]">
+            <div className="relative aspect-[4/5] w-full max-h-[30rem] md:aspect-[5/4]">
               <div className="absolute inset-0 grid place-items-center p-6 transition-opacity duration-500" style={{ opacity: ready ? 0 : 1 }} aria-hidden>
                 {!ready && <ProductPoster page={posterPage} className="h-full max-h-72 w-full" />}
               </div>

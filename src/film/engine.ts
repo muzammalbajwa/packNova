@@ -35,6 +35,18 @@ class Engine {
   onLost: (() => void) | null = null;
   onRestored: (() => void) | null = null;
   private lost = false;
+  /**
+   * Idle motion (the product page opens on the finished product, gently turning). `idleAmp` is the sway in radians (0 = off), `idleFade` (0..1)
+   * is how much of it is left as the visitor starts to scroll. The loop only runs while the stage is on screen, the tab is visible and
+   * some sway is left; on the low tier it is capped at 30 fps. Nothing else is drawn in a loop, and nothing is allocated per frame.
+   */
+  idleAmp = 0;
+  idleFade = 1;
+  idleLow = false;
+  private onScreen = true;
+  private io: IntersectionObserver | null = null;
+  private lastDraw = 0;
+  private onVisible = () => { if (!document.hidden) this.request(); };
   private unwatch: (() => void) | null = null;
   private destroyTimer = 0;
 
@@ -78,6 +90,13 @@ class Engine {
     this.ro?.disconnect();
     this.ro = new ResizeObserver(() => this.resize());
     this.ro.observe(host);
+    this.io?.disconnect();
+    this.io = new IntersectionObserver(([e]) => {
+      this.onScreen = e.isIntersecting;
+      if (this.onScreen) this.request();
+    });
+    this.io.observe(host);
+    document.addEventListener("visibilitychange", this.onVisible);
     this.resize();
   }
 
@@ -85,6 +104,10 @@ class Engine {
     this.mountId++; // cancels a mount that is still uploading textures
     this.ro?.disconnect();
     this.ro = null;
+    this.io?.disconnect();
+    this.io = null;
+    document.removeEventListener("visibilitychange", this.onVisible);
+    this.idleAmp = 0;
     cancelAnimationFrame(this.raf);
     this.raf = 0;
     if (this.recipe) {
@@ -115,6 +138,8 @@ class Engine {
     cancelAnimationFrame(this.raf);
     this.raf = 0;
     this.unwatch?.();
+    this.io?.disconnect();
+    document.removeEventListener("visibilitychange", this.onVisible);
     this.renderer.domElement.remove();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
@@ -188,8 +213,16 @@ class Engine {
   private draw = () => {
     this.raf = 0;
     if (this.lost || !this.recipe || !this.host) return;
+    const now = performance.now();
+    const idle = this.idleAmp > 0 && this.idleFade > 0.002 && this.onScreen && !document.hidden;
+    if (idle && this.idleLow && this.tail <= 0 && now - this.lastDraw < 30) {
+      this.raf = requestAnimationFrame(this.draw); // low tier: draw about every other frame (30 fps)
+      return;
+    }
+    this.lastDraw = now;
     const t0 = window.__perfOn ? performance.now() : 0; // ?perf=1 only: record the CPU time of this draw
     this.recipe.update(this.p, this.camera);
+    this.recipe.root.rotation.y = this.idleAmp > 0 ? Math.sin(now * 0.00075) * this.idleAmp * this.idleFade : 0;
     this.renderer.render(this.scene, this.camera);
     if (t0) {
       const m = window.__filmMs;
@@ -200,7 +233,7 @@ class Engine {
       this.firstFrame = null;
       f();
     }
-    if (this.tail-- > 0) this.raf = requestAnimationFrame(this.draw);
+    if (this.tail-- > 0 || idle) this.raf = requestAnimationFrame(this.draw);
   };
 
   private resize() {

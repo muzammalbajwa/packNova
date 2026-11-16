@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { quoteHref, type CatalogPage } from "@/content/catalog";
+import { closedProgress, filmProgress, introShare } from "@/film/closed";
 import { RECIPE_LOADERS, loadEngine, waitForOtherContexts } from "@/film/loaders";
 import { detectDevice } from "@/lib/deviceTier";
 import { trackProgress } from "@/lib/scroll";
-import ProductPoster from "./ProductPoster";
+import { FILM_LAYOUT, HERO_COL, STAGE_BOX } from "./filmLayout";
 
 /** The page detail that sits next to a step (what it is, materials, sizes, finishes, uses, order, a question). */
 function detailFor(page: CatalogPage, i: number, n: number): { label: string; body: string } {
@@ -26,14 +27,16 @@ function detailFor(page: CatalogPage, i: number, n: number): { label: string; bo
   }
 }
 
-export default function Pinned({ page }: { page: CatalogPage }) {
+export default function Pinned({ page, hero, poster }: { page: CatalogPage; hero: ReactNode; poster: ReactNode }) {
   const n = page.steps.length;
+  const I = introShare(n);
+  const closed = closedProgress(page.recipe, page.skin);
   const secRef = useRef<HTMLElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
   const pRef = useRef(0);
-  const setProgressRef = useRef<((p: number) => void) | null>(null);
-  const [step, setStep] = useState(0);
+  const setProgressRef = useRef<((P: number) => void) | null>(null);
+  const [step, setStep] = useState(-1); // -1: the first screen (headline and the finished product), then steps 0 to n-1
   const [ready, setReady] = useState(false);
 
   // build the film in idle time: one canvas for the whole page, fetched as its own chunks
@@ -49,8 +52,15 @@ export default function Pinned({ page }: { page: CatalogPage }) {
       eng.firstFrame = () => setReady(true);
       eng.onLost = () => setReady(false); // the poster comes back while the context is gone
       eng.onRestored = () => { eng.firstFrame = () => setReady(true); };
-      setProgressRef.current = (p) => eng.setProgress(p);
-      eng.setProgress(pRef.current);
+      // idle sway of the finished product on the first screen; it fades out as the visitor starts to scroll
+      eng.idleAmp = 0.17;
+      eng.idleLow = profile.tier === "low";
+      const apply = (P: number) => {
+        eng.idleFade = Math.max(0, 1 - P / (I * 0.4));
+        eng.setProgress(filmProgress(P, n, closed));
+      };
+      setProgressRef.current = apply;
+      apply(pRef.current);
       await eng.mount(mod.default({ skin: page.skin, steps: page.steps, low: profile.tier === "low" }));
       detach = () => eng.detach();
     };
@@ -65,19 +75,19 @@ export default function Pinned({ page }: { page: CatalogPage }) {
       setProgressRef.current = null;
       detach?.();
     };
-  }, [page]);
+  }, [page, n, I, closed]);
 
   // scroll progress: written to the engine and a CSS variable; React state changes only when the step changes
   useEffect(() => {
     const el = secRef.current;
     if (!el) return;
     gsap.registerPlugin(ScrollTrigger);
-    let cur = -1;
-    const st = trackProgress(el, (p) => {
-      pRef.current = p;
-      stickyRef.current?.style.setProperty("--p", p.toFixed(4));
-      setProgressRef.current?.(p);
-      const idx = Math.min(n - 1, Math.floor(p * n));
+    let cur = -2;
+    const st = trackProgress(el, (P) => {
+      pRef.current = P;
+      stickyRef.current?.style.setProperty("--p", P.toFixed(4));
+      setProgressRef.current?.(P);
+      const idx = P < I ? -1 : Math.min(n - 1, Math.floor(((P - I) / (1 - I)) * n));
       if (idx !== cur) {
         cur = idx;
         setStep(idx);
@@ -85,42 +95,49 @@ export default function Pinned({ page }: { page: CatalogPage }) {
     }, "top top", "bottom bottom");
     ScrollTrigger.refresh();
     return () => st.kill();
-  }, [n]);
+  }, [n, I]);
 
   const goTo = useCallback((i: number) => {
     const el = secRef.current;
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({ top: top + (el.offsetHeight - window.innerHeight) * ((i + 0.5) / n), behavior: "smooth" });
-  }, [n]);
+    window.scrollTo({ top: top + (el.offsetHeight - window.innerHeight) * (I + (1 - I) * ((i + 0.5) / n)), behavior: "smooth" });
+  }, [n, I]);
 
-  const s = page.steps[step];
-  const d = detailFor(page, step, n);
+  const intro = step < 0;
+  const s = page.steps[Math.max(0, step)];
+  const d = detailFor(page, Math.max(0, step), n);
   const last = step === n - 1;
   return (
-    <section id="how" ref={secRef} aria-labelledby="how-h" className="relative border-t border-[var(--line)] [--film-step:64vh] md:[--film-step:76vh]" style={{ height: `calc(${n} * var(--film-step) + 100dvh)` }}>
-      <h2 id="how-h" className="sr-only">How {page.noun} is made</h2>
+    <section id="how" ref={secRef} aria-label={`How ${page.noun} is made`} className="relative [--film-step:64vh] md:[--film-step:76vh]" style={{ height: `calc(${n + 0.6} * var(--film-step) + 100dvh)` }}>
       <ol className="sr-only">{page.steps.map((x) => <li key={x.action}>{x.title}. {x.caption}</li>)}</ol>
-      <div ref={stickyRef} className="sticky top-0 flex h-dvh flex-col gap-3 overflow-hidden px-4 pb-[4.9rem] pt-[6.4rem] md:grid md:grid-cols-[1fr_1.25fr] md:items-center md:gap-10 md:px-6 md:pb-20 md:pt-[6.8rem]" style={{ ["--p" as string]: 0 }}>
-        <div className="relative z-10 order-2 mx-auto w-full max-w-xl md:order-1 md:mx-0 md:max-w-md md:pl-4 lg:pl-10">
-          <div key={step} className="fade-in" aria-live="polite">
-            <p className="font-display text-xl text-[var(--kraft-ink)]">{String(step + 1).padStart(2, "0")} <span className="text-[var(--muted)]">/ {String(n).padStart(2, "0")}</span></p>
-            <h3 className="font-display mt-1 text-2xl font-medium leading-[1.1] md:mt-2 md:text-4xl">{s.title}</h3>
-            <p className="mt-2 text-base text-[var(--muted)] md:mt-3 md:text-lg">{s.caption}</p>
-            <div className="mt-4 border-t border-[var(--line-strong)] pt-3 md:mt-6 md:pt-4">
-              <p className="text-sm font-semibold text-[var(--kraft-ink)]">{d.label}</p>
-              <p className="mt-1 text-base md:text-lg">{d.body}</p>
-              {last && (
-                <Link href={quoteHref(page.quote.product, page.quote.note)} className="mt-4 inline-flex rounded-[var(--r-btn)] bg-[var(--accent)] px-5 py-3 font-semibold text-[var(--on-accent)] hover:bg-[var(--fg)]">
-                  Get a quote for {page.title}
-                </Link>
-              )}
-            </div>
+      <div ref={stickyRef} className={FILM_LAYOUT} style={{ ["--p" as string]: 0 }}>
+        <div className={HERO_COL}>
+          {/* the headline: always in the page (it is the h1); out of view and inert once the steps take over */}
+          <div className={`transition-[opacity,transform] duration-300 ${intro ? "" : "pointer-events-none absolute inset-x-0 top-0 -translate-y-2 opacity-0"}`} inert={!intro}>
+            {hero}
+            <p className="mt-5 hidden text-sm font-semibold text-[var(--kraft-ink)] md:block">Scroll to see how it is made · 01 / {String(n).padStart(2, "0")}</p>
           </div>
+          {!intro && (
+            <div key={step} className="fade-in" aria-live="polite">
+              <p className="font-display text-xl text-[var(--kraft-ink)]">{String(step + 1).padStart(2, "0")} <span className="text-[var(--muted)]">/ {String(n).padStart(2, "0")}</span></p>
+              <h2 className="font-display mt-1 text-2xl font-medium leading-[1.1] md:mt-2 md:text-4xl">{s.title}</h2>
+              <p className="mt-2 text-base text-[var(--muted)] md:mt-3 md:text-lg">{s.caption}</p>
+              <div className="mt-4 border-t border-[var(--line-strong)] pt-3 md:mt-6 md:pt-4">
+                <p className="text-sm font-semibold text-[var(--kraft-ink)]">{d.label}</p>
+                <p className="mt-1 text-base md:text-lg">{d.body}</p>
+                {last && (
+                  <Link href={quoteHref(page.quote.product, page.quote.note)} className="mt-4 inline-flex rounded-[var(--r-btn)] bg-[var(--accent)] px-5 py-3 font-semibold text-[var(--on-accent)] hover:bg-[var(--fg)]">
+                    Get a quote for {page.title}
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-        <div className="relative order-1 min-h-0 flex-1 overflow-hidden rounded-[var(--r-card)] border border-[var(--line)] bg-[var(--surface)] md:order-2 md:h-full md:max-h-[34rem] md:flex-none">
+        <div className={STAGE_BOX}>
           <div className="absolute inset-0 grid place-items-center p-6 transition-opacity duration-500" style={{ opacity: ready ? 0 : 1 }} aria-hidden>
-            <ProductPoster page={page} className="h-full max-h-80 w-full" />
+            {poster}
           </div>
           <div ref={hostRef} className="absolute inset-0 transition-opacity duration-500" style={{ opacity: ready ? 1 : 0 }} />
         </div>
@@ -138,4 +155,3 @@ export default function Pinned({ page }: { page: CatalogPage }) {
     </section>
   );
 }
-

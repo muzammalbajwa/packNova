@@ -1,16 +1,17 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { CatalogPage } from "@/content/catalog";
 import { hasFilm } from "@/film/loaders";
 import { detectDevice } from "@/lib/deviceTier";
+import { FILM_LAYOUT, HERO_COL, STAGE_BOX } from "./filmLayout";
 
 const h2 = "font-display text-3xl font-medium leading-[1.1] md:text-4xl";
 // the pinned 3D film (GSAP, ScrollTrigger, the film engine's loader code) is its own chunk, fetched only where the film runs
 const Pinned = dynamic(() => import("./ProductFilmPinned"), { ssr: false });
 
-/** The steps as a plain list: server render, no WebGL, reduced motion, or a recipe without a film yet. */
+/** The steps as a plain list: no WebGL, reduced motion, or a recipe without a film. */
 function StaticSteps({ page }: { page: CatalogPage }) {
   return (
     <section id="how" aria-labelledby="how-h" className="border-t border-[var(--line)] px-6 py-16 md:py-24">
@@ -30,12 +31,28 @@ function StaticSteps({ page }: { page: CatalogPage }) {
   );
 }
 
+/** First screen as the server draws it (and what a visitor without the film sees): the headline on the left, the stage with the poster on the right. */
+function Intro({ hero, poster, page, sticky }: { hero: ReactNode; poster: ReactNode; page: CatalogPage; sticky: boolean }) {
+  return (
+    <div className={sticky ? FILM_LAYOUT : "flex flex-col gap-4 px-4 pb-10 pt-4 md:grid md:grid-cols-[1fr_1.25fr] md:items-center md:gap-10 md:px-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] md:pb-14"}>
+      <div className={HERO_COL}>
+        {hero}
+        {sticky && <p className="mt-5 hidden text-sm font-semibold text-[var(--kraft-ink)] md:block">Scroll to see how it is made · 01 / {String(page.steps.length).padStart(2, "0")}</p>}
+      </div>
+      <div className={sticky ? STAGE_BOX : "stage order-2 min-h-[40dvh] md:h-[min(66dvh,38rem)]"} aria-hidden>
+        <div className="absolute inset-0 grid place-items-center p-6">{poster}</div>
+      </div>
+    </div>
+  );
+}
+
 /**
- * "How it is made": the pinned 3D film where it can run, the plain step list everywhere else.
- * The film section is much taller than the list, so its height is reserved from the first paint (unless the visitor asked for reduced motion)
- * and kept while the film code loads: nothing below it jumps (no layout shift). Once we know there will be no film, the reservation is dropped.
+ * The top of a product page: the headline (`hero`) and the 3D film are ONE composition. The film section is the first thing on the page: the
+ * headline on the left, the stage on the right with the finished product already on it, and the steps start at scroll 0.
+ * The film is much taller than the plain page, so its height is reserved from the first paint and kept while the film code loads (no layout
+ * shift); a visitor who gets no film (no WebGL, reduced motion) gets the same first screen followed by the step list.
  */
-export default function ProductFilm({ page }: { page: CatalogPage }) {
+export default function ProductFilm({ page, hero, poster }: { page: CatalogPage; hero: ReactNode; poster: ReactNode }) {
   const [film, setFilm] = useState(false);
   const [decided, setDecided] = useState(false);
   useEffect(() => {
@@ -48,10 +65,11 @@ export default function ProductFilm({ page }: { page: CatalogPage }) {
   const reserve = !decided || film;
   return (
     <div
-      className={`[--film-step:64vh] md:[--film-step:76vh] ${reserve ? "motion-safe:min-h-[calc(var(--n)*var(--film-step)+100dvh)]" : ""}`}
-      style={{ ["--n" as string]: page.steps.length }}
+      id="film-top"
+      className={`-mt-[6.25rem] [--film-step:64vh] md:[--film-step:76vh] ${reserve ? "motion-safe:min-h-[calc(var(--n)*var(--film-step)+100dvh)]" : "pt-[6.25rem]"}`}
+      style={{ ["--n" as string]: page.steps.length + 0.6 }}
     >
-      {film ? <Pinned page={page} /> : <StaticSteps page={page} />}
+      {film ? <Pinned page={page} hero={hero} poster={poster} /> : decided ? <><Intro hero={hero} poster={poster} page={page} sticky={false} /><StaticSteps page={page} /></> : <Intro hero={hero} poster={poster} page={page} sticky />}
     </div>
   );
 }

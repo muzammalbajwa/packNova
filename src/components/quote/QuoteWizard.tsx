@@ -134,8 +134,7 @@ export default function QuoteWizard() {
 
   return (
     <div>
-      <p className="text-lg text-[var(--muted)]">{w.lead}</p>
-      <div className="mt-6" aria-label="Progress">
+      <div aria-label="Progress">
         <p className="text-sm font-semibold">Step {step} of 5: {w.steps[step - 1]}</p>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--wash)]"><div className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-300" style={{ width: `${(step / 5) * 100}%` }} /></div>
         <ol className="mt-3 hidden flex-wrap gap-x-5 gap-y-1 text-sm sm:flex">

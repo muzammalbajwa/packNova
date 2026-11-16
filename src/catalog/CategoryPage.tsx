@@ -12,30 +12,29 @@ const h2 = "font-display text-3xl font-medium leading-[1.1] md:text-4xl";
 export default function CategoryPage({ page }: { page: CatalogPage }) {
   const g = GROUP_BY_ID[page.group];
   const qHref = quoteHref(page.quote.product, page.quote.note);
+  // The headline block. It is the left half of the first screen, next to the live stage (see ProductFilm), so it is short:
+  // the title, one line of promise, one line of description and the two actions. The longer "what it is" text opens the Details section.
+  const hero = (
+    <>
+      <div className="hidden md:block"><Crumbs trail={[{ label: "Home", href: "/" }, { label: g.label, href: g.href }, { label: page.title }]} /></div>
+      <h1 className="font-display text-3xl font-medium leading-[1.08] md:mt-5 md:text-5xl">{page.title}</h1>
+      <p className="font-display mt-2 text-xl text-[var(--kraft-ink)] md:mt-3 md:text-2xl">{page.hero.headline}</p>
+      <p className="mt-2 text-base text-[var(--muted)] md:mt-4 md:text-lg">{page.short}</p>
+      <div className="mt-4 flex flex-row gap-2.5 md:mt-6">
+        <Link href={qHref} className="inline-flex flex-1 items-center justify-center rounded-[var(--r-btn)] bg-[var(--accent)] px-4 py-3 text-base font-semibold text-[var(--on-accent)] hover:bg-[var(--fg)] md:flex-none md:px-6"><span className="md:hidden">Get a quote</span><span className="hidden md:inline">Get a quote for {page.title}</span></Link>
+        <Link href={ROUTES.configurator} className="inline-flex flex-1 items-center justify-center rounded-[var(--r-btn)] border border-[var(--line-strong)] px-4 py-3 text-base font-semibold hover:border-[var(--fg)] md:flex-none md:px-6">Design your box</Link>
+      </div>
+    </>
+  );
   return (
     <Shell>
-      <section className="px-6 pb-14 pt-10 md:pb-20">
-        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.2fr_1fr] md:items-center">
-         <div>
-          <Crumbs trail={[{ label: "Home", href: "/" }, { label: g.label, href: g.href }, { label: page.title }]} />
-          <h1 className="font-display mt-6 max-w-3xl text-4xl font-medium leading-[1.08] md:text-6xl">{page.title}</h1>
-          <p className="font-display mt-3 text-2xl text-[var(--kraft-ink)] md:text-3xl">{page.hero.headline}</p>
-          <p className="mt-5 max-w-xl text-lg text-[var(--muted)]">{page.what}</p>
-          <div className="mt-7 flex flex-col gap-2.5 sm:flex-row">
-            <Link href={qHref} className="inline-flex items-center justify-center rounded-[var(--r-btn)] bg-[var(--accent)] px-6 py-3 text-base font-semibold text-[var(--on-accent)] hover:bg-[var(--fg)]">Get a quote for {page.title}</Link>
-            <Link href={ROUTES.configurator} className="inline-flex items-center justify-center rounded-[var(--r-btn)] border border-[var(--line-strong)] px-6 py-3 text-base font-semibold hover:border-[var(--fg)]">Design your box</Link>
-          </div>
-         </div>
-         <ProductPoster page={page} className="mx-auto hidden w-full max-w-md md:block" />
-        </div>
-      </section>
-
-      <ProductFilm page={page} />
+      <ProductFilm page={page} hero={hero} poster={<ProductPoster page={page} className="h-full max-h-[22rem] w-full" />} />
 
       <section aria-labelledby="specs-h" className="border-t border-[var(--line)] px-6 py-16 md:py-24">
         <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[1.3fr_1fr] md:gap-16">
           <div>
             <h2 id="specs-h" className={h2}>Details</h2>
+            <p className="mt-4 max-w-2xl text-lg text-[var(--muted)]">{page.what}</p>
             <dl className="mt-6 border-t border-[var(--line-strong)]">
               {page.specs.map((s) => (
                 <div key={s.label} className="grid gap-1 border-b border-[var(--line)] py-4 sm:grid-cols-[10rem_1fr] sm:gap-6">

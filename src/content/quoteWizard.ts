@@ -7,6 +7,12 @@ export const wizard = {
   lead: "Five short steps. You choose how to send it: on WhatsApp, by email, or (when the site is connected to a form service) straight from this page.",
   steps: ["Product and size", "Material and finishes", "Artwork", "Your details", "Review and send"],
   artwork: "Please send your artwork on WhatsApp or by email after you send this request. Do not paste files here: this form only takes text.",
+  /** The side panel of the quote page (desktop): what to have ready, and what happens next. */
+  aside: [
+    { h: "What to have ready", p: "The product, the size if you know it, and about how many you need. A rough idea is enough: we confirm everything before anything is made." },
+    { h: "Your artwork", p: "Send your logo or artwork on WhatsApp or by email after you send the request. This form only takes text." },
+    { h: "No price here", p: "We do not show prices on the website. A quote is made after we see what you need." },
+  ],
   noPriceNote: "We do not show prices here. A quote is made after we see what you need.",
   privacy: {
     title: "Privacy",

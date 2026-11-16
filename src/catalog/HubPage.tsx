@@ -8,6 +8,9 @@ import Shell from "./Shell";
 export default function HubPage({ group }: { group: GroupId }) {
   const g = GROUP_BY_ID[group];
   const pages = pagesIn(group);
+  // the last card fills whatever is left of the last row (so the grid never shows an empty grey cell) and carries the "not sure" question
+  const SM = { 1: "sm:col-span-1", 2: "sm:col-span-2" }[pages.length % 2 === 0 ? 2 : 1];
+  const LG = { 1: "lg:col-span-1", 2: "lg:col-span-2", 3: "lg:col-span-3" }[pages.length % 3 === 0 ? 3 : 3 - (pages.length % 3)];
   return (
     <Shell>
       <section className="px-6 pb-20 pt-10 md:pb-28">
@@ -25,10 +28,14 @@ export default function HubPage({ group }: { group: GroupId }) {
                 </PrefetchLink>
               </li>
             ))}
+            <li className={`bg-[var(--sand)] ${SM} ${LG}`}>
+              <Link href={quoteHref()} className="group flex h-full flex-col justify-center p-6 transition-colors hover:bg-[var(--wash)]">
+                <span className="font-display text-2xl font-medium leading-tight">Not sure which one fits?</span>
+                <span className="mt-2 text-[var(--muted)]">Tell us what you are packing and we will suggest one.</span>
+                <span className="mt-4 text-base font-semibold text-[var(--accent)] group-hover:underline underline-offset-4">Get a quote →</span>
+              </Link>
+            </li>
           </ul>
-          <p className="mt-10 text-[var(--muted)]">
-            Not sure which one fits? <Link href={quoteHref()} className="font-semibold text-[var(--accent)] underline underline-offset-4">Tell us what you are packing</Link>.
-          </p>
         </div>
       </section>
     </Shell>

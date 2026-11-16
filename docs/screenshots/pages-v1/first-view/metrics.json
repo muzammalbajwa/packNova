@@ -1,0 +1,290 @@
+[
+ {
+  "page": "home",
+  "viewport": "1440",
+  "maxEmptyRectPct": 23.3,
+  "emptyCellsPct": 69.6,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 60
+ },
+ {
+  "page": "hub-industry",
+  "viewport": "1440",
+  "maxEmptyRectPct": 14.6,
+  "emptyCellsPct": 70.1,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "hub-shape-and-style",
+  "viewport": "1440",
+  "maxEmptyRectPct": 11.3,
+  "emptyCellsPct": 67.5,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "hub-material",
+  "viewport": "1440",
+  "maxEmptyRectPct": 15,
+  "emptyCellsPct": 64.5,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "hub-event",
+  "viewport": "1440",
+  "maxEmptyRectPct": 15.4,
+  "emptyCellsPct": 69.8,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "recipe-rigid",
+  "viewport": "1440",
+  "maxEmptyRectPct": 13,
+  "emptyCellsPct": 58.3,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 60
+ },
+ {
+  "page": "recipe-corrugated",
+  "viewport": "1440",
+  "maxEmptyRectPct": 13,
+  "emptyCellsPct": 57.6,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 60
+ },
+ {
+  "page": "recipe-folding",
+  "viewport": "1440",
+  "maxEmptyRectPct": 13,
+  "emptyCellsPct": 58.8,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 60
+ },
+ {
+  "page": "recipe-paper-bag",
+  "viewport": "1440",
+  "maxEmptyRectPct": 13,
+  "emptyCellsPct": 59.2,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 61
+ },
+ {
+  "page": "recipe-pouch",
+  "viewport": "1440",
+  "maxEmptyRectPct": 13,
+  "emptyCellsPct": 58.4,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 60
+ },
+ {
+  "page": "recipe-label-tag",
+  "viewport": "1440",
+  "maxEmptyRectPct": 13,
+  "emptyCellsPct": 58.5,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 60
+ },
+ {
+  "page": "recipe-tray-sleeve",
+  "viewport": "1440",
+  "maxEmptyRectPct": 13,
+  "emptyCellsPct": 58.3,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 61
+ },
+ {
+  "page": "event-halloween",
+  "viewport": "1440",
+  "maxEmptyRectPct": 11.8,
+  "emptyCellsPct": 57.6,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 60
+ },
+ {
+  "page": "configurator",
+  "viewport": "1440",
+  "maxEmptyRectPct": 11.5,
+  "emptyCellsPct": 68.3,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "quote",
+  "viewport": "1440",
+  "maxEmptyRectPct": 12.5,
+  "emptyCellsPct": 73.2,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "contact",
+  "viewport": "1440",
+  "maxEmptyRectPct": 10.6,
+  "emptyCellsPct": 66.5,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "privacy",
+  "viewport": "1440",
+  "maxEmptyRectPct": 21.7,
+  "emptyCellsPct": 74.5,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "404",
+  "viewport": "1440",
+  "maxEmptyRectPct": 17.5,
+  "emptyCellsPct": 78.8,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "home",
+  "viewport": "390",
+  "maxEmptyRectPct": 12.7,
+  "emptyCellsPct": 64.8,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "hub-industry",
+  "viewport": "390",
+  "maxEmptyRectPct": 9.6,
+  "emptyCellsPct": 74.1,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "hub-shape-and-style",
+  "viewport": "390",
+  "maxEmptyRectPct": 6.1,
+  "emptyCellsPct": 73.5,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "hub-material",
+  "viewport": "390",
+  "maxEmptyRectPct": 9.6,
+  "emptyCellsPct": 73.4,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "hub-event",
+  "viewport": "390",
+  "maxEmptyRectPct": 7.9,
+  "emptyCellsPct": 72.6,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "recipe-rigid",
+  "viewport": "390",
+  "maxEmptyRectPct": 4.6,
+  "emptyCellsPct": 32.2,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 30
+ },
+ {
+  "page": "recipe-corrugated",
+  "viewport": "390",
+  "maxEmptyRectPct": 4.9,
+  "emptyCellsPct": 29.5,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 30
+ },
+ {
+  "page": "recipe-folding",
+  "viewport": "390",
+  "maxEmptyRectPct": 3.8,
+  "emptyCellsPct": 27.5,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 30
+ },
+ {
+  "page": "recipe-paper-bag",
+  "viewport": "390",
+  "maxEmptyRectPct": 6.3,
+  "emptyCellsPct": 31.2,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 30
+ },
+ {
+  "page": "recipe-pouch",
+  "viewport": "390",
+  "maxEmptyRectPct": 4.3,
+  "emptyCellsPct": 30,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 30
+ },
+ {
+  "page": "recipe-label-tag",
+  "viewport": "390",
+  "maxEmptyRectPct": 4.6,
+  "emptyCellsPct": 30.1,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 30
+ },
+ {
+  "page": "recipe-tray-sleeve",
+  "viewport": "390",
+  "maxEmptyRectPct": 4.3,
+  "emptyCellsPct": 27.3,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 30
+ },
+ {
+  "page": "event-halloween",
+  "viewport": "390",
+  "maxEmptyRectPct": 3.9,
+  "emptyCellsPct": 30.1,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 30
+ },
+ {
+  "page": "configurator",
+  "viewport": "390",
+  "maxEmptyRectPct": 12.6,
+  "emptyCellsPct": 63.6,
+  "canvasOnScreen": true,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "quote",
+  "viewport": "390",
+  "maxEmptyRectPct": 8.6,
+  "emptyCellsPct": 77.9,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "contact",
+  "viewport": "390",
+  "maxEmptyRectPct": 18.5,
+  "emptyCellsPct": 62.3,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "privacy",
+  "viewport": "390",
+  "maxEmptyRectPct": 7,
+  "emptyCellsPct": 64.2,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ },
+ {
+  "page": "404",
+  "viewport": "390",
+  "maxEmptyRectPct": 12.7,
+  "emptyCellsPct": 77.6,
+  "canvasOnScreen": false,
+  "framesWhileIdle": 0
+ }
+]
