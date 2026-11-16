@@ -11,16 +11,23 @@ export default function Loader() {
   const ready = useAppStore((s) => s.ready);
   const [leaving, setLeaving] = useState(false);
   const [gone, setGone] = useState(false);
+  // The page (and the poster that stands in for the 3D) is already on screen under this splash. It never waits longer than
+  // about a second for the 3D: the live scene fades in behind the poster when it is ready.
+  const [waited, setWaited] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setWaited(true), 1200);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready && !waited) return;
     const t1 = setTimeout(() => setLeaving(true), 450);
     const t2 = setTimeout(() => setGone(true), 1150);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, [ready]);
+  }, [ready, waited]);
 
   // Freeze scroll while the loader is up.
   useEffect(() => {

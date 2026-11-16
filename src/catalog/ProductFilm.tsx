@@ -30,12 +30,28 @@ function StaticSteps({ page }: { page: CatalogPage }) {
   );
 }
 
-/** "How it is made": the pinned 3D film where it can run, the plain step list everywhere else. */
+/**
+ * "How it is made": the pinned 3D film where it can run, the plain step list everywhere else.
+ * The film section is much taller than the list, so its height is reserved from the first paint (unless the visitor asked for reduced motion)
+ * and kept while the film code loads: nothing below it jumps (no layout shift). Once we know there will be no film, the reservation is dropped.
+ */
 export default function ProductFilm({ page }: { page: CatalogPage }) {
   const [film, setFilm] = useState(false);
+  const [decided, setDecided] = useState(false);
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setFilm(detectDevice().webgl && !reduced && hasFilm(page.recipe)); // eslint-disable-line react-hooks/set-state-in-effect
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setFilm(detectDevice().webgl && !reduced && hasFilm(page.recipe));
+    setDecided(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [page.recipe]);
-  return film ? <Pinned page={page} /> : <StaticSteps page={page} />;
+  const reserve = !decided || film;
+  return (
+    <div
+      className={`[--film-step:64vh] md:[--film-step:76vh] ${reserve ? "motion-safe:min-h-[calc(var(--n)*var(--film-step)+100dvh)]" : ""}`}
+      style={{ ["--n" as string]: page.steps.length }}
+    >
+      {film ? <Pinned page={page} /> : <StaticSteps page={page} />}
+    </div>
+  );
 }
