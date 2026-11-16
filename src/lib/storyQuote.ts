@@ -10,7 +10,7 @@ const spec = defaultSpec("folding");
 export const storySpecLines = () =>
   specLines(spec, emptyArt()).filter((l) => !l.startsWith("Quantity") && !l.startsWith("Artwork"));
 
-/** `base` is the template route (e.g. "/t/editorial"), so the configurator keeps the template look. */
+/** `base` is the template route ("" for the site root). */
 export const storyConfiguratorHref = (base = "") => `${base}/configurator/?${specToQuery(spec)}`;
 
 export const storyWhatsappHref = () =>

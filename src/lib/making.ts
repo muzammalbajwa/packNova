@@ -61,8 +61,6 @@ export function stageIndex(p: number): number {
 
 /** Progress at which the full "ready" call to action is shown (inside the last stage, "deliver"). */
 export const CTA_AT = 0.985;
-/** Progress from which the subtle "get a quote" button appears (start of the fold stage). */
-export const QUOTE_BUTTON_AT = 0.55 * SPLIT;
 
 /** Smoothstep of v over [a, b], clamped. */
 export const seg = (v: number, a: number, b: number) => {

@@ -59,7 +59,6 @@ export const LOAD = {
   reach: 3.7, // how far the platform extension slides toward the door
   conveyorTop: FLOOR_Y + 0.3, // roller conveyors and the collapsed platform top
 };
-export const HOLD_FLOOR_Y = LOAD.sillY;
 export const HOUSE_X = 262;
 export const HOUSE = { w: 14, h: 7.5, d: 9, doorX: 3 };
 export const ROAD_Z = 10.5;

@@ -34,32 +34,17 @@ node scripts/export-images.mjs --theme a    # re-render hero poster + og.png
 node scripts/story-sweep.mjs / cold-jump.mjs / template-shots.mjs / hover-shots.mjs / loading-shots.mjs
 ```
 
-URL flags for testing: `?debug=1` (fps/draw-call overlay), `?tier=low|mid|high|none` (force device tier), `?theme=a|b|c|d` (palette, persisted in localStorage), `?themes=1` (floating theme switcher), `?preview=1` (used by the picker links).
+URL flags for testing: `?debug=1` / `?perf=1` (fps, draw calls, scene object counts), `?tier=low|mid|high|none` (force device tier).
 
 ## 3. Current architecture (what exists today)
 
-The site went from a single home page (phases 1 to 3) to **four interchangeable templates** sharing one engine. The root `/` is now a **template picker**, not the home page.
+The site is a multi-page catalog (home, hubs, product film pages, configurator, quote, contact, legal) built on one design: **eco** (cream/forest/kraft). The four-template experiment was removed on 2026-11-16; the old code is kept in git tag `backup-4-templates`.
 
 ### Routes (`src/app`)
-| Route | File | Purpose |
-| --- | --- | --- |
-| `/` | `app/page.tsx` | Template picker: 4 cards with screenshots from `public/templates/<id>.jpg`. `robots: noindex`. No 3D loads. |
-| `/t/[template]/` | `app/t/[template]/page.tsx` | Statically generated for `editorial`, `cinematic`, `industrial`, `eco` (`dynamicParams = false`). Per-template OG image `/og-<id>.png`. |
-| `/t/[template]/configurator/` | `app/t/[template]/configurator/page.tsx` | That template's configurator page. |
-| `/configurator/` | `app/configurator/page.tsx` | Legacy link; renders the editorial template's configurator. `ConfiguratorClient.tsx` reads `?type=&l=&w=&h=&m=`. |
-| `robots.txt`, `sitemap.xml` | `app/robots.ts`, `app/sitemap.ts` | Generated from `site.brand.url`. |
+`/` (eco Home), `/[group]/` (hubs), `/[group]/[slug]/` (product film pages), `/configurator/`, `/quote/`, `/contact/`, `/privacy/`, `/terms/`, `404`, `robots.txt`, `sitemap.xml`. There is no `/t/...` route and no template picker.
 
-### Templates (`src/templates/`)
-`registry.ts` lists `TEMPLATE_IDS`, `TEMPLATE_META` (picker metadata, no code imported) and `TEMPLATE_LOADERS` (lazy `import()` per template, so a page ships only its own CSS/JS). Each template folder has: `index.tsx` (exports `Home`, `ConfiguratorPage`), `Home`, `Hero`, `Navbar`, `Story`, `Products`, `Process`, `ConfiguratorTeaser`, `ConfiguratorPage`, `QuoteSection`, `Footer`, `fonts.ts`, `tokens.css` (CSS variables), `config.ts` (a `Story3DConfig`). `editorial` also has `Ticker`.
-
-| id | Name | Look | Palette |
-| --- | --- | --- | --- |
-| editorial | Editorial Light | ivory paper, serif headlines, thin rules, magazine layout | a |
-| cinematic | Midnight Cinematic | dark, full-bleed 3D, giant headlines, captions over the box | b |
-| industrial | Industrial Blueprint | spec-sheet: visible grid, hard borders, mono type, dimension lines | (own tokens) |
-| eco | Playful Eco | rounded shapes, lime stickers, bouncy chips on deep green | c |
-
-**To add a template:** new folder in `src/templates/`, an entry in `registry.ts` (`TEMPLATE_IDS`, `TEMPLATE_META`, `TEMPLATE_LOADERS`), a picker screenshot in `public/templates/`, an OG image `public/og-<id>.png`.
+### Template (`src/templates/eco/`)
+Home, Hero, Navbar, Story, Products, Process, ConfiguratorTeaser, QuoteSection, Footer, `fonts.ts`, `tokens.css`, `config.ts` (a `Story3DConfig`), `copy.ts`. Only palette `c` (story) and `ECO_PAGE` remain in `lib/palette.ts`.
 
 ### Shared engine (`src/shared/`)
 - `StoryEngine.tsx`: pinned "how your box is made" scroll section. Wires GSAP ScrollTrigger progress into the store, lazy-loads `MakingScene` (`next/dynamic`, `ssr:false`), exposes `useStoryLinks(base)` (CTA hrefs + `track()` + quote prefill) and a `StoryApi`.

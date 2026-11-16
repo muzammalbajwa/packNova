@@ -38,16 +38,6 @@ export const PANELS: Record<ModelId, Panel[]> = {
   paperbag: ["front", "back", "left", "right"],
 };
 
-/** Models whose preview can open and close. */
-export const OPENABLE: Record<ModelId, boolean> = {
-  carton: true,
-  folding: true,
-  rigid: true,
-  pouch: false,
-  courier: false,
-  paperbag: false,
-};
-
 export const DEFAULT_DIMS: Record<ModelId, [number, number, number]> = {
   carton: [40, 30, 25],
   folding: [12, 6, 18],
@@ -64,33 +54,11 @@ export function defaultSpec(model: ModelId = "carton"): Spec {
   return { model, l, w, h, material: "kraft", quantity: 500 };
 }
 
-const num = (v: string | null, fallback: number, range: Range) => {
-  const n = Number(v);
-  return Number.isFinite(n) && n >= range[0] && n <= range[1] ? n : fallback;
-};
-
-export function specFromSearch(search: string): Spec {
-  const q = new URLSearchParams(search);
-  const model = MODELS.find((m) => m.id === q.get("type"))?.id ?? "carton";
-  const d = defaultSpec(model);
-  const material = (["kraft", "white", "black"] as const).find((m) => m === q.get("m")) ?? "kraft";
-  const lim = LIMITS[model];
-  return {
-    model,
-    l: num(q.get("l"), d.l, lim.l),
-    w: num(q.get("w"), d.w, lim.w),
-    h: num(q.get("h"), d.h, lim.h),
-    material,
-    quantity: num(q.get("q"), d.quantity, QUANTITY_LIMITS),
-  };
-}
-
 export function specToQuery(s: Spec) {
   return new URLSearchParams({ type: s.model, l: String(s.l), w: String(s.w), h: String(s.h), m: s.material, q: String(s.quantity) }).toString();
 }
 
 const PANEL_LABEL: Record<Panel, string> = { front: "Front", back: "Back", left: "Left", right: "Right", top: "Top" };
-export const panelLabel = (p: Panel) => PANEL_LABEL[p];
 
 /** Human-readable spec lines, shared by the summary card and the WhatsApp / email message. */
 export function specLines(spec: Spec, art: ArtMap): string[] {

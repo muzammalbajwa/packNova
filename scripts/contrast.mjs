@@ -4,7 +4,7 @@
 import { readFileSync } from "node:fs";
 import { THEMES, ECO_PAGE, contrast } from "../src/lib/palette.ts";
 
-const TEMPLATES = { editorial: "a", cinematic: "b", industrial: "d", eco: "c" };
+const TEMPLATES = { eco: "c" };
 const pairs = [
   ["text on bg", "fg", "bg", 4.5],
   ["text on surface", "fg", "surface", 4.5],

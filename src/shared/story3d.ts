@@ -33,7 +33,7 @@ export interface Story3DConfig {
 
 /** Defaults equal the framing the story shipped with (text on the left, model on the right). */
 export const DEFAULT_STORY3D: Story3DConfig = {
-  theme: "a",
+  theme: "c",
   camera: { z: 7, fov: 32 },
   story: {
     wide: { offsetX: 0.18, offsetY: 0, widthFrac: 0.42, heightFrac: 0.8 },

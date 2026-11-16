@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { site } from "@/content/site";
 
 /** Everything here is procedural (canvas): no image downloads, nothing to license. */
 
@@ -79,8 +78,6 @@ function baseTexture(kind: MaterialKind, size: number) {
 }
 
 export const kraftTexture = () => baseTexture("kraft", 256);
-export const whiteTexture = () => baseTexture("white", 128);
-export const blackTexture = () => baseTexture("black", 128);
 
 /** Converts a grayscale height canvas into a tangent-space normal map (wraps, so it tiles). */
 function heightToNormal(src: HTMLCanvasElement, strength: number) {
@@ -135,42 +132,6 @@ export function grainNormal() {
     g.fillRect(rnd() * 128, rnd() * 128, 1 + rnd() * 2, 1);
   }
   return heightToNormal(c, 1.4);
-}
-
-/** PBR board material. `detail` 0 skips the normal map (low tier). Textures are disposed via `dispose`. */
-export function createPackMaterial(kind: MaterialKind, detail: 0 | 1 | 2 = 2) {
-  const map = baseTexture(kind, kind === "kraft" ? 256 : 128);
-  const normal = detail > 0 ? (kind === "kraft" ? kraftNormal() : grainNormal()) : null;
-  if (normal) normal.repeat.set(1, kind === "kraft" ? 1 : 3);
-  const material = new THREE.MeshStandardMaterial({
-    map,
-    normalMap: normal,
-    normalScale: new THREE.Vector2(kind === "kraft" ? 0.5 : 0.3, kind === "kraft" ? 0.5 : 0.3),
-    roughness: kind === "kraft" ? 0.92 : kind === "white" ? 0.82 : 0.22,
-    metalness: kind === "black" ? 0.12 : 0,
-    side: THREE.DoubleSide,
-  });
-  return {
-    material,
-    dispose() {
-      map.dispose();
-      normal?.dispose();
-      material.dispose();
-    },
-  };
-}
-
-export function logoTexture(accent = "#ff5b2e") {
-  const [c, g] = makeCanvas(1024, 256);
-  g.textAlign = "center";
-  g.textBaseline = "middle";
-  g.fillStyle = accent;
-  g.font = "700 150px system-ui, sans-serif";
-  g.fillText(site.brand.name, 512, 108);
-  g.fillStyle = "rgba(255,255,255,0.75)";
-  g.font = "500 34px system-ui, sans-serif";
-  g.fillText("PACKAGING, UNBOXED", 512, 212);
-  return finish(c, true, false);
 }
 
 export function labelTexture() {

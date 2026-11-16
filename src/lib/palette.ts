@@ -1,9 +1,9 @@
 /**
- * Color palettes. Each template (src/templates/<name>/tokens.css) writes the same hex values as CSS
+ * Color palettes. The eco template (src/templates/eco/tokens.css) writes the same hex values as CSS
  * variables; the 3D lights, kraft, foil, shadows read them from here (`Story3DConfig.theme`).
  * scripts/contrast.mjs checks WCAG AA and that every tokens.css matches its palette.
  */
-export type ThemeId = "a" | "b" | "c" | "d";
+export type ThemeId = "c";
 
 export interface SceneLook {
   hemiSky: string;
@@ -67,51 +67,7 @@ const DARK_SCENE: Omit<SceneLook, "rimColor"> = {
   toneExposure: 1,
 };
 
-const LIGHT_SCENE: Omit<SceneLook, "rimColor"> = {
-  hemiSky: "#ffffff",
-  hemiGround: "#7a6a58",
-  hemi: 0.5,
-  key: 2.7,
-  keyColor: "#fff4e6",
-  rim: 0.9,
-  env: 0.16,
-  shadow: 0.62,
-  shadowSpread: 1.2,
-  toneExposure: 0.92,
-};
-
 export const THEMES: Record<ThemeId, Theme> = {
-  a: {
-    id: "a",
-    name: "Ivory and Ink",
-    dark: false,
-    bg: "#F5F0E8",
-    surface: "#FFFFFF",
-    fg: "#111318",
-    muted: "#59554D",
-    kraft: "#B8895A",
-    kraftInk: "#8A5E30",
-    accent: "#0F5C4D",
-    onAccent: "#FFFFFF",
-    ink: PROCESS_INK,
-    scene: { ...LIGHT_SCENE, rimColor: "#9fe3d0" },
-  },
-  b: {
-    id: "b",
-    name: "Midnight and Gold",
-    dark: true,
-    bg: "#0B1220",
-    surface: "#121B2E",
-    fg: "#F4F1EA",
-    muted: "#9AA3B5",
-    kraft: "#C9A574",
-    kraftInk: "#C9A574",
-    accent: "#E8B04B",
-    onAccent: "#0B1220",
-    printBlock: "#26385c",
-    ink: PROCESS_INK,
-    scene: { ...DARK_SCENE, rimColor: "#ffc766" },
-  },
   c: {
     // Eco: this is the dark STORY palette (deep forest). The cream page palette is ECO_PAGE below.
     id: "c",
@@ -128,21 +84,6 @@ export const THEMES: Record<ThemeId, Theme> = {
     printBlock: "#1E4D3A",
     ink: PROCESS_INK,
     scene: { ...DARK_SCENE, rimColor: "#cfe0d2", rim: 1.1 },
-  },
-  d: {
-    id: "d",
-    name: "Paper and Cobalt",
-    dark: false,
-    bg: "#F4F4F1",
-    surface: "#FFFFFF",
-    fg: "#0F1222",
-    muted: "#565A6B",
-    kraft: "#B98A55",
-    kraftInk: "#85582B",
-    accent: "#2B4BFF",
-    onAccent: "#FFFFFF",
-    ink: PROCESS_INK,
-    scene: { ...LIGHT_SCENE, rimColor: "#9db0ff" },
   },
 };
 
@@ -163,8 +104,7 @@ export const ECO_PAGE = {
   sage: "#9DB8A0",
 } as const;
 
-export const THEME_IDS = Object.keys(THEMES) as ThemeId[];
-export const DEFAULT_THEME: ThemeId = "a";
+export const DEFAULT_THEME: ThemeId = "c";
 
 /* ---------- contrast helpers (also used by scripts/contrast.mjs) ---------- */
 const lin = (c: number) => {

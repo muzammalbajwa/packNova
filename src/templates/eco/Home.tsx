@@ -13,12 +13,12 @@ import Products from "./Products";
 import QuoteSection from "./QuoteSection";
 import Story from "./Story";
 
-/** Empty: eco is the site root, so links are "/" and "/configurator/". The /t/eco/ route still works. */
+/** Empty: eco is the site root, so links are "/" and "/configurator/". */
 export const BASE = "";
 
 export default function Home() {
   return (
-    <TemplateFrame id="eco" base={BASE} config={config} fontClass={fontClass} previewBack={false}>
+    <TemplateFrame id="eco" base={BASE} config={config} fontClass={fontClass}>
       <Navbar base={BASE} />
       <main id="main" tabIndex={-1} className="relative z-10 outline-none">
         <Hero base={BASE} />

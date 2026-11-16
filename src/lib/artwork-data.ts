@@ -35,34 +35,5 @@ export const emptyArt = (): ArtMap => ({
 
 export const hasArt = (a: PanelArt) => !!(a.bitmap || a.text.trim() || a.bg);
 
-/* ---------- upload validation ---------- */
-
-export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
-export const ACCEPTED_TYPES = ["image/png", "image/jpeg"];
-const MAX_BITMAP_EDGE = 1536; // downscale big uploads: keeps GPU memory and decode time sane
-
-export type LoadResult = { ok: true; bitmap: ImageBitmap } | { ok: false; error: string };
-
-export async function loadArtwork(file: File): Promise<LoadResult> {
-  const okType = ACCEPTED_TYPES.includes(file.type) || (!file.type && /\.(png|jpe?g)$/i.test(file.name));
-  if (!okType) return { ok: false, error: "Please choose a PNG or JPG image." };
-  if (file.size > MAX_UPLOAD_BYTES) {
-    return { ok: false, error: `That file is ${(file.size / 1048576).toFixed(1)} MB. The limit is 10 MB.` };
-  }
-  try {
-    const probe = await createImageBitmap(file);
-    const scale = Math.min(1, MAX_BITMAP_EDGE / Math.max(probe.width, probe.height));
-    if (scale === 1) return { ok: true, bitmap: probe };
-    const small = await createImageBitmap(file, {
-      resizeWidth: Math.round(probe.width * scale),
-      resizeHeight: Math.round(probe.height * scale),
-      resizeQuality: "high",
-    });
-    probe.close();
-    return { ok: true, bitmap: small };
-  } catch {
-    return { ok: false, error: "That image could not be read. Try another PNG or JPG." };
-  }
-}
 
 /* ---------- panel texture composite ---------- */
