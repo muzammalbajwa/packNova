@@ -34,8 +34,7 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
   const grey = { ...skin, material: "white" as const, base: "#8d8982", print: "none" as const, foil: false };
   const printTex = sheetTexture(pool, skin, baseLayout, false, low);
   const blankTex = sheetTexture(pool, grey, baseLayout, true, low);
-  const mats = skinMats(pool, skin, printTex, blankTex, undefined, true);
-  mats.edge.color.set("#77736c");
+  const mats = skinMats(pool, skin, printTex, blankTex, undefined, true, "#77736c");
   mats.uReveal.value = 0;
   const base = buildChain(pool, baseSpec, baseLayout, mats);
 
@@ -45,8 +44,7 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
     tuckTop: [0, 0, 0, 0], tuckBottom: [0, 0, 0, 0],
   };
   const lidLayout = chainLayout(lidSpec);
-  const lidMats = skinMats(pool, skin, sheetTexture(pool, skin, lidLayout, false, true), sheetTexture(pool, grey, lidLayout, true, true), undefined, true);
-  lidMats.edge.color.set("#77736c");
+  const lidMats = skinMats(pool, skin, sheetTexture(pool, skin, lidLayout, false, true), sheetTexture(pool, grey, lidLayout, true, true), undefined, true, "#77736c");
   const lid: Chain = buildChain(pool, lidSpec, lidLayout, lidMats);
   for (let i = 1; i < 4; i++) lid.setWall(i, 1);
   lid.setGlue(1);

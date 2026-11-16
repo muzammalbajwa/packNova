@@ -33,9 +33,8 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
     top: [0, 0, 0, 0], bottom: [0, 0, D, 0], topLayer: [0, 0, 0, 0], bottomLayer: [0, 0, 0, 0], tuckTop: [0, 0, 0, 0], tuckBottom: [0, 0, 0, 0],
   };
   const trayL = chainLayout(trayS);
-  const trayMats = skinMats(pool, trayInk, sheetTexture(pool, trayInk, trayL, false, low), sheetTexture(pool, trayInk, trayL, true, low), undefined, true);
+  const trayMats = skinMats(pool, trayInk, sheetTexture(pool, trayInk, trayL, false, low), sheetTexture(pool, trayInk, trayL, true, low), undefined, true, "#8a6a43");
   trayMats.uReveal.value = 1;
-  trayMats.edge.color.set("#8a6a43");
   const tray: Chain = buildChain(pool, trayS, trayL, trayMats);
   tray.creasesV.visible = tray.creasesH.visible = false;
 

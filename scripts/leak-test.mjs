@@ -38,7 +38,8 @@ for (let i = 0; i < SEQ.length; i++) {
   // watch the context count continuously during the transition
   await c.ev(`window.__maxAlive = 0; window.__watch = setInterval(()=>{ const n=window.__ctxs.filter(g=>!g.isContextLost()).length; if(n>window.__maxAlive) window.__maxAlive=n; const home = [window.__gl, window.__glMaking].some(r=>r && !r.getContext().isContextLost()); const film = window.__film && !window.__film.renderer.getContext().isContextLost(); if (home && film) window.__both = true; }, 15); 0`);
   await goTo(SEQ[i]);
-  if (SEQ[i] !== "/") await c.waitFor("window.__film && document.querySelector('#how canvas') && getComputedStyle(document.querySelector('#how canvas').parentElement).opacity === '1'", 30000);
+  if (SEQ[i] === "/configurator/") await c.waitFor("window.__film && document.querySelector('[aria-label^=\\\"3D preview\\\"]') && getComputedStyle(document.querySelector('[aria-label^=\\\"3D preview\\\"]')).opacity === '1'", 30000);
+  else if (SEQ[i] !== "/") await c.waitFor("window.__film && document.querySelector('#how canvas') && getComputedStyle(document.querySelector('#how canvas').parentElement).opacity === '1'", 30000);
   await sleep(SEQ[i] === "/" ? 3500 : 1500);
   const s = await c.ev(stats);
   await c.send("HeapProfiler.collectGarbage");

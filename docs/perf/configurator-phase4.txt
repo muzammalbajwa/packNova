@@ -1,0 +1,11 @@
+Design your box (/configurator/), measured 2026-11-16 on a quiet machine (load average 2.8 to 3.5 before each run).
+Chrome headless, node scripts/configurator-test.mjs --perf 1 [--mode mobile --cpu 4]
+
+Initial JS (gzip, scripts in the exported HTML): 255.7 kB (limit 262). The 3D chunks and the dieline view load later.
+Draw calls: max 28 over all 8 types x 21 fold positions (limit 30). No empty frames.
+
+Dragging the size sliders (two at once, one input event per frame) and then the fold slider, 3.6 s per type:
+  1440 px           tuck  58.3 fps p99 16.8 ms | rigid 59.4 fps p99 16.8 ms | mailer 58.9 fps p99 16.8 ms
+  390 px, 4x CPU    tuck  58.1 fps p99 16.8 ms | rigid 58.6 fps p99 16.8 ms | mailer 58.1 fps p99 16.8 ms
+After the sliders stop, the box is rebuilt once (160 ms debounce). That frame is long:
+  1440 px: 67 to 100 ms    390 px, 4x CPU: 100 to 133 ms   (not part of the p99 above)

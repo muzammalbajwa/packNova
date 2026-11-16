@@ -23,6 +23,7 @@ export default function QuoteForm() {
   const prefill = useAppStore((s) => s.quotePrefill);
   const [text, setText] = useState<string | null>(null);
   const [vals, setVals] = useState<Record<string, string>>({}); // kept so "Edit request" does not lose input
+  const [qty, setQty] = useState(""); // from /quote/?qty= (the configurator)
 
   // /quote/?product=...&note=... (product pages and the configurator link here) fills the form
   useEffect(() => {
@@ -30,6 +31,8 @@ export default function QuoteForm() {
     const product = q.get("product") ?? undefined;
     const note = q.get("note") ?? undefined;
     if (product || note) useAppStore.getState().setQuotePrefill({ product, note });
+    const n = q.get("qty");
+    if (n && /^\d{1,8}$/.test(n)) setQty(n); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -53,7 +56,7 @@ export default function QuoteForm() {
   return (
     // key: starting from a different prefill remounts the fields so their defaults apply
     <form
-      key={`${prefill?.product ?? ""}|${prefill?.note ?? ""}`}
+      key={`${prefill?.product ?? ""}|${prefill?.note ?? ""}|${qty}`}
       onSubmit={onSubmit}
       className="grid gap-4 rounded-[var(--r-card)] bg-[var(--surface)] p-6 text-[var(--fg)] md:p-8"
     >
@@ -83,7 +86,7 @@ export default function QuoteForm() {
         </label>
         <label>
           <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.quantity}</span>
-          <input name="quantity" type="number" min={1} inputMode="numeric" required defaultValue={vals.quantity ?? ""} className={field} />
+          <input name="quantity" type="number" min={1} inputMode="numeric" required defaultValue={vals.quantity ?? qty} className={field} />
         </label>
       </div>
       <label>

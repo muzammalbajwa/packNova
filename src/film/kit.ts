@@ -80,7 +80,14 @@ export function sheetTexture(pool: Pool, skin: Skin, art: SheetArt, blank: boole
       g.textBaseline = "middle";
       const size = Math.min(b.h * 0.22, b.w * 0.2) * scale;
       g.font = `600 ${size}px Georgia, 'Times New Roman', serif`;
-      g.fillText(site.brand.name, b.x + b.w / 2, b.y + b.h * 0.42, b.w * 0.86);
+      if (skin.logo) {
+        // the visitor's logo, fitted inside the panel (kept in the browser, never uploaded)
+        const img = skin.logo as CanvasImageSource & { width: number; height: number };
+        const iw = img.width || 1;
+        const ih = img.height || 1;
+        const f = Math.min((b.w * 0.62) / iw, (b.h * 0.34) / ih);
+        g.drawImage(skin.logo, b.x + b.w / 2 - (iw * f) / 2, b.y + b.h * 0.42 - (ih * f) / 2, iw * f, ih * f);
+      } else g.fillText(site.brand.name, b.x + b.w / 2, b.y + b.h * 0.42, b.w * 0.86);
       g.restore();
     };
     const foilFill = (r: Rect) => {
@@ -179,16 +186,22 @@ export interface Mats {
   /** Print wipe: 0 shows the blank sheet, 1 the print. A bright scan line sits at the wipe edge (uScan). */
   uReveal: { value: number };
   uScan: { value: number };
+  /** Edge and inner faces share one material and one small texture (edge swatch on top, inner swatch below): rectGeo(.., packed) maps to it. */
+  packed?: boolean;
 }
 
 const ROUGH: Record<Skin["material"], number> = { kraft: 0.92, white: 0.82, black: 0.4, color: 0.72, film: 0.3 };
 
 /** Materials of one skin. `printTex` / `blankTex` come from sheetTexture(); the outer face wipes between them. */
-export function skinMats(pool: Pool, skin: Skin, printTex: THREE.Texture, blankTex: THREE.Texture, edgeMap?: THREE.Texture, separateEdge = false): Mats {
+export function skinMats(pool: Pool, skin: Skin, printTex: THREE.Texture, blankTex: THREE.Texture, edgeMap?: THREE.Texture, separateEdge = false, edgeColor?: string): Mats {
   const uReveal = { value: 1 };
   const uScan = { value: 0 };
   const uBlank = { value: blankTex };
-  const outer = pool.add(new THREE.MeshStandardMaterial({ map: printTex, roughness: ROUGH[skin.material], metalness: skin.material === "black" ? 0.08 : 0 }));
+  const outer = pool.add(new THREE.MeshStandardMaterial({ map: printTex, roughness: skin.finish?.gloss ? 0.2 : ROUGH[skin.material], metalness: skin.material === "black" ? 0.08 : 0 }));
+  if (skin.finish?.emboss) {
+    outer.bumpMap = printTex;
+    outer.bumpScale = 1.6;
+  }
   outer.onBeforeCompile = (sh) => {
     sh.uniforms.uBlankMap = uBlank;
     sh.uniforms.uReveal = uReveal;
@@ -203,17 +216,29 @@ diffuseColor *= mix(sb, sp, step(vMapUv.x, uReveal));`,
       )
       .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1.0, 0.86, 0.55) * exp(-pow((vMapUv.x - uReveal) * 46.0, 2.0)) * uScan;`);
   };
-  const innerColor = skin.material === "black" ? "#34322f" : skin.material === "kraft" ? "#d8b987" : mix(skin.base, "#f3ecdc", 0.6);
-  const inner = pool.add(new THREE.MeshStandardMaterial({ color: innerColor, roughness: 0.9 }));
-  const edge = new THREE.MeshStandardMaterial({ color: edgeMap ? "#ffffff" : innerColor, map: edgeMap ?? null, roughness: 0.9 });
-  if (edgeMap || separateEdge) pool.add(edge);
-  // without a flute map the edge and the inner face look the same: one material, so the box needs only 2 draw calls
-  if (!edgeMap && !separateEdge) {
-    edge.dispose();
-    const shared = inner;
-    return { outer, inner, edge: shared, arr: [shared, outer], uReveal, uScan };
+  const innerColor = skin.innerColor ?? (skin.material === "black" ? "#34322f" : skin.material === "kraft" ? "#d8b987" : mix(skin.base, "#f3ecdc", 0.6));
+  if (edgeMap || separateEdge) {
+    // one material for the edge and the inner face (2 draw calls per panel instead of 3): a texture with the edge on top
+    // (the flute cross-section, or a flat colour) and the inner colour in a strip below it
+    const c = document.createElement("canvas");
+    c.width = 256;
+    c.height = 40;
+    const g = c.getContext("2d")!;
+    g.fillStyle = edgeColor ?? innerColor;
+    g.fillRect(0, 0, 256, 32);
+    if (edgeMap?.image) g.drawImage(edgeMap.image as CanvasImageSource, 0, 0, 256, 32);
+    g.fillStyle = innerColor;
+    g.fillRect(0, 32, 256, 8);
+    const tex = pool.add(new THREE.CanvasTexture(c));
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.wrapS = THREE.RepeatWrapping;
+    if (edgeMap) tex.repeat.copy(edgeMap.repeat);
+    const shared = pool.add(new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 }));
+    return { outer, inner: shared, edge: shared, arr: [shared, outer], uReveal, uScan, packed: true };
   }
-  return { outer, inner, edge, arr: [edge, outer, inner], uReveal, uScan };
+  const inner = pool.add(new THREE.MeshStandardMaterial({ color: innerColor, roughness: 0.9 }));
+  // without a flute map the edge and the inner face look the same: one material, so the box needs only 2 draw calls
+  return { outer, inner, edge: inner, arr: [inner, outer], uReveal, uScan };
 }
 
 /**
@@ -221,7 +246,7 @@ diffuseColor *= mix(sb, sp, step(vMapUv.x, uReveal));`,
  * the printed face is at z = 0 and the thickness runs into -z. The outer face uv are sheet coordinates:
  * (sx, sy) is where the local origin sits on the sheet.
  */
-export function rectGeo(pool: Pool, x: number, y: number, w: number, h: number, t: number, sx: number, sy: number, SW: number, SH: number, trim = 0, three = false): THREE.BoxGeometry {
+export function rectGeo(pool: Pool, x: number, y: number, w: number, h: number, t: number, sx: number, sy: number, SW: number, SH: number, trim = 0, three = false, packed = false): THREE.BoxGeometry {
   const g = new THREE.BoxGeometry(w - trim, h, t);
   g.translate(x + w / 2, y + h / 2, -t / 2);
   const uv = g.attributes.uv;
@@ -229,6 +254,11 @@ export function rectGeo(pool: Pool, x: number, y: number, w: number, h: number, 
     const u = uv.getX(i);
     const v = uv.getY(i);
     uv.setXY(i, (sx + x + u * w) / SW, (sy + y + v * h) / SH);
+  }
+  if (packed) {
+    // edge faces sample the top 80% of the packed texture, the inner face its bottom strip
+    for (let i = 0; i < 16; i++) uv.setY(i, 0.2 + 0.8 * uv.getY(i));
+    for (let i = 20; i < 24; i++) uv.setXY(i, 0.5, 0.1);
   }
   // group by material: the four edge faces (and the inner face when it shares the material) are one draw call
   g.clearGroups();

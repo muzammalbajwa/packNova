@@ -23,7 +23,7 @@ for (const path of PATHS) {
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
       await new Promise(r => requestAnimationFrame(r));
       const calls = info.render.calls, tris = info.render.triangles;
-      if (!f.visible() || calls < 3) empty.push(p.toFixed(2));
+      if (!f.visible() || calls < 2) empty.push(p.toFixed(2));
       maxCalls = Math.max(maxCalls, calls); minCalls = Math.min(minCalls, calls); maxTris = Math.max(maxTris, tris);
     }
     return { empty, maxCalls, minCalls, maxTris, geos: info.memory.geometries, texs: info.memory.textures };

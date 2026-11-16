@@ -34,6 +34,14 @@ export interface Skin {
   props: PropKind[];
   /** label-tag recipe: a hang tag with a string, or a sticker on a backing. */
   card?: CardLook;
+  /** Configurator only: the visitor's logo (kept in the browser), drawn instead of the wordmark. */
+  logo?: CanvasImageSource;
+  /** Configurator only: gloss coat and embossed print as visual hints. */
+  finish?: { gloss?: boolean; emboss?: boolean };
+  /** Configurator only: colour of the inside faces (inside print). */
+  innerColor?: string;
+  /** Configurator only: corrugated flute size (repeats of the flute texture along the edge). */
+  flute?: number;
 }
 
 export interface ProcessStep {

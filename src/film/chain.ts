@@ -82,7 +82,7 @@ export function buildChain(pool: Pool, s: ChainSpec, L: ChainLayout, mats: Mats)
   const { SW, SH, xs, sumW, yw0, maxTop, maxBot } = L;
   const mesh = (g: THREE.BufferGeometry, m: THREE.Material | THREE.Material[] = mats.arr) => new THREE.Mesh(g, m);
   const three = mats.arr.length === 3;
-  const rect = (x: number, y: number, w: number, h: number, sx: number, sy: number, trim = 0.003) => rectGeo(pool, x, y, w, h, t, sx, sy, SW, SH, trim, three);
+  const rect = (x: number, y: number, w: number, h: number, sx: number, sy: number, trim = 0.003) => rectGeo(pool, x, y, w, h, t, sx, sy, SW, SH, trim, three, mats.packed);
 
   const root = new THREE.Group();
   const walls: THREE.Group[] = [];
@@ -150,7 +150,7 @@ export function buildChain(pool: Pool, s: ChainSpec, L: ChainLayout, mats: Mats)
   const wOuter: THREE.BufferGeometry[] = [];
   const wr = (x: number, y: number, w: number, h: number) => {
     if (w <= 0.002 || h <= 0.002) return;
-    const g = rectGeo(new Pool(), x, y, w, h, t, margin, yw0, SW, SH, 0, false);
+    const g = rectGeo(new Pool(), x, y, w, h, t, margin, yw0, SW, SH, 0, false, mats.packed);
     const idx = g.index!.array as Uint16Array;
     const e = g.clone();
     e.setIndex(Array.from(idx.subarray(0, 30)));

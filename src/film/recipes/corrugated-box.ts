@@ -36,7 +36,7 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
   const printTex = sheetTexture(pool, skin, layout, false, low);
   const blankTex = sheetTexture(pool, skin, layout, true, low);
   const flute = fluteTexture(pool, skin.base);
-  flute.repeat.set(10, 1);
+  flute.repeat.set(skin.flute ?? 10, 1);
   const mats = skinMats(pool, skin, printTex, blankTex, flute);
   mats.uReveal.value = 1;
   const c = buildChain(pool, spec, layout, mats);

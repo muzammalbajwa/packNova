@@ -21,6 +21,10 @@ Requires **Node >= 20.19** (Tailwind's Turbopack loader needs `require(esm)`). `
                         # files are re-read whenever they change on disk (mtime + size), so a rebuild is picked up
                         # without restarting the server; stop it with Ctrl+C. All test scripts expect it on :8080.
 
+    node scripts/configurator-test.mjs [--perf 1] [--mode mobile --cpu 4]   # Design your box: URL round trip, configurator -> quote, draw calls, drag frame times
+    node scripts/configurator-extra.mjs     # logo upload limits, labels, keyboard, no-WebGL and reduced-motion fallbacks, rebuild leaks
+    node scripts/configurator-shots.mjs     # screenshots of every product type (docs/screenshots/pages-v1/phase4)
+
     node scripts/perf-measure.mjs --base http://localhost:8080 [--cpu 4] [--net slow4g] [--mobile]
     bash scripts/perf-matrix.sh            # full throttled matrix + Lighthouse (run on a quiet machine)
     node scripts/screenshots.mjs           # desktop + mobile screenshots -> docs/screenshots/

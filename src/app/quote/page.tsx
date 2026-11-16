@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Shell from "@/catalog/Shell";
 import { pageMetadata } from "@/catalog/seo";
+import QuoteConfigSummary from "@/components/sections/QuoteConfigSummary";
 import QuoteForm from "@/components/sections/QuoteForm";
 import { site } from "@/content/site";
 import { copy } from "@/templates/eco/copy";
@@ -15,7 +16,7 @@ export default function Page() {
         <div className="mx-auto max-w-2xl">
           <h1 className="font-display text-4xl font-medium leading-[1.1] md:text-5xl">{copy.quote.heading}</h1>
           <p className="mt-4 text-lg text-[var(--muted)]">{copy.quote.lead}</p>
-          <div className="mt-8"><QuoteForm /></div>
+          <div className="mt-8"><QuoteConfigSummary /><QuoteForm /></div>
         </div>
       </section>
     </Shell>
