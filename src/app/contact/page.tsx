@@ -31,7 +31,7 @@ export default function Page() {
               </dl>
               <MapPlaceholder />
             </div>
-            <ContactForm />
+            <ContactForm heading={c.formHeading} lead={c.formLead} />
           </div>
 
           <section aria-labelledby="faq-h" className="mt-16 border-t border-[var(--line)] pt-10">

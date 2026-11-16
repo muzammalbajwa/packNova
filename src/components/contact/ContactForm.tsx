@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { contactPage as c } from "@/content/contactPage";
 import { wizard } from "@/content/quoteWizard";
 import Field, { inputCls } from "@/components/quote/Field";
 const SendActions = dynamic(() => import("@/components/quote/SendActions"), { ssr: false, loading: () => <p className="text-[var(--muted)]">Loading the send buttons…</p> });
@@ -13,7 +12,7 @@ import { QUOTE_ENDPOINT, type QuotePayload } from "@/lib/submitQuote";
 type F = Pick<QuoteDraft, "name" | "code" | "phone" | "email" | "artwork" | "company">;
 
 /** The short contact form: the same validation, message builder and sending as the quote wizard. */
-export default function ContactForm() {
+export default function ContactForm({ heading, lead }: { heading: string; lead: string }) {
   const [d, setD] = useState<F>({ name: EMPTY_DRAFT.name, code: EMPTY_DRAFT.code, phone: "", email: "", artwork: "", company: "" });
   const [errors, setErrors] = useState<Errors>({});
   const [announce, setAnnounce] = useState("");
@@ -34,8 +33,8 @@ export default function ContactForm() {
   const payload = (): QuotePayload => ({ message: text, name: d.name.trim(), phone: normalizePhone(d.phone, d.code) ?? d.phone, email: d.email.trim(), fields: { kind: "contact" }, _gotcha: d.company });
   return (
     <form noValidate onSubmit={(e) => e.preventDefault()} aria-labelledby="contact-form-h" className="grid gap-4 rounded-[var(--r-card)] border border-[var(--line)] bg-[var(--surface)] p-5 md:p-7">
-      <h2 id="contact-form-h" className="font-display text-2xl font-medium">{c.formHeading}</h2>
-      <p className="text-[var(--muted)]">{c.formLead}</p>
+      <h2 id="contact-form-h" className="font-display text-2xl font-medium">{heading}</h2>
+      <p className="text-[var(--muted)]">{lead}</p>
       <div role="status" aria-live="polite" className={announce ? "rounded-[var(--r-field)] border border-[#a2392b] bg-[var(--wash)] px-4 py-3 text-sm font-semibold text-[#a2392b]" : "sr-only"}>{announce}</div>
       <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden"><label>Company website<input type="text" tabIndex={-1} autoComplete="off" value={d.company} onChange={(e) => set("company", e.target.value)} /></label></div>
       <Field id="c-name" label="Your name" required error={errors.name}>{(p) => <input {...p} className={inputCls} autoComplete="name" value={d.name} onChange={(e) => set("name", e.target.value)} />}</Field>

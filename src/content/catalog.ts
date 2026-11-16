@@ -766,16 +766,8 @@ export const NAV: NavItem[] = [
   { label: "Contact us", href: "/contact/" },
 ];
 
-export const ROUTES = { quote: "/quote/", contact: "/contact/", configurator: "/configurator/" } as const;
-
-/** Quote link that carries the product name to the quote form. */
-export const quoteHref = (product?: string, note?: string) => {
-  const q = new URLSearchParams();
-  if (product) q.set("product", product);
-  if (note) q.set("note", note);
-  const s = q.toString();
-  return s ? `${ROUTES.quote}?${s}` : ROUTES.quote;
-};
+import { ROUTES, quoteHref } from "./routes";
+export { ROUTES, quoteHref };
 
 /** The six homepage categories (site.products.items ids) and the page each one opens. */
 export const HOME_CATEGORY_HREF: Record<string, string> = {

@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { GROUPS, PAGES } from "@/content/catalog";
+import { PRODUCT_TITLES } from "@/content/navData";
 import { wizard as w } from "@/content/quoteWizard";
 import type * as Box from "@/lib/box";
 import type { BoxConfig } from "@/lib/box";
@@ -109,7 +109,7 @@ export default function QuoteWizard() {
   };
 
   const products = useMemo(() => {
-    const titles = new Set(PAGES.map((p) => p.title));
+    const titles = new Set(PRODUCT_TITLES.flatMap((g) => g.titles));
     return draft.product && draft.product !== NOT_SURE && !titles.has(draft.product) && !cfg ? [draft.product] : [];
   }, [draft.product, cfg]);
 
@@ -174,7 +174,7 @@ export default function QuoteWizard() {
                     <option value="">Choose a product</option>
                     <option value={NOT_SURE}>{NOT_SURE}: help me choose</option>
                     {products.map((x) => <option key={x}>{x}</option>)}
-                    {GROUPS.map((g) => <optgroup key={g.id} label={g.label}>{PAGES.filter((pg) => pg.group === g.id).map((pg) => <option key={pg.href}>{pg.title}</option>)}</optgroup>)}
+                    {PRODUCT_TITLES.map((g) => <optgroup key={g.group} label={g.group}>{g.titles.map((t) => <option key={t}>{t}</option>)}</optgroup>)}
                   </select>
                 )}
               </Field>

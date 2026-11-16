@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import PrefetchLink from "@/catalog/PrefetchLink";
 import { usePathname } from "next/navigation";
-import { site } from "@/content/site";
-import { NAV, quoteHref as quoteLink } from "@/content/catalog";
+import { brand, contact, navCta, social } from "@/content/siteCore";
+import { NAV, quoteHref as quoteLink } from "@/content/navData";
 import Logo from "@/components/ui/Logo";
-import { getLenis } from "@/lib/scroll";
+import { getLenis } from "@/lib/lenisRef";
 import { track } from "@/lib/track";
 import { useHideOnScroll } from "@/shared/useHideOnScroll";
 
@@ -32,7 +32,6 @@ export default function Navbar({ base: _base, onHome: _onHome }: { base?: string
   const [mobile, setMobile] = useState(false);
   const [acc, setAcc] = useState<number | null>(null);
   const wrap = useRef<HTMLUListElement>(null);
-  const { contact } = site;
 
   useEffect(() => {
     const onDown = (e: PointerEvent) => {
@@ -84,7 +83,7 @@ export default function Navbar({ base: _base, onHome: _onHome }: { base?: string
       <div className="bg-[var(--accent)] text-[var(--on-accent)]">
         <div className="mx-auto flex h-9 max-w-6xl items-center justify-between gap-4 px-6 text-sm">
           <ul className="hidden items-center gap-4 sm:flex">
-            {site.social.map((s) => (
+            {social.map((s) => (
               <li key={s.name}><a href={s.href} className="hover:underline underline-offset-4">{s.name}</a></li>
             ))}
           </ul>
@@ -99,7 +98,7 @@ export default function Navbar({ base: _base, onHome: _onHome }: { base?: string
       {/* main bar */}
       <nav aria-label="Primary" className="relative border-b border-[var(--line)]">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
-          <Link href="/" aria-label={`${site.brand.name} home`} className="text-xl">
+          <Link href="/" aria-label={`${brand.name} home`} className="text-xl">
             <Logo />
           </Link>
 
@@ -138,7 +137,7 @@ export default function Navbar({ base: _base, onHome: _onHome }: { base?: string
 
           <div className="flex items-center gap-2">
             <Link href={quoteHref} className="rounded-[var(--r-btn)] bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--on-accent)] xl:hidden">
-              {site.nav.cta}
+              {navCta}
             </Link>
             <button type="button" aria-expanded={mobile} aria-controls="eco-mobile-menu" aria-label={mobile ? "Close menu" : "Open menu"} onClick={() => setMobile((m) => !m)}
               className="grid size-10 place-items-center rounded-[var(--r-btn)] border border-[var(--line-strong)] lg:hidden">

@@ -2,7 +2,7 @@
  * The text of a request, and the links that carry it: ONE builder for WhatsApp, email and the form-service payload.
  * Loaded by the review step, not by the first screen. No React and no alias imports (node unit-tests it).
  */
-import { site } from "../content/site";
+import { contact, emailSubject, messageIntro, messageLabels } from "../content/siteCore";
 import { MATERIALS, TYPE_BY_ID, summaryLines, type BoxConfig } from "./box";
 import { CONTACT_LABEL, NOT_SURE, normalizePhone, type QuoteDraft } from "./quote";
 
@@ -15,8 +15,8 @@ const size = (d: QuoteDraft) => (d.l || d.w || d.h ? `${d.l || "?"} x ${d.w || "
  * configurator, its summary lines replace the product, size and material lines.
  */
 export function buildQuoteMessage(d: QuoteDraft, cfg?: BoxConfig | null): string {
-  const L = site.quote.messageLabels;
-  const out: string[] = [site.quote.messageIntro, ""];
+  const L = messageLabels;
+  const out: string[] = [messageIntro, ""];
   const add = (label: string, v?: string) => { if (v && v.trim()) out.push(`${label}: ${v.trim()}`); };
   if (cfg) {
     out.push("Box designed in the configurator:");
@@ -52,8 +52,8 @@ export function buildContactMessage(d: Pick<QuoteDraft, "name" | "code" | "phone
   return out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
-export const whatsappLink = (text: string) => `${site.contact.whatsappHref}?text=${encodeURIComponent(text)}`;
-export const mailtoLink = (text: string) => `mailto:${site.contact.email}?subject=${encodeURIComponent(site.quote.emailSubject)}&body=${encodeURIComponent(text)}`;
+export const whatsappLink = (text: string) => `${contact.whatsappHref}?text=${encodeURIComponent(text)}`;
+export const mailtoLink = (text: string) => `mailto:${contact.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(text)}`;
 
 /** What the configurator's design fills in on the quote form. */
 export function prefillFromConfig(cfg: BoxConfig): Partial<QuoteDraft> {

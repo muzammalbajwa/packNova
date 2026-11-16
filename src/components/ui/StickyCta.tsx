@@ -1,9 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { site } from "@/content/site";
+import { contact, messageIntro, navCta } from "@/content/siteCore";
 import { track } from "@/lib/track";
-import { whatsappUrl } from "@/lib/quoteMessage";
 
 function WhatsAppGlyph() {
   return (
@@ -23,8 +22,8 @@ export default function StickyCta({ base = "" }: { base?: string }) {
   const path = usePathname().replace(/\/$/, "");
   const onHome = path === base || path === "";
   const quoteHref = onHome ? "#quote" : base === "" ? "/quote/" : `${base}/#quote`;
-  const wa = whatsappUrl(site.quote.messageIntro);
-  const label = site.nav.cta;
+  const wa = `${contact.whatsappHref}?text=${encodeURIComponent(messageIntro)}`;
+  const label = navCta;
   if (path === "/quote") return null; // the quote form has its own buttons; the bar would cover them on phones
 
   const quote = (place: string) => () => track("sticky_quote_click", { place });

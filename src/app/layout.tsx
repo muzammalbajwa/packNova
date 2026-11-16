@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import DebugOverlay from "@/components/ui/DebugOverlay";
+import DebugGate from "@/components/ui/DebugGate";
 import { site } from "@/content/site";
 import "./globals.css";
 
@@ -34,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang={site.lang} dir={site.dir} suppressHydrationWarning>
       <body className="min-h-dvh antialiased">
         {children}
-        <DebugOverlay />
+        <DebugGate />
       </body>
     </html>
   );

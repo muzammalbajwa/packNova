@@ -1,12 +1,11 @@
 import Lenis from "lenis";
+import { lenisRef } from "./lenisRef";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 let lenis: Lenis | null = null;
 
-export function getLenis() {
-  return lenis;
-}
+export { getLenis } from "./lenisRef";
 
 /**
  * Lenis smooth scroll wired into GSAP's ticker so ScrollTrigger and the
@@ -18,6 +17,7 @@ export function initScroll(reducedMotion: boolean): () => void {
   if (reducedMotion) return () => {};
 
   lenis = new Lenis({ lerp: 0.1, smoothWheel: true, anchors: true });
+  lenisRef.current = lenis;
   lenis.on("scroll", ScrollTrigger.update);
 
   const tick = (time: number) => lenis?.raf(time * 1000);
@@ -28,6 +28,7 @@ export function initScroll(reducedMotion: boolean): () => void {
     gsap.ticker.remove(tick);
     lenis?.destroy();
     lenis = null;
+    lenisRef.current = null;
   };
 }
 

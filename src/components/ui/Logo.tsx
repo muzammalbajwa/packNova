@@ -1,4 +1,4 @@
-import { site } from "@/content/site";
+import { brand } from "@/content/siteCore";
 
 /** Small folded-box mark: kraft body, accent lid folding open. */
 export function LogoMark({ size = 28 }: { size?: number }) {
@@ -15,7 +15,7 @@ export function LogoMark({ size = 28 }: { size?: number }) {
 
 /** Mark + wordmark. The second capital letter of the name takes the accent color. */
 export default function Logo({ className = "", size = 28 }: { className?: string; size?: number }) {
-  const name = site.brand.name;
+  const name = brand.name;
   const split = name.slice(1).search(/[A-Z]/) + 1;
   const head = split > 0 ? name.slice(0, split) : name;
   const tail = split > 0 ? name.slice(split) : "";

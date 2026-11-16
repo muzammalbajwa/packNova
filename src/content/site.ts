@@ -7,35 +7,24 @@
  * and pick it by route/locale. Every component reads from `site`, never from literals.
  */
 
+import { brand, contact, emailSubject, messageIntro, messageLabels, navCta, social } from "./siteCore";
+
+/*
+ * The values the page shell needs on EVERY page (brand name, phone, WhatsApp, email, address, hours, social links, the "Get a quote"
+ * label and the first line of a quote message) live in src/content/siteCore.ts, a very small file, so pages do not download this
+ * whole file just to draw the header. Edit those values there. Everything else is below.
+ */
 const en = {
   lang: "en" as const,
   dir: "ltr" as const,
 
-  brand: {
-    name: "PackNova",
-    tagline: "Packaging that makes your product unforgettable.",
-    description: "Custom boxes, cartons and pouches, designed in 3D and made to order.",
-    /** Used for absolute URLs (Open Graph). Replace with the real domain. */
-    url: "https://staging.artinstallation.uk",
-  },
+  brand,
 
-  contact: {
-    phone: "+92 300 0000000",
-    phoneHref: "tel:+923000000000",
-    whatsapp: "+92 300 0000000",
-    whatsappHref: "https://wa.me/923000000000",
-    email: "hello@example.com",
-    address: "Plot 00, Industrial Area, Lahore, Pakistan",
-    hours: "Mon to Sat, 9:00 AM to 6:00 PM",
-  },
+  contact,
 
   /** The contact page text (heading, FAQ) is in src/content/contactPage.ts. */
 
-  social: [
-    { name: "Instagram", href: "#" },
-    { name: "Facebook", href: "#" },
-    { name: "LinkedIn", href: "#" },
-  ],
+  social,
 
   seo: {
     title: "PackNova | Custom 3D-designed packaging, made to order",
@@ -51,7 +40,7 @@ const en = {
       { label: "Quote", hash: "quote" },
       { label: "Contact", hash: "contact" },
     ],
-    cta: "Get a quote",
+    cta: navCta,
   },
 
   hero: {
@@ -281,23 +270,10 @@ const en = {
       again: "Edit request",
     },
     /** Message header used for WhatsApp / email (the fields are appended). */
-    messageIntro: "Hello, I would like a quote.",
-    messageLabels: {
-      name: "Name",
-      phone: "Phone",
-      product: "Product",
-      quantity: "Quantity",
-      message: "Notes",
-      spec: "Spec",
-    },
-    emailSubject: "Quote request",
+    messageIntro,
+    messageLabels,
+    emailSubject,
     whatsappCta: "Or message us on WhatsApp",
-    /** Short lines kept here so they are easy to find. The rest of the quote wizard text is in src/content/quoteWizard.ts. */
-    /** After "Send request" worked (a form service is connected). TODO(owner): add a real reply time only when you can keep it. It is left out on purpose. */
-    sent: {
-      title: "Thank you. We have your request.",
-      body: "We will contact you using the method you chose. Please also send your artwork on WhatsApp or by email.",
-    },
   },
 
   footer: {
