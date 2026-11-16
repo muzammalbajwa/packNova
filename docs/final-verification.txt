@@ -1,0 +1,198 @@
+
+=== node and routes (load 3.95)
+v22.23.4
+/ /_not-found/ /404/ /configurator/ /contact/ /event/ /event/brand-anniversary/ /event/christmas/ /event/halloween/ /event/new-year/ /event/thanksgiving/ /industry/ /industry/apparel-boxes/ /industry/bakery-and-cake/ /industry/candle-boxes/ /industry/chocolate-boxes/ /industry/cosmetic-boxes/ /industry/display-boxes/ /industry/electronic-boxes/ /industry/food-boxes/ /industry/health-boxes/ /industry/jewelry-boxes/ /industry/mylar-bags/ /industry/pizza-boxes/ /material/ /material/corrugated-boxes/ /material/kraft-boxes/ /material/retail-boxes/ /material/rigid-boxes/ /privacy/ /quote/ /shape-and-style/ /shape-and-style/folding-cartons/ /shape-and-style/gable-boxes/ /shape-and-style/hang-tags/ /shape-and-style/labels-and-stickers/ /shape-and-style/paper-bags/ /shape-and-style/pillow-boxes/ /shape-and-style/poly-and-courier-bags/ /shape-and-style/trays-and-sleeves/ /shape-and-style/tuck-boxes/ /shape-and-style/window-boxes/ /t/cinematic/ /t/cinematic/configurator/ /t/eco/ /t/eco/configurator/ /t/editorial/ /t/editorial/configurator/ /t/industrial/ /t/industrial/configurator/ /terms/ 
+      51
+
+=== lint (load 3.95)
+✖ 14 problems (0 errors, 14 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
+
+=== link check (load 4.19)
+52 pages, 1817 internal links, 0 broken
+
+=== initial JS per route (gzip, modern browsers) (load 4.19)
+/  11 scripts  217.5 kB gzip  (+ 38.7 kB nomodule polyfills that moder
+/industry/  7 scripts  142.7 kB gzip  (+ 38.7 kB nomodule polyfills th
+/material/rigid-boxes/  7 scripts  143.7 kB gzip  (+ 38.7 kB nomodule 
+/shape-and-style/tuck-boxes/  7 scripts  143.7 kB gzip  (+ 38.7 kB nom
+/event/halloween/  7 scripts  143.7 kB gzip  (+ 38.7 kB nomodule polyf
+/configurator/  8 scripts  155.6 kB gzip  (+ 38.7 kB nomodule polyfill
+/quote/  8 scripts  147.9 kB gzip  (+ 38.7 kB nomodule polyfills that 
+/contact/  8 scripts  149.5 kB gzip  (+ 38.7 kB nomodule polyfills tha
+/privacy/  7 scripts  142.7 kB gzip  (+ 38.7 kB nomodule polyfills tha
+
+=== lazy 3D chunks of a film page (load 4.19)
+    48.5 kB gzip   131 kB raw  0gopogwsd4jv5.js
+   100.1 kB gzip   404 kB raw  3kt_rl9t9m4r2.js
+   320.3 kB gzip  lazy JS a film page downloads in total (three.js + engine + recipe + gsap)
+
+=== empty-frame sweeps, draw calls, triangles: 1440 px (load 4.65)
+/material/rigid-boxes/ desktop {"empty":[],"maxCalls":27,"minCalls":12,"maxTris":456,"geos":19,"texs":8}
+/material/corrugated-boxes/ desktop {"empty":[],"maxCalls":33,"minCalls":27,"maxTris":852,"geos":22,"texs":6}
+/shape-and-style/tuck-boxes/ desktop {"empty":[],"maxCalls":27,"minCalls":19,"maxTris":756,"geos":16,"texs":5}
+/shape-and-style/paper-bags/ desktop {"empty":[],"maxCalls":24,"minCalls":4,"maxTris":518,"geos":18,"texs":4}
+/industry/mylar-bags/ desktop {"empty":[],"maxCalls":11,"minCalls":3,"maxTris":2722,"geos":15,"texs":4}
+/shape-and-style/hang-tags/ desktop {"empty":[],"maxCalls":9,"minCalls":5,"maxTris":4252,"geos":9,"texs":3}
+/shape-and-style/trays-and-sleeves/ desktop {"empty":[],"maxCalls":28,"minCalls":13,"maxTris":804,"geos":19,"texs":8}
+/shape-and-style/pillow-boxes/ desktop {"empty":[],"maxCalls":4,"minCalls":2,"maxTris":11354,"geos":7,"texs":4}
+/shape-and-style/gable-boxes/ desktop {"empty":[],"maxCalls":33,"minCalls":25,"maxTris":866,"geos":20,"texs":5}
+/event/halloween/ desktop {"empty":[],"maxCalls":33,"minCalls":25,"maxTris":1104,"geos":22,"texs":5}
+
+=== empty-frame sweeps, draw calls, triangles: 390 px (load 3.89)
+/material/rigid-boxes/ mobile {"empty":[],"maxCalls":27,"minCalls":12,"maxTris":456,"geos":19,"texs":8}
+/material/corrugated-boxes/ mobile {"empty":[],"maxCalls":33,"minCalls":27,"maxTris":852,"geos":22,"texs":6}
+/shape-and-style/tuck-boxes/ mobile {"empty":[],"maxCalls":27,"minCalls":19,"maxTris":756,"geos":16,"texs":5}
+/shape-and-style/paper-bags/ mobile {"empty":[],"maxCalls":24,"minCalls":4,"maxTris":518,"geos":18,"texs":4}
+/industry/mylar-bags/ mobile {"empty":[],"maxCalls":11,"minCalls":3,"maxTris":2722,"geos":15,"texs":4}
+/shape-and-style/hang-tags/ mobile {"empty":[],"maxCalls":9,"minCalls":5,"maxTris":4252,"geos":9,"texs":3}
+/shape-and-style/trays-and-sleeves/ mobile {"empty":[],"maxCalls":28,"minCalls":13,"maxTris":804,"geos":19,"texs":8}
+/event/halloween/ mobile {"empty":[],"maxCalls":33,"minCalls":25,"maxTris":866,"geos":22,"texs":5}
+
+=== frame rate: 1440 px, no throttle (load 3.46)
+load average (1 min) before: 3.46
+/material/rigid-boxes/                     avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 0.33 ms
+/material/corrugated-boxes/                avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 0.36 ms
+/shape-and-style/tuck-boxes/               avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 0.31 ms
+/shape-and-style/paper-bags/               avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 0.32 ms
+/industry/mylar-bags/                      avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 0.43 ms
+/shape-and-style/hang-tags/                avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 0.32 ms
+/shape-and-style/trays-and-sleeves/        avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 0.35 ms
+load average (1 min) after: 5.33
+
+=== frame rate: 390 px, 4x CPU throttle (load 3.35)
+load average (1 min) before: 3.35
+/material/rigid-boxes/                     avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 1.2 ms
+/material/corrugated-boxes/                avg  59.6 fps  p99  16.8 ms  max   33.4 ms  >33ms: 1  draw cpu avg 1.64 ms
+/shape-and-style/tuck-boxes/               avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 1.17 ms
+/shape-and-style/paper-bags/               avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 1.07 ms
+/industry/mylar-bags/                      avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 1.25 ms
+/shape-and-style/hang-tags/                avg  59.6 fps  p99  16.8 ms  max   66.7 ms  >33ms: 1  draw cpu avg 1.15 ms
+/shape-and-style/trays-and-sleeves/        avg    60 fps  p99  16.8 ms  max   16.8 ms  >33ms: 0  draw cpu avg 1.22 ms
+load average (1 min) after: 4.35
+
+=== 20 navigations: renderer geometries, textures, programs, JS heap (load 4.35)
+ 1  /material/rigid-boxes/                 JS heap  10.5 MB  film geos   8  texs  8  programs  6   WebGL contexts alive: 1 (max 2 during the transition)
+ 2  /material/corrugated-boxes/            JS heap  10.7 MB  film geos  15  texs  6  programs  7   WebGL contexts alive: 1 (max 1 during the transition)
+ 3  /shape-and-style/tuck-boxes/           JS heap  11.4 MB  film geos  11  texs  5  programs  6   WebGL contexts alive: 1 (max 1 during the transition)
+ 4  /shape-and-style/pillow-boxes/         JS heap  11.5 MB  film geos   2  texs  4  programs  5   WebGL contexts alive: 1 (max 1 during the transition)
+ 5  /shape-and-style/paper-bags/           JS heap  11.7 MB  film geos   2  texs  4  programs  5   WebGL contexts alive: 1 (max 1 during the transition)
+ 6  /industry/mylar-bags/                  JS heap  11.7 MB  film geos   2  texs  4  programs  7   WebGL contexts alive: 1 (max 1 during the transition)
+ 7  /shape-and-style/hang-tags/            JS heap  11.9 MB  film geos   4  texs  4  programs  6   WebGL contexts alive: 1 (max 1 during the transition)
+ 8  /shape-and-style/trays-and-sleeves/    JS heap  12.1 MB  film geos  15  texs  8  programs  5   WebGL contexts alive: 1 (max 1 during the transition)
+ 9  /event/halloween/                      JS heap  12.5 MB  film geos  15  texs  5  programs  8   WebGL contexts alive: 1 (max 1 during the transition)
+10  /                                      JS heap  14.4 MB  film geos   -  texs  -  programs  -   WebGL contexts alive: 2 (max 2 during the transition)
+11  /material/rigid-boxes/                 JS heap  13.7 MB  film geos   8  texs  8  programs  6   WebGL contexts alive: 1 (max 1 during the transition)
+12  /material/corrugated-boxes/            JS heap  13.6 MB  film geos  15  texs  6  programs  7   WebGL contexts alive: 1 (max 1 during the transition)
+13  /shape-and-style/tuck-boxes/           JS heap  13.6 MB  film geos  11  texs  5  programs  6   WebGL contexts alive: 1 (max 1 during the transition)
+14  /shape-and-style/pillow-boxes/         JS heap  13.6 MB  film geos   2  texs  4  programs  5   WebGL contexts alive: 1 (max 1 during the transition)
+15  /shape-and-style/paper-bags/           JS heap  13.6 MB  film geos   2  texs  4  programs  5   WebGL contexts alive: 1 (max 1 during the transition)
+16  /industry/mylar-bags/                  JS heap  13.6 MB  film geos   2  texs  4  programs  7   WebGL contexts alive: 1 (max 1 during the transition)
+17  /shape-and-style/hang-tags/            JS heap  13.6 MB  film geos   4  texs  4  programs  6   WebGL contexts alive: 1 (max 1 during the transition)
+18  /shape-and-style/trays-and-sleeves/    JS heap  13.7 MB  film geos  15  texs  8  programs  5   WebGL contexts alive: 1 (max 1 during the transition)
+19  /event/halloween/                      JS heap  13.8 MB  film geos  15  texs  5  programs  8   WebGL contexts alive: 1 (max 1 during the transition)
+20  /                                      JS heap  15.6 MB  film geos   -  texs  -  programs  -   WebGL contexts alive: 2 (max 2 during the transition)
+PASS  /material/rigid-boxes/: geometries 8 -> 8, textures 8 -> 8, programs 6 -> 6, heap MB 10.5 -> 13.7
+PASS  /material/corrugated-boxes/: geometries 15 -> 15, textures 6 -> 6, programs 7 -> 7, heap MB 10.7 -> 13.6
+PASS  /shape-and-style/tuck-boxes/: geometries 11 -> 11, textures 5 -> 5, programs 6 -> 6, heap MB 11.4 -> 13.6
+PASS  /shape-and-style/pillow-boxes/: geometries 2 -> 2, textures 4 -> 4, programs 5 -> 5, heap MB 11.5 -> 13.6
+PASS  /shape-and-style/paper-bags/: geometries 2 -> 2, textures 4 -> 4, programs 5 -> 5, heap MB 11.7 -> 13.6
+PASS  /industry/mylar-bags/: geometries 2 -> 2, textures 4 -> 4, programs 7 -> 7, heap MB 11.7 -> 13.6
+PASS  /shape-and-style/hang-tags/: geometries 4 -> 4, textures 4 -> 4, programs 6 -> 6, heap MB 11.9 -> 13.6
+PASS  /shape-and-style/trays-and-sleeves/: geometries 15 -> 15, textures 8 -> 8, programs 5 -> 5, heap MB 12.1 -> 13.7
+PASS  /event/halloween/: geometries 15 -> 15, textures 5 -> 5, programs 8 -> 8, heap MB 12.5 -> 13.8
+PASS  homepage engine and film renderer were never alive together
+PASS  most WebGL contexts alive at once: 2
+
+=== menus (mobile menu), prefetch (load 3.19)
+PASS  menu opens (aria-expanded true, panel visible)
+PASS  header is visible when the menu opens
+PASS  page scroll is locked (html overflow hidden)
+PASS  scrolling over the page behind does not move it  (scrollY 1200 -> 1200)
+PASS  accordion 1 opens and shows its links
+PASS  opening accordion 2 closes accordion 1
+PASS  menu panel fits the screen (no overflow past the viewport)
+PASS  close button closes the menu
+PASS  scroll lock released
+PASS  Escape closes the menu
+PASS  tapping a link opens that page  (/event/halloween/ (expected /event/halloween/))
+PASS  menu is closed and scroll works after navigating
+PASS  hub card, hover: film chunks before click: 2, film chunks fetched after click: 0, click to live frame: 1267 ms
+PASS  mobile menu item, touch start: film chunks before click: 2, film chunks fetched after click: 0, click to live frame: 1294 ms
+PASS  no prefetch (control): click only: film chunks before click: 0, film chunks fetched after click: 2, click to live frame: 1102 ms
+
+=== accessibility (keyboard, focus, reduced motion, headings) (load 5.76)
+PASS  /: one h1, no skipped heading levels, lang and title set
+PASS  /industry/: one h1, no skipped heading levels, lang and title set
+PASS  /material/rigid-boxes/: one h1, no skipped heading levels, lang and title set
+PASS  /shape-and-style/paper-bags/: one h1, no skipped heading levels, lang and title set
+PASS  /event/halloween/: one h1, no skipped heading levels, lang and title set
+PASS  /configurator/: one h1, no skipped heading levels, lang and title set
+PASS  /quote/: one h1, no skipped heading levels, lang and title set
+PASS  /contact/: one h1, no skipped heading levels, lang and title set
+PASS  /privacy/: one h1, no skipped heading levels, lang and title set
+PASS  /terms/: one h1, no skipped heading levels, lang and title set
+PASS  /nope-404/: one h1, no skipped heading levels, lang and title set
+PASS  skip link is the first Tab stop and becomes visible
+PASS  skip link moves focus into the main content
+PASS  menu button shows a visible focus indicator
+PASS  ArrowDown opens the dropdown and focuses its first link
+PASS  ArrowDown moves to the next link
+PASS  End jumps to the last link
+PASS  Home jumps back to the first link
+PASS  Escape closes the dropdown and puts focus back on its button
+PASS  Tab keeps moving through the page: focus is not trapped in the menu, which closes behind it
+PASS  every SVG on /quote/ is labelled or hidden from screen readers (0 unlabelled)
+PASS  /: no unlabelled SVG (0)
+PASS  /: every image has an alt attribute
+PASS  /material/rigid-boxes/: no unlabelled SVG (0)
+PASS  /material/rigid-boxes/: every image has an alt attribute
+PASS  /material/rigid-boxes/ (reduced motion): the film is replaced by the step list (6 steps, no canvas)
+PASS  /shape-and-style/paper-bags/ (reduced motion): the film is replaced by the step list (5 steps, no canvas)
+PASS  /event/halloween/ (reduced motion): the film is replaced by the step list (6 steps, no canvas)
+PASS  / (reduced motion): smooth scroll is off and no endless CSS animation runs ({"smooth":false,"canvases":1,"anim":0})
+all passed
+
+=== context loss and device tiers (load 5.12)
+PASS  film page: context lost -> the poster is shown again (3D area hidden)
+PASS  film page: context restored -> 3D drawn again (13 draw calls, something in view)
+PASS  film page: no uncaught errors
+PASS  configurator: context lost -> the poster is shown again (3D area hidden)
+PASS  configurator: context restored -> 3D drawn again (20 draw calls, something in view)
+PASS  configurator: no uncaught errors
+PASS  homepage: context lost -> the hero poster fades back in (opacity 0 -> 1)
+PASS  homepage: context restored -> the poster hides again and the canvas is live ({"opacity":"0","lost":false,"calls":11})
+PASS  homepage: no uncaught errors
+PASS  tiers: pixel ratio on a 2x screen: high 2, low 1.25
+PASS  tiers: ?tier=none (no WebGL) shows no canvas, the step list instead
+PASS  tiers: homepage pixel ratio high 2, low 1.25
+PASS  tiers: instanced seasonal props on Halloween: high 56, low 53
+all passed
+
+=== configurator (load 6.34)
+  mailer    draw calls max 24  empty folds none  geometries 14 textures 6
+  shipping  draw calls max 28  empty folds none  geometries 16 textures 6
+  tuck      draw calls max 20  empty folds none  geometries 11 textures 5
+  pillow    draw calls max  4  empty folds none  geometries 3 textures 4
+  gable     draw calls max 26  empty folds none  geometries 15 textures 5
+  rigid     draw calls max 25  empty folds none  geometries 13 textures 8
+  bag       draw calls max 23  empty folds none  geometries 13 textures 4
+  pouch     draw calls max 11  empty folds none  geometries 12 textures 4
+PASS  draw calls under 30 on every type and fold position (max 28)
+PASS  no empty frames on any type at any fold position
+PASS  no uncaught errors
+all passed
+all passed
+
+=== quote and contact (unit, browser) (load 5.60)
+all 96 checks passed
+SKIP  mock form-service checks (pass --mock-dir)
+all passed
+
+=== screenshots (load 5.28)
+docs/screenshots/pages-v1/final/contact-390.png
+docs/screenshots/pages-v1/final/home-390.png
+docs/screenshots/pages-v1/final/privacy-390.png
+
+VERIFY_DONE
