@@ -1,3 +1,6 @@
+# CLOUDFLARE PAGES ONLY. This file does nothing on OpenLiteSpeed / Apache: for your own server use docs/server/htaccess.txt.
+# (It is copied into the build output and is harmless on other hosts.)
+
 # Cloudflare Pages custom headers (https://developers.cloudflare.com/pages/configuration/headers/)
 
 # Hashed build output: the file name changes whenever the content changes, so cache for a year.

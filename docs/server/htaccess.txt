@@ -1,0 +1,74 @@
+# ---------------------------------------------------------------------------------------------------------
+# .htaccess for the PackNova static export on OpenLiteSpeed (CyberPanel). Paste it at the TOP of the site's .htaccess.
+#
+# Where to paste it in CyberPanel (5 steps):
+#   1. CyberPanel > Websites > List Websites > your site > File Manager (or SSH to /home/<domain>/public_html).
+#   2. Open the existing .htaccess (create it if it is missing). Do NOT delete what is already there (the deploy script leaves this file alone).
+#   3. Paste everything below above the existing lines, save.
+#   4. CyberPanel > Websites > your site > "Rewrite Rules" is read from this same file. Then restart: Server Status > "Graceful Restart".
+#   5. Check with: curl -sI https://YOUR-DOMAIN/_next/static/ -H 'Accept-Encoding: br' and curl -sI https://YOUR-DOMAIN/quote/ (headers below should appear).
+# Brotli/gzip: OpenLiteSpeed compresses in the server settings (WebAdmin > Server Configuration > Tuning > "Enable Compression" = Yes,
+# "Compressible Types" must include text/html, text/css, application/javascript, application/json, image/svg+xml; Brotli level 4 to 6 is a good choice).
+# The AddOutputFilterByType lines below are a fallback that OpenLiteSpeed accepts.
+# ---------------------------------------------------------------------------------------------------------
+
+# --- static export: directories are pages (/quote/ -> /quote/index.html), and one 404 page -------------------
+DirectoryIndex index.html
+Options -Indexes
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+# add the trailing slash the export uses (/quote -> /quote/) when the target is a directory
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteCond %{REQUEST_URI} !/$
+RewriteRule ^(.*)$ /$1/ [R=301,L]
+# never expose build leftovers
+RewriteRule ^(\.git|node_modules)(/|$) - [F,L]
+</IfModule>
+
+# --- compression (fallback; the server setting above is the real switch) --------------------------------------
+<IfModule mod_deflate.c>
+AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript text/javascript application/json application/xml image/svg+xml font/ttf
+</IfModule>
+
+# --- caching ---------------------------------------------------------------------------------------------------
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresDefault "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_headers.c>
+# Hashed build output (file name changes when the content changes): one year, immutable.
+<FilesMatch "\.(js|css|woff2|woff|ttf|map)$">
+  Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+# Images, models, textures, icons: one month (not hashed, so not immutable).
+<FilesMatch "\.(png|jpg|jpeg|webp|avif|gif|svg|ico|glb|ktx2)$">
+  Header set Cache-Control "public, max-age=2592000, stale-while-revalidate=86400"
+</FilesMatch>
+# Pages and data files: always check with the server (a new deploy shows at once; the files above stay cached).
+<FilesMatch "\.(html|txt|xml|json)$">
+  Header set Cache-Control "no-cache"
+</FilesMatch>
+# Fonts need to be readable by the page's own origin only; nothing else to allow.
+
+# --- security headers ------------------------------------------------------------------------------------------
+Header always set X-Content-Type-Options "nosniff"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+Header always set Cross-Origin-Opener-Policy "same-origin"
+# Modern replacement for X-Frame-Options (keep both):
+Header always set Content-Security-Policy "frame-ancestors 'self'"
+# Turn this on only when the whole site is served over HTTPS for good (it cannot be undone quickly):
+# Header always set Strict-Transport-Security "max-age=31536000"
+</IfModule>
+
+# --- mime types some servers miss ----------------------------------------------------------------------------------
+<IfModule mod_mime.c>
+AddType font/woff2 .woff2
+AddType image/webp .webp
+AddType image/avif .avif
+AddType model/gltf-binary .glb
+</IfModule>
