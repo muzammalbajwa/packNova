@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { site } from "@/content/site";
+import { robotsMeta } from "@/content/launch";
 
 /**
  * Metadata shared by every new page: canonical, Open Graph, and noindex while this is staging
@@ -12,7 +13,7 @@ export function pageMetadata(title: string, description: string, path: string): 
     title,
     description,
     alternates: { canonical: url },
-    robots: { index: false, follow: false },
+    robots: robotsMeta,
     openGraph: { type: "website", siteName: site.brand.name, title, description, url, images: [image] },
     twitter: { card: "summary_large_image", title, description, images: [image.url] },
   };

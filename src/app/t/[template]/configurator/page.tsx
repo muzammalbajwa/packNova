@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { robotsMeta } from "@/content/launch";
 import { notFound } from "next/navigation";
 import { site } from "@/content/site";
 import { TEMPLATE_IDS, TEMPLATE_LOADERS, isTemplateId } from "@/templates/registry";
@@ -12,7 +13,7 @@ export function generateStaticParams() {
 export const metadata: Metadata = {
   title: `Configurator | ${site.brand.name}`,
   description: site.configurator.body,
-  robots: { index: false },
+  robots: robotsMeta,
 };
 
 export default async function TemplateConfigurator({ params }: { params: Promise<{ template: string }> }) {

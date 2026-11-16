@@ -1,0 +1,66 @@
+name: Deploy to PRODUCTION (manual, disabled until you set it up)
+
+# This workflow NEVER runs by itself. It only runs when you press "Run workflow" in the Actions tab, and only if you type the
+# confirmation word. Nothing here is switched on yet: it needs its own secrets and variables (listed below). The staging workflow
+# (deploy.yml) is untouched and keeps staging noindex.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "production" to deploy to the live site'
+        required: true
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: ${{ github.event.inputs.confirm == 'production' }}
+    runs-on: ubuntu-latest
+    # Create an Environment called "production" in the repository settings and add required reviewers: GitHub then asks for approval.
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - name: Build (indexing allowed, real domain)
+        run: npm run build
+        env:
+          # Repository VARIABLE (not secret): the real address, e.g. https://www.example.com  (no trailing slash)
+          NEXT_PUBLIC_SITE_URL: ${{ vars.PRODUCTION_SITE_URL }}
+          # Removes noindex from every page and lets robots.txt allow crawling.
+          NEXT_PUBLIC_ALLOW_INDEXING: "1"
+          # Optional: the form service (see README). Separate secrets from staging.
+          NEXT_PUBLIC_QUOTE_ENDPOINT: ${{ secrets.PROD_QUOTE_ENDPOINT }}
+          NEXT_PUBLIC_QUOTE_ACCESS_KEY: ${{ secrets.PROD_QUOTE_ACCESS_KEY }}
+      - name: Refuse to deploy without a real address
+        run: test -n "${{ vars.PRODUCTION_SITE_URL }}" || (echo "Set the repository variable PRODUCTION_SITE_URL first" && exit 1)
+      - name: Set up SSH (production secrets, different from staging)
+        env:
+          KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.PROD_SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Upload build (never touches the live .htaccess)
+        run: |
+          rsync -az --delete --exclude '.htaccess' -e "ssh -i ~/.ssh/deploy_key" out/ \
+            ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }}:${{ secrets.PROD_UPLOAD_PATH }}/
+      - name: Publish on server
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_SSH_HOST }} \
+            "sudo ${{ secrets.PROD_DEPLOY_COMMAND }}"
+
+# Secrets to create (Settings > Secrets and variables > Actions), all different from the staging ones:
+#   PROD_SSH_PRIVATE_KEY, PROD_SSH_KNOWN_HOSTS, PROD_SSH_USER, PROD_SSH_HOST,
+#   PROD_UPLOAD_PATH   (folder on the server the build is uploaded to, e.g. /home/deploy/site-upload-prod)
+#   PROD_DEPLOY_COMMAND (the script on the server that publishes it, e.g. /usr/local/bin/packnova-deploy-production.sh)
+#   PROD_QUOTE_ENDPOINT, PROD_QUOTE_ACCESS_KEY (optional)
+# Variable: PRODUCTION_SITE_URL.   Environment: production (with required reviewers).

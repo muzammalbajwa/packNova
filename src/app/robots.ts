@@ -1,12 +1,13 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/content/site";
+import { INDEXABLE } from "@/content/launch";
 
 export const dynamic = "force-static"; // required for `output: 'export'`
 
-// TODO(launch): staging is not indexed. Change to `{ userAgent: "*", allow: "/" }` when the real domain goes live.
+// Staging is not indexed. The production build (NEXT_PUBLIC_ALLOW_INDEXING=1, see content/launch.ts) allows everything.
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: { userAgent: "*", disallow: "/" },
+    rules: INDEXABLE ? { userAgent: "*", allow: "/" } : { userAgent: "*", disallow: "/" },
     sitemap: `${site.brand.url}/sitemap.xml`,
   };
 }

@@ -14,5 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     at(ROUTES.configurator, 0.7),
     at(ROUTES.quote, 0.6),
     at(ROUTES.contact, 0.6),
+    at("/privacy/", 0.2),
+    at("/terms/", 0.2),
   ];
 }

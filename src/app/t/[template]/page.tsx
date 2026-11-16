@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { robotsMeta } from "@/content/launch";
 import { notFound } from "next/navigation";
 import { TEMPLATE_IDS, TEMPLATE_LOADERS, isTemplateId } from "@/templates/registry";
 
@@ -12,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ template:
   const { template } = await params;
   const image = isTemplateId(template) ? `/og-${template}.png` : "/og.png";
   return {
-    robots: { index: false },
+    robots: robotsMeta,
     openGraph: { images: [{ url: image, width: 1200, height: 630 }] },
     twitter: { card: "summary_large_image", images: [image] },
   };

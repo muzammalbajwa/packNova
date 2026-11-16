@@ -10,7 +10,7 @@ export const brand = {
   tagline: "Packaging that makes your product unforgettable.",
   description: "Custom boxes, cartons and pouches, designed in 3D and made to order.",
   /** Used for absolute URLs (Open Graph). Replace with the real domain. */
-  url: "https://staging.artinstallation.uk",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://staging.artinstallation.uk",
 };
 
 export const contact = {
