@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { watchContext } from "@/lib/contextLoss";
 import type { RecipeInstance } from "./types";
 
 declare global {
@@ -30,6 +31,11 @@ class Engine {
   private ro: ResizeObserver | null = null;
   private maxDpr = 1.5;
   firstFrame: (() => void) | null = null;
+  /** The WebGL context was lost / given back: the page shows its poster in between (see lib/contextLoss.ts). */
+  onLost: (() => void) | null = null;
+  onRestored: (() => void) | null = null;
+  private lost = false;
+  private unwatch: (() => void) | null = null;
   private destroyTimer = 0;
 
   constructor() {
@@ -40,6 +46,19 @@ class Engine {
     r.domElement.setAttribute("aria-hidden", "true");
     r.domElement.style.cssText = "position:absolute;inset:0;width:100%;height:100%;display:block";
     this.renderer = r;
+    this.unwatch = watchContext(r.domElement, {
+      onLost: () => {
+        this.lost = true;
+        cancelAnimationFrame(this.raf);
+        this.raf = 0;
+        this.onLost?.();
+      },
+      onRestored: () => {
+        this.lost = false;
+        this.onRestored?.();
+        this.request(); // three.js re-creates its GPU resources on its own; the next frame draws the current progress
+      },
+    });
     const hemi = new THREE.HemisphereLight("#fff6e6", "#b59a78", 1.25);
     const key = new THREE.DirectionalLight("#fff1dc", 2.3);
     key.position.set(3, 5, 4);
@@ -93,6 +112,7 @@ class Engine {
     this.ro?.disconnect();
     cancelAnimationFrame(this.raf);
     this.raf = 0;
+    this.unwatch?.();
     this.renderer.domElement.remove();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
@@ -165,7 +185,7 @@ class Engine {
 
   private draw = () => {
     this.raf = 0;
-    if (!this.recipe || !this.host) return;
+    if (this.lost || !this.recipe || !this.host) return;
     const t0 = window.__perfOn ? performance.now() : 0; // ?perf=1 only: record the CPU time of this draw
     this.recipe.update(this.p, this.camera);
     this.renderer.render(this.scene, this.camera);

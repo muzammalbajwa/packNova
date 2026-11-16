@@ -99,7 +99,7 @@ const create: RecipeFactory = (ctx: RecipeCtx) => {
   const OX = [-1, 1, -1, 0, 1];
   const OZ = [0, 0, -1, -1, -1];
 
-  const props = createProps(pool, skin, { halfX: L * 1.5, zFront: D / 2 + 0.45, floor: 0, top: H });
+  const props = createProps(pool, skin, { halfX: L * 1.5, zFront: D / 2 + 0.45, floor: 0, top: H }, low);
   if (props) root.add(props.root);
   const shadow = blobShadow(pool);
   shadow.scale.set(L * 1.8, D * 1.8, 1);

@@ -14,6 +14,8 @@ interface AppState {
   zones: number;
   /** True while at least one scene zone is on screen (canvas renders only then). */
   sceneActive: boolean;
+  /** True while the hero canvas has lost its WebGL context (the poster is shown again). */
+  glLost: boolean;
   /**
    * Fast-changing scroll values (0-1). Components that animate every frame
    * MUST read these with useAppStore.getState() inside useFrame and never
@@ -48,6 +50,7 @@ export const useAppStore = create<AppState>((set) => ({
   ready: false,
   zones: 0,
   sceneActive: false,
+  glLost: false,
   heroProgress: 0,
   makingProgress: 0,
   quotePrefill: null,

@@ -23,7 +23,7 @@ interface Props {
  */
 export default function HeroStage({ posterSrc, posterAlt, posterClassName, behind, children }: Props) {
   const track = useRef<HTMLDivElement>(null);
-  const live = useAppStore((s) => s.ready && !!s.profile?.webgl);
+  const live = useAppStore((s) => s.ready && !!s.profile?.webgl && !s.glLost);
 
   useEffect(() => {
     const el = track.current;

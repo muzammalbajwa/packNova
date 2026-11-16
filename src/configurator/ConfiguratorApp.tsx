@@ -95,6 +95,8 @@ export default function ConfiguratorApp() {
       const eng = getEngine();
       eng.attach(hostRef.current, prof.dpr[1]);
       eng.firstFrame = () => setReady(true);
+      eng.onLost = () => setReady(false);
+      eng.onRestored = () => { eng.firstFrame = () => setReady(true); };
       eng.setProgress(foldRef.current);
       engRef.current = eng;
       modRef.current = mod;

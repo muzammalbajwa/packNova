@@ -127,7 +127,8 @@ const COUNT: Partial<Record<PropKind, number>> = { pumpkin: 3, bat: 4, star: 3, 
 const ORDER: PropKind[] = ["pumpkin", "bat", "star", "snowflake", "leaf", "confetti"];
 
 /** Returns null when the skin has no props that a film can show (ribbon and bow are built by the rigid-box recipe itself). */
-export function createProps(pool: Pool, skin: Skin, area: PropArea): Props | null {
+/** `low`: weak devices get fewer confetti pieces and leaves (the other props are only a handful). */
+export function createProps(pool: Pool, skin: Skin, area: PropArea, low = false): Props | null {
   const kinds = ORDER.filter((k) => skin.props.includes(k));
   if (!kinds.length) return null;
   const root = new THREE.Group();
@@ -136,7 +137,7 @@ export function createProps(pool: Pool, skin: Skin, area: PropArea): Props | nul
   const confettiColors = [skin.second, skin.accent, "#e8e2d0", "#c9622a", "#3f7a52"];
 
   kinds.forEach((kind, ki) => {
-    const n = COUNT[kind]!;
+    const n = low ? Math.max(2, Math.ceil(COUNT[kind]! * 0.5)) : COUNT[kind]!;
     const geo =
       kind === "bat" ? batGeometry() : kind === "star" ? starGeometry("#ffffff") : kind === "snowflake" ? snowflakeGeometry() : kind === "leaf" ? leafGeometry() : kind === "pumpkin" ? pumpkinGeometry() : paint(new THREE.PlaneGeometry(0.06, 0.1), "#ffffff");
     pool.add(geo);

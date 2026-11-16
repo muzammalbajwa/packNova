@@ -65,7 +65,7 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
   const pallet = new THREE.Mesh(pool.add(new THREE.BoxGeometry(L * 2.25, 0.12, D * 2.25)), pool.add(new THREE.MeshStandardMaterial({ color: "#8a6a43", roughness: 0.9 })));
   stage.add(pallet);
 
-  const props = createProps(pool, skin, { halfX: L * 1.3, zFront: D * 1.35 + 0.3, floor: -H / 2 - 0.14, top: -H / 2 + H * 3 });
+  const props = createProps(pool, skin, { halfX: L * 1.3, zFront: D * 1.35 + 0.3, floor: -H / 2 - 0.14, top: -H / 2 + H * 3 }, low);
   if (props) root.add(props.root);
   const shadow = blobShadow(pool);
   root.add(shadow);

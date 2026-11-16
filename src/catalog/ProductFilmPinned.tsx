@@ -47,6 +47,8 @@ export default function Pinned({ page }: { page: CatalogPage }) {
       const eng = getEngine();
       eng.attach(hostRef.current, profile.dpr[1]);
       eng.firstFrame = () => setReady(true);
+      eng.onLost = () => setReady(false); // the poster comes back while the context is gone
+      eng.onRestored = () => { eng.firstFrame = () => setReady(true); };
       setProgressRef.current = (p) => eng.setProgress(p);
       eng.setProgress(pRef.current);
       await eng.mount(mod.default({ skin: page.skin, steps: page.steps, low: profile.tier === "low" }));
