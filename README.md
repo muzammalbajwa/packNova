@@ -1,6 +1,45 @@
 # PackNova: cinematic 3D packaging site
 
-Scroll-driven 3D marketing site. Brand name, contact details and **all copy** live in `src/content/site.ts` (dummy values: see `CONTENT-TODO.md`). Next.js static export, deployable on Cloudflare Pages.
+Scroll-driven 3D marketing site. Brand name and contact details live in `src/content/siteCore.ts`, the rest of the copy in `src/content/site.ts` and `catalog.ts` (dummy values: see `CONTENT-TODO.md`). Next.js static export, deployable on Cloudflare Pages.
+
+## Start here (for the owner, no programming needed for most things)
+
+The site is a set of files. You change a text in a file, check it on your computer, and send it to GitHub. GitHub then builds the site and puts it on the staging server by itself.
+
+### Run it on your computer
+1. Install Node.js 22 (nodejs.org), then open a terminal in this folder.
+2. `npm install` (once), then `npm run dev`, and open http://localhost:3000. Changes you save show up in the browser at once.
+3. Before you send changes: `npm run lint` and `npm run build` must both finish without errors.
+
+### How to edit content (find the sentence, change it, save)
+| To change | Open | Look for |
+| --- | --- | --- |
+| Phone, WhatsApp, email, address, hours, social links, brand name | `src/content/siteCore.ts` | the values at the top |
+| Homepage words, footer, the making-of story, SEO title | `src/content/site.ts` | the same words you see on the page |
+| A product page (text, specs, FAQ, colours) | `src/content/catalog.ts` | the page title, e.g. `"Rigid Boxes"` |
+| Quote page words and privacy note | `src/content/quoteWizard.ts` | |
+| Contact page words, FAQ, map link | `src/content/contactPage.ts` | |
+| Privacy policy and terms | `src/content/legal.ts` | |
+Only change the text between the quote marks. Keep the commas and quote marks. If the page breaks after a change, undo it (Ctrl+Z) and look at the error `npm run dev` prints. `CONTENT-TODO.md` lists everything that is still dummy.
+
+### How to add a new product page
+1. Open `src/content/catalog.ts`, find a similar page (for example `slug: "tuck-boxes"`) and copy the whole `{ ... }` block into the `ENTRIES` list.
+2. Change `slug` (the address, lowercase with dashes), `title`, `noun` (singular, for sentences), the texts, `uses`, `finishes` and the FAQ line.
+3. Choose how its 3D film looks: `recipe` is the way it is made (`rigid-box`, `corrugated-box`, `folding-carton`, `paper-bag`, `pouch`, `label-tag`, `tray-sleeve`) and `skin` is its look (material, colours, print, size ratio, lid, window, handle). Use another page's skin as a starting point and change the colours and `ratio` (length : width : height).
+4. Add its address to the `related` list of two or three other pages if you want links to it.
+5. Save. The menu, the group page, the sitemap, the quote form's product list and the 3D page all update by themselves. Run `node scripts/gen-nav.mjs` (the menu list is regenerated from the catalog; `npm run build` does it for you) and then `npm run build` to check: it fails with a clear message if something is missing.
+
+### How to deploy
+- **Staging (the test site):** every time changes are pushed to the `main` branch on GitHub, the workflow `.github/workflows/deploy.yml` checks, builds and uploads the site. You can also run it by hand: GitHub > Actions > "Deploy to staging" > Run workflow. Staging is hidden from search engines.
+- **Live site:** use the separate manual workflow `.github/workflows/deploy-production.yml`. It is not switched on yet: it needs its own secrets and a repository variable `PRODUCTION_SITE_URL` (the list is at the top of that file), and it asks you to type "production". It builds with search engines allowed.
+- **Server settings** (caching, compression, security headers, 404): paste `docs/server/htaccess.txt` into the site's `.htaccess` in CyberPanel (the five steps are at the top of that file). The deploy never overwrites your `.htaccess`.
+
+### How to connect the quote form
+By default the forms only open WhatsApp or the email app with the message ready. To receive requests without relying on WhatsApp, connect a form service: see **Connecting a form service** at the end of this file (Formspree, Web3Forms or a Cloudflare Worker, 3 to 5 lines each, and the two secrets to set in GitHub).
+
+---
+
+## For developers
 
 ## Stack
 

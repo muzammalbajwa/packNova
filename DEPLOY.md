@@ -4,7 +4,7 @@ The site is a static export (`output: 'export'`), so Cloudflare Pages serves the
 
 ## Before the first deploy
 
-1. Edit `src/content/site.ts`: set `brand.url` to the real domain (used for the social preview, robots.txt and sitemap) and replace the dummy contact details (see `CONTENT-TODO.md`).
+1. Edit `src/content/siteCore.ts`: set `brand.url` (or, for the production workflow, the variable `PRODUCTION_SITE_URL`) to the real domain (used for the social preview, robots.txt and sitemap) and replace the dummy contact details (see `CONTENT-TODO.md`).
 2. Check locally: `nvm use 22 && npm run lint && npm run build`.
 
 ## Option A (recommended): connect the Git repository
