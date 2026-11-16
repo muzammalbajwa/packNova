@@ -18,7 +18,7 @@ const TYPES = {
   ".glb": "model/gltf-binary", ".ktx2": "image/ktx2",
 };
 const COMPRESSIBLE = new Set([".html", ".js", ".css", ".json", ".svg", ".txt", ".xml"]);
-const cache = new Map(); // path -> { raw, br, gz }
+const cache = new Map(); // path -> { mtimeMs, size, raw, br, gz }; an entry is reused only while the file on disk is unchanged
 
 async function resolveFile(urlPath) {
   let p = normalize(decodeURIComponent(urlPath.split("?")[0])).replace(/^(\.\.[/\\])+/, "");
@@ -50,11 +50,14 @@ createServer(async (req, res) => {
     return;
   }
   const ext = extname(file);
+  const st = await stat(file);
   let entry = cache.get(file);
-  if (!entry) {
+  if (!entry || entry.mtimeMs !== st.mtimeMs || entry.size !== st.size) {
     const raw = await readFile(file);
     const comp = COMPRESSIBLE.has(ext) && raw.length > 512;
     entry = {
+      mtimeMs: st.mtimeMs,
+      size: st.size,
       raw,
       br: comp ? brotliCompressSync(raw, { params: { [constants.BROTLI_PARAM_QUALITY]: 5 } }) : null,
       gz: comp ? gzipSync(raw, { level: 6 }) : null,

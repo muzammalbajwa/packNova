@@ -201,7 +201,8 @@ export function createProps(pool: Pool, skin: Skin, area: PropArea): Props | nul
             break;
           case "star":
             y += Math.sin(t * 36 + i * 2.1) * 0.03 + (1 - e) * 1.0;
-            ry = t * 9 + i;
+            ry = Math.sin(t * 14 + i * 1.7) * 0.55; // sways, never edge-on
+            rz = Math.sin(t * 9 + i) * 0.12;
             break;
           case "snowflake":
             y += (1 - e) * 1.3 + Math.sin(t * 30 + i) * 0.02;

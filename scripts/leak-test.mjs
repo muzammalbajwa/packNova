@@ -31,7 +31,7 @@ const goTo = async (target) => {
 let ok = true;
 let prev = null;
 const rows = [];
-const show = (i, path, s, alive, both) => console.log(`${String(i).padStart(2)}  ${path.padEnd(38)} film geos ${s ? String(s.geos).padStart(3) : "  -"}  texs ${s ? String(s.texs).padStart(2) : " -"}  programs ${s ? String(s.progs).padStart(2) : " -"}   WebGL contexts alive: ${alive}${both ? "  <-- BOTH" : ""}`);
+const show = (i, path, s, alive, both, heap) => console.log(`${String(i).padStart(2)}  ${path.padEnd(38)} JS heap ${heap.toFixed(1).padStart(5)} MB  film geos ${s ? String(s.geos).padStart(3) : "  -"}  texs ${s ? String(s.texs).padStart(2) : " -"}  programs ${s ? String(s.progs).padStart(2) : " -"}   WebGL contexts alive: ${alive}${both ? "  <-- BOTH" : ""}`);
 let maxAlive = 0;
 let bothSeen = false;
 for (let i = 0; i < SEQ.length; i++) {
@@ -41,14 +41,16 @@ for (let i = 0; i < SEQ.length; i++) {
   if (SEQ[i] !== "/") await c.waitFor("window.__film && document.querySelector('#how canvas') && getComputedStyle(document.querySelector('#how canvas').parentElement).opacity === '1'", 30000);
   await sleep(SEQ[i] === "/" ? 3500 : 1500);
   const s = await c.ev(stats);
+  await c.send("HeapProfiler.collectGarbage");
+  const heap = (await c.send("Runtime.getHeapUsage")).usedSize / 1048576;
   const alive = await c.ev(aliveAll);
   const mx = await c.ev("window.__maxAlive");
   const both = await c.ev("!!window.__both");
   await c.ev("clearInterval(window.__watch); 0");
   maxAlive = Math.max(maxAlive, mx);
   bothSeen ||= both;
-  show(i + 1, SEQ[i], s, `${alive} (max ${mx} during the transition)`, both);
-  rows.push({ path: SEQ[i], s });
+  show(i + 1, SEQ[i], s, `${alive} (max ${mx} during the transition)`, both, heap);
+  rows.push({ path: SEQ[i], s: s && { ...s, heap } });
 }
 // growth: compare film pages visited more than once
 const byPath = {};
@@ -56,7 +58,8 @@ for (const r of rows) if (r.s) (byPath[r.path] ??= []).push(r.s);
 for (const [p, list] of Object.entries(byPath)) {
   const g = list.map((x) => x.geos), t = list.map((x) => x.texs);
   const grew = list.length > 1 && (g[g.length - 1] > g[0] || t[t.length - 1] > t[0]);
-  console.log(`${grew ? "FAIL" : "PASS"}  ${p}: geometries ${g.join(" -> ")}, textures ${t.join(" -> ")}`);
+  const h = list.map((x) => x.heap.toFixed(1));
+  console.log(`${grew ? "FAIL" : "PASS"}  ${p}: geometries ${g.join(" -> ")}, textures ${t.join(" -> ")}, programs ${list.map((x) => x.progs).join(" -> ")}, heap MB ${h.join(" -> ")}`);
   ok &&= !grew;
 }
 console.log(`${bothSeen ? "FAIL" : "PASS"}  homepage engine and film renderer were never alive together`);

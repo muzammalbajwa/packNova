@@ -18,6 +18,8 @@ Requires **Node >= 20.19** (Tailwind's Turbopack loader needs `require(esm)`). `
     npm run build    # static export to ./out
     npm run lint
     npm run serve:out   # serve ./out with Brotli on 0.0.0.0:8080 (prints the phone URL)
+                        # files are re-read whenever they change on disk (mtime + size), so a rebuild is picked up
+                        # without restarting the server; stop it with Ctrl+C. All test scripts expect it on :8080.
 
     node scripts/perf-measure.mjs --base http://localhost:8080 [--cpu 4] [--net slow4g] [--mobile]
     bash scripts/perf-matrix.sh            # full throttled matrix + Lighthouse (run on a quiet machine)

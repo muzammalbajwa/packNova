@@ -517,6 +517,7 @@ const ENTRIES: Entry[] = [
     uses: ["Clothing and textiles", "Online stores", "Couriers and returns", "Soft goods"],
     finishes: ["Matte or gloss film", "Peel-and-seal strip", "Tamper-evident seal", "One to four colors"],
     extra: { q: "Are the bags waterproof?", a: "Poly film keeps out rain and splashes. If your goods are very sensitive to moisture, tell us and we will suggest a thicker film." },
+    notes: { fill: "On your line, the bag is opened and your goods go in.", final: "The strip seals the flap and the {noun} is ready to post." },
     related: ["/industry/mylar-bags/", "/shape-and-style/paper-bags/", "/industry/apparel-boxes/"],
   },
   {
