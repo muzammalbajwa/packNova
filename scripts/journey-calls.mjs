@@ -4,7 +4,7 @@
 import { launch, sleep } from "./lib/cdp.mjs";
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://127.0.0.1:8080");
-const TEMPLATE = arg("template", "cinematic");
+const TEMPLATE = arg("template", "eco");
 const TIER = arg("tier", "mid");
 const MOBILE = process.argv.includes("--mobile");
 const SPLIT = 0.58;
@@ -12,7 +12,7 @@ const IDS = ["board", "print", "finish", "diecut", "fold", "glue", "ship", "coun
 const FROM = [0, 0.12, 0.28, 0.4, 0.55, 0.8, 0.92].map((v) => v * SPLIT).concat([SPLIT, 0.665, 0.77, 0.835, 0.93]);
 const TO = [0.12, 0.28, 0.4, 0.55, 0.8, 0.92, 1].map((v) => v * SPLIT).concat([0.665, 0.77, 0.835, 0.93, 1]);
 const c = await launch(MOBILE ? { width: 412, height: 915, dpr: 2, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
-await c.send("Page.navigate", { url: `${BASE}/t/${TEMPLATE}/?preview=0&tier=${TIER}` });
+await c.send("Page.navigate", { url: `${BASE}/?preview=0&tier=${TIER}` });
 await c.waitFor("window.__r3f && !document.querySelector('[role=status]') && window.__makingSet", 120000);
 await sleep(1500);
 await c.ev(`(()=>{const el=document.getElementById('making'); window.scrollTo(0, el.getBoundingClientRect().top+scrollY+(el.offsetHeight-innerHeight)*0.3);})()`);

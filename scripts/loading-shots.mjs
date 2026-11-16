@@ -4,11 +4,11 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { launch, sleep } from "./lib/cdp.mjs";
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
-const BASE = arg("base", "http://127.0.0.1:8080"), T = arg("template", "cinematic"), MOBILE = process.argv.includes("--mobile");
+const BASE = arg("base", "http://127.0.0.1:8080"), T = arg("template", "eco"), MOBILE = process.argv.includes("--mobile");
 const out = "docs/screenshots/loading"; mkdirSync(out, { recursive: true });
 for (const [name, speed] of [["slow", 700], ["normal", 3500], ["fast", 12000]]) {
   const c = await launch(MOBILE ? { width: 412, height: 915, dpr: 1, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
-  await c.send("Page.navigate", { url: `${BASE}/t/${T}/?${MOBILE ? "" : "tier=mid"}` });
+  await c.send("Page.navigate", { url: `${BASE}/?${MOBILE ? "" : "tier=mid"}` });
   await c.waitFor("document.readyState==='complete' && !document.querySelector('[role=status]') && !!document.getElementById('making')", 90000);
   await sleep(800);
   await c.ev(`(()=>{const el=document.getElementById('making'); const top=el.getBoundingClientRect().top+scrollY, len=el.offsetHeight-innerHeight; const y0=top-innerHeight*0.5; const t0=performance.now();
@@ -26,7 +26,7 @@ for (const [name, speed] of [["slow", 700], ["normal", 3500], ["fast", 12000]]) 
 // jumps: scroll straight to a stage anchor on a fresh page and screenshot the very first frame after it
 {
   const c = await launch(MOBILE ? { width: 412, height: 915, dpr: 1, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
-  await c.send("Page.navigate", { url: `${BASE}/t/${T}/?${MOBILE ? "" : "tier=mid"}` });
+  await c.send("Page.navigate", { url: `${BASE}/?${MOBILE ? "" : "tier=mid"}` });
   await c.waitFor("document.readyState==='complete' && !document.querySelector('[role=status]') && !!document.getElementById('making')", 90000);
   await sleep(800);
   for (const p of [0.0, 0.09, 0.26, 0.385, 0.535, 0.79, 0.915, 0.985]) {

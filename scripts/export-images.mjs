@@ -7,11 +7,11 @@ import { launch, sleep } from "./lib/cdp.mjs";
 
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://localhost:8080");
-const TEMPLATE = arg("template", "editorial");
+const TEMPLATE = arg("template", "eco");
 const FLAT = TEMPLATE === "eco"; // eco: plain social image (no glow, sentence-case label, the page's own headline, wrapped)
 
 const c = await launch({ width: 1440, height: 900, dpr: 1 });
-await c.send("Page.navigate", { url: `${BASE}/t/${TEMPLATE}/?tier=high` });
+await c.send("Page.navigate", { url: `${BASE}/?tier=high` });
 await c.waitFor("window.__r3f && !document.querySelector('[role=status]') && document.querySelector('canvas')");
 await sleep(2500);
 

@@ -6,7 +6,7 @@ import { launch, sleep } from "./lib/cdp.mjs";
 
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://localhost:3000");
-const TEMPLATE = arg("template", "editorial");
+const TEMPLATE = arg("template", "eco");
 const MODE = arg("mode", "desktop");
 const OUT = arg("out", `docs/screenshots/${TEMPLATE}`);
 const TIER = arg("tier", MODE === "mobile" ? "" : "mid");
@@ -17,7 +17,7 @@ const list = custom ? custom.split(",").map((v) => [`p${v}`, Number(v)]) : STAGE
 
 const c = await launch(MODE === "mobile" ? { width: 412, height: 915, dpr: 2, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
 const q = `preview=0${TIER ? `&tier=${TIER}` : ""}`;
-await c.send("Page.navigate", { url: `${BASE}/t/${TEMPLATE}/?${q}` });
+await c.send("Page.navigate", { url: `${BASE}/?${q}` });
 await c.waitFor("window.__r3f && !document.querySelector('[role=status]') && document.querySelector('canvas')");
 await sleep(1500);
 await c.waitFor("document.getElementById('making') && document.getElementById('making').offsetHeight > window.innerHeight * 3");

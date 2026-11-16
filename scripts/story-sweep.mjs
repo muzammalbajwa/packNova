@@ -8,7 +8,7 @@ import { launch, sleep } from "./lib/cdp.mjs";
 
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://127.0.0.1:8080");
-const TEMPLATE = arg("template", "cinematic");
+const TEMPLATE = arg("template", "eco");
 const CPU = Number(arg("cpu", 1));
 const MOBILE = process.argv.includes("--mobile");
 const ONLY_C = process.argv.includes("--only-c"); // invariant test only (load independent: no timing involved)
@@ -57,7 +57,7 @@ const SWEEP = `(async (speed, from, to) => {
 async function fresh() {
   const c = await launch(MOBILE ? { width: 412, height: 915, dpr: 2, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
   await c.send("Page.addScriptToEvaluateOnNewDocument", { source: HOOK });
-  await c.send("Page.navigate", { url: `${BASE}/t/${TEMPLATE}/?${MOBILE ? "" : "tier=mid"}` });
+  await c.send("Page.navigate", { url: `${BASE}/?${MOBILE ? "" : "tier=mid"}` });
   console.error("navigated");
   const dbg = setInterval(async () => console.error("state", await c.ev("JSON.stringify([document.readyState, !!document.querySelector('[role=status]'), !!document.getElementById('making')])").catch((e) => String(e))), 4000);
   c.dbg = dbg;

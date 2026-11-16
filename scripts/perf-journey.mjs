@@ -8,7 +8,7 @@ import { launch, sleep } from "./lib/cdp.mjs";
 
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://127.0.0.1:8080");
-const TEMPLATE = arg("template", "cinematic");
+const TEMPLATE = arg("template", "eco");
 const CPU = Number(arg("cpu", 1));
 const SECONDS = Number(arg("seconds", 30));
 const MOBILE = process.argv.includes("--mobile");
@@ -17,7 +17,7 @@ const load0 = +loadavg()[0].toFixed(2);
 if (load0 > 4 && !process.argv.includes("--force")) { console.error(`Load average is ${load0} (> 4). Retry on a quiet machine or pass --force.`); process.exit(2); }
 
 const c = await launch(MOBILE ? { width: 412, height: 915, dpr: 2, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
-await c.send("Page.navigate", { url: `${BASE}/t/${TEMPLATE}/?preview=0${TIER ? `&tier=${TIER}` : ""}` });
+await c.send("Page.navigate", { url: `${BASE}/?preview=0${TIER ? `&tier=${TIER}` : ""}` });
 await c.waitFor("window.__r3f && !document.querySelector('[role=status]') && window.__makingSet", 120000);
 await sleep(2500);
 await c.ev(`(()=>{const el=document.getElementById('making'); window.scrollTo(0, el.getBoundingClientRect().top+scrollY+(el.offsetHeight-innerHeight)*0.55);})()`);

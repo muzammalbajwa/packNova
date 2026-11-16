@@ -6,7 +6,7 @@ import { join } from "node:path";
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-export async function launch({ width = 1440, height = 900, dpr = 1, mobile = false, cores } = {}) {
+export async function launch({ width = 1440, height = 900, dpr = 1, mobile = false, cores, eager = true } = {}) {
   const PORT = 9333 + Math.floor(Math.random() * 500);
   const CHROME = process.env.CHROME_PATH || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
   const chrome = spawn(CHROME, ["--headless=new", `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "cdp-"))}`,
@@ -26,6 +26,8 @@ export async function launch({ width = 1440, height = 900, dpr = 1, mobile = fal
   const ev = async (expression) => { const r = await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true }); if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description); return r.result.value; };
   const waitFor = async (expr, ms = 60000) => { const t = Date.now(); while (Date.now() - t < ms) { try { if (await ev(expr)) return true; } catch {} await sleep(250); } return false; };
   await send("Page.enable"); await send("Runtime.enable");
+  // the story canvas waits for a visitor's first input on phones; scripts never send input, so they ask for the eager mount (eager:false = behave like a visitor)
+  if (eager) await send("Page.addScriptToEvaluateOnNewDocument", { source: "window.__eagerStory = true" });
   await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: dpr, mobile });
   if (mobile) {
     await send("Emulation.setTouchEmulationEnabled", { enabled: true });

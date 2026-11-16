@@ -8,6 +8,7 @@ import { useAppStore } from "@/lib/store";
 import SceneLights from "../SceneLights";
 import CartonModel from "./CartonModel";
 import JourneyScene from "./JourneyScene";
+import { warmScene } from "./warm";
 
 declare global {
   interface Window {
@@ -60,24 +61,7 @@ function WarmUp() {
   const camera = useThree((s) => s.camera);
   const invalidate = useThree((s) => s.invalidate);
   useEffect(() => {
-    const hidden: THREE.Object3D[] = [];
-    scene.traverse((o) => {
-      if (!o.visible) {
-        hidden.push(o);
-        o.visible = true;
-      }
-    });
-    const textures = new Set<THREE.Texture>();
-    scene.traverse((o) => {
-      const m = (o as THREE.Mesh).material as THREE.Material | THREE.Material[] | undefined;
-      for (const mat of Array.isArray(m) ? m : m ? [m] : []) {
-        for (const v of Object.values(mat)) if (v && (v as THREE.Texture).isTexture) textures.add(v as THREE.Texture);
-      }
-    });
-    textures.forEach((t) => gl.initTexture(t));
-    const done = gl.compileAsync(scene, camera); // collects the programs synchronously, links in parallel
-    hidden.forEach((o) => (o.visible = false));
-    done.then(() => invalidate()).catch(() => {});
+    warmScene(gl, scene, camera, invalidate);
   }, [gl, scene, camera, invalidate]);
   return null;
 }

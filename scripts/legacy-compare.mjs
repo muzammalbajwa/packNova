@@ -22,7 +22,7 @@ mkdirSync(OUT, { recursive: true });
 
 async function capture(base, mapP, tag) {
   const c = await launch(MOBILE ? { width: 412, height: 915, dpr: 2, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
-  await c.send("Page.navigate", { url: `${base}/t/${TEMPLATE}/?preview=0&tier=mid` });
+  await c.send("Page.navigate", { url: `${base}/?preview=0&tier=mid` });
   await c.waitFor("window.__r3f && !document.querySelector('[role=status]') && document.querySelector('canvas')", 90000);
   await sleep(1500);
   await c.waitFor("document.getElementById('making') && document.getElementById('making').offsetHeight > window.innerHeight * 3", 60000);

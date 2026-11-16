@@ -192,3 +192,9 @@ Outcome: This file, written from the codebase, README/DEPLOY/CONTENT-TODO/PHONE-
 - No rear ramp: the plane is loaded through a side cargo door on the +Z side. Stage 10 (`journey.ts`: `LOAD`, `liftState`, `masterState`): carton across a roller conveyor, along the feeder to a scissor-lift high-loader, up to the door sill, in through the door; door closes, lift lowers and drives away. The carton's materials carry a world-space clip plane (`localClippingEnabled`) that is only active while loading, so the part inside the hold is cut cleanly at the skin.
 - The plane taxis in from the right just before the Load stage (so it never pops in) and its gear extends again for the landing at the end of Fly.
 - Review tools: `scripts/load-shots.mjs` (Load stage at 8 points), screenshots in `docs/screenshots/plane-v2/`.
+
+### Homepage mobile speed (2026-11-16)
+- The shipped-chapter scene (`JourneyScene.tsx`) is built by a generator (`buildSteps`) that yields between sections; `buildInSlices` runs it in idle slots (about 6 ms each) and mounts the result, then `warmScene` (`making/warm.ts`) warms its shaders and textures again.
+- On mid and low tier the story canvas is created on the visitor's first input (scroll, wheel, touch, pointer, key), not right after load (`StoryEngine.tsx`). High tier (desktop) still mounts in idle time. Test scripts get `window.__eagerStory = true` from `scripts/lib/cdp.mjs` (pass `eager: false` to behave like a visitor; `scripts/visitor-story.mjs` does).
+- Tools: `scripts/home-profile.mjs` (long tasks and the functions inside them, 4x CPU phone profile), `scripts/story-compare.mjs` (pixel compare of the story between two builds).
+

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { warmScene } from "./warm";
+import { useEffect, useMemo, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAppStore } from "@/lib/store";
@@ -23,7 +24,11 @@ const Q_LIE = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 
 const Q_ID = new THREE.Quaternion();
 const ONE = new THREE.Vector3(1, 1, 1);
 
-function build(theme: Theme, low: boolean) {
+/**
+ * Builds every object of the shipped chapter. It is a generator: it yields between its sections so the caller
+ * (JourneyScene) can spread the work over idle slots instead of blocking the main thread for one long task.
+ */
+function* buildSteps(theme: Theme, low: boolean) {
   const disposables: { dispose(): void }[] = [];
   const own = <T extends { dispose(): void }>(x: T) => (disposables.push(x), x);
   const std = (color: THREE.ColorRepresentation, o: THREE.MeshStandardMaterialParameters = {}) => own(new THREE.MeshStandardMaterial({ color, roughness: 0.82, ...o }));
@@ -86,6 +91,7 @@ function build(theme: Theme, low: boolean) {
   );
   root.add(gBelt);
 
+  yield;
   /* ------------------------------------------------- the batch (instanced copies of the finished carton) */
   const faces = boxFaceTextures(theme);
   disposables.push({ dispose: faces.dispose });
@@ -101,6 +107,7 @@ function build(theme: Theme, low: boolean) {
   boxes.count = 0;
   root.add(boxes);
 
+  yield;
   /* ------------------------------------------------------- corrugated master carton (pack, load) */
   const M = J.MASTER;
   const corrNormal = low ? null : own(kraftNormal());
@@ -139,6 +146,7 @@ function build(theme: Theme, low: boolean) {
   );
   root.add(gMaster);
 
+  yield;
   /* -------------------------------- loading (load): roller conveyors and a scissor-lift high-loader */
   const LD = J.LOAD;
   const cTop = LD.conveyorTop;
@@ -193,11 +201,13 @@ function build(theme: Theme, low: boolean) {
   const gLift = group(truck, liftBars, deckG);
   root.add(gLift);
 
+  yield;
   /* ------------------------------------------------------------------- cargo plane */
   const vehicle: Vehicle = createCargoPlane({ body, shade, accent, dark: mixC(theme.bg, theme.fg, dark ? 0.12 : 0.78), inner: mixC(theme.bg, theme.fg, dark ? 0.1 : 0.55) }, low, typeof location !== "undefined" && new URLSearchParams(location.search).get("debug") === "plane");
   const planeRoot = vehicle.root;
   root.add(planeRoot);
 
+  yield;
   /* ----------------------------------------------- ground, runway, sky, clouds, blob shadows */
   const groundMat = std(dark ? mixC(theme.bg, theme.surface, 0.75) : mixC(theme.bg, theme.fg, 0.1), { roughness: 1, transparent: true, opacity: 0 });
   const ground = mesh(geo(new THREE.PlaneGeometry(3200, 3200).rotateX(-Math.PI / 2)), groundMat, 0, J.FLOOR_Y - 0.03, 0);
@@ -252,6 +262,7 @@ function build(theme: Theme, low: boolean) {
   shHouse.o.position.set(J.HOUSE_X, J.FLOOR_Y + 0.04, 0);
   root.add(shBelt.o, shMaster.o, shPlane.o, shVan.o, shHouse.o);
 
+  yield;
   /* ----------------------------------------------------- village: house, road, trees, delivery van */
   const wallMat = std(kraft, { roughness: 0.9 });
   const roofMat = std(dark ? mixC(theme.surface, theme.fg, 0.22) : mixC(theme.accent, theme.fg, 0.4), { roughness: 0.8 });
@@ -302,6 +313,7 @@ function build(theme: Theme, low: boolean) {
   );
   root.add(gVan);
 
+  yield;
   /* ------------------------------------------------------------------- sky + map (follow the camera) */
   const skyGeo = geo(new THREE.PlaneGeometry(1, 1));
   skyGeo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(12), 3));
@@ -379,7 +391,7 @@ function build(theme: Theme, low: boolean) {
     },
   };
 }
-export type Journey = ReturnType<typeof build>;
+export type Journey = ReturnType<typeof buildSteps> extends Generator<unknown, infer R> ? R : never;
 
 const FRAME: J.Frame = { fit: 1, x: 0, y: 0, vw: 1, vh: 1, ox: 0, oy: 0, fw: 0.8, fh: 0.8, aspect: 1, tanHalf: 0.3 };
 const CAM: J.CamPose = { px: 0, py: 0, pz: 0, tx: 0, ty: 0, tz: 0, dist: 1 };
@@ -645,10 +657,39 @@ function apply(j: Journey, P: number, state: { camera: THREE.Camera; size: { wid
   }
 }
 
-/** Mounts the journey and drives it from the story progress. Sibling of CartonModel inside the making canvas. */
+/** Runs the build in idle slices (about 6 ms of work per slot) and hands the finished journey to `done`. Returns a cancel function. */
+function buildInSlices(theme: Theme, low: boolean, done: (j: Journey) => void) {
+  const gen = buildSteps(theme, low);
+  let handle = 0;
+  let cancelled = false;
+  const ric = (cb: () => void) => (typeof window.requestIdleCallback === "function" ? window.requestIdleCallback(cb, { timeout: 250 }) : window.setTimeout(cb, 16));
+  const cic = (h: number) => (typeof window.cancelIdleCallback === "function" ? window.cancelIdleCallback(h) : window.clearTimeout(h));
+  const step = () => {
+    if (cancelled) return;
+    const t0 = performance.now();
+    let r = gen.next();
+    while (!r.done && performance.now() - t0 < 6) r = gen.next();
+    if (r.done) done(r.value as Journey);
+    else handle = ric(step);
+  };
+  handle = ric(step);
+  return () => {
+    cancelled = true;
+    cic(handle);
+  };
+}
+
+/** Builds the journey in idle time, then mounts it. Sibling of CartonModel inside the making canvas. */
 export default function JourneyScene({ low }: { low: boolean }) {
   const themeId = useAppStore((s) => s.themeId);
-  const journey = useMemo(() => build(THEMES[themeId], low), [themeId, low]);
+  const invalidate = useThree((s) => s.invalidate);
+  const [journey, setJourney] = useState<Journey | null>(null);
+  useEffect(() => buildInSlices(THEMES[themeId], low, (j) => { setJourney(j); invalidate(); }), [themeId, low, invalidate]);
+  return journey ? <MountedJourney journey={journey} low={low} /> : null;
+}
+
+/** Mounts a finished journey and drives it from the story progress. */
+function MountedJourney({ journey, low }: { journey: Journey; low: boolean }) {
   const get = useThree((s) => s.get);
   useEffect(() => () => journey.dispose(), [journey]);
   // the carton's clip plane (loading) needs local clipping; set before the warm-up compiles the materials
@@ -663,6 +704,11 @@ export default function JourneyScene({ low }: { low: boolean }) {
     return () => {
       if (scene.fog === fog) scene.fog = null;
     };
+  }, [get, journey]);
+  // the objects arrive after the first warm-up, so their shaders and textures are warmed here (same routine)
+  useEffect(() => {
+    const { gl, scene, camera, invalidate } = get();
+    warmScene(gl, scene, camera, invalidate);
   }, [get, journey]);
   const cache = useMemo(() => ({ cloudParted: -1, legacyCam: true, journey }), [journey]);
   useFrame((state) => {

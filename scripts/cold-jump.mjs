@@ -8,7 +8,7 @@ import { launch, sleep } from "./lib/cdp.mjs";
 
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://127.0.0.1:8080");
-const TEMPLATE = arg("template", "cinematic");
+const TEMPLATE = arg("template", "eco");
 const CPU = Number(arg("cpu", 1));
 const SLOW = process.argv.includes("--slow4g"); // cache off + Slow 4G + CPU throttle already during load
 const MOBILE = process.argv.includes("--mobile");
@@ -44,7 +44,7 @@ for (const p of POINTS) {
     await c.send("Network.emulateNetworkConditions", { offline: false, latency: 150, downloadThroughput: (1.6 * 1024 * 1024) / 8, uploadThroughput: (750 * 1024) / 8 });
     if (CPU > 1) await c.send("Emulation.setCPUThrottlingRate", { rate: CPU });
   }
-  await c.send("Page.navigate", { url: `${BASE}/t/${TEMPLATE}/?${MOBILE ? "" : "tier=mid"}` });
+  await c.send("Page.navigate", { url: `${BASE}/?${MOBILE ? "" : "tier=mid"}` });
   await c.waitFor("document.readyState==='complete' && !document.querySelector('[role=status]') && !!document.getElementById('making')", 180000);
   await sleep(600);
   if (CPU > 1) await c.send("Emulation.setCPUThrottlingRate", { rate: CPU });

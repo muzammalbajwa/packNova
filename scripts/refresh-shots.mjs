@@ -14,7 +14,7 @@ const SETTLE = Number(arg("settle", 900));
 
 for (const mode of MODES) {
   const c = await launch(mode === "mobile" ? { width: 412, height: 915, dpr: 2, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
-  await c.send("Page.navigate", { url: `${BASE}/t/${TEMPLATE}/?preview=0${mode === "mobile" ? "" : "&tier=mid"}` });
+  await c.send("Page.navigate", { url: `${BASE}/?preview=0${mode === "mobile" ? "" : "&tier=mid"}` });
   await c.waitFor("window.__r3f && !document.querySelector('[role=status]') && document.querySelector('canvas')", 120000);
   await sleep(1500);
   const dir = `${OUT}/page`;

@@ -7,7 +7,7 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { launch, sleep } from "./lib/cdp.mjs";
 
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
-const TEMPLATE = arg("template", "editorial");
+const TEMPLATE = arg("template", "eco");
 const BASE = arg("base", "http://localhost:3000");
 const OUT = "docs/screenshots/hover";
 const DUR = 1400;
@@ -19,7 +19,7 @@ const errors = [];
 await c.send("Log.enable");
 c.on("Runtime.consoleAPICalled", (p) => { if (p.type === "error") errors.push(p.args?.map((a) => a.value ?? a.description).join(" ")); });
 c.on("Runtime.exceptionThrown", (p) => errors.push(p.exceptionDetails?.exception?.description ?? "exception"));
-await c.send("Page.navigate", { url: `${BASE}/t/${TEMPLATE}/?tier=none` });
+await c.send("Page.navigate", { url: `${BASE}/?tier=none` });
 await c.waitFor("document.getElementById('products')", 60000);
 await sleep(2500);
 await c.ev("window.scrollTo(0, document.getElementById('products').getBoundingClientRect().top + scrollY + 120)");

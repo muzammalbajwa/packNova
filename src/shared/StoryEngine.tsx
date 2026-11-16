@@ -101,20 +101,38 @@ function Pinned({ base, canvasClassName, stickyClassName = "", behind, overlay: 
   const [cta, setCta] = useState(false);
   const links = useStoryLinks(base);
 
-  // The canvas is mounted (and its shaders/textures warmed) in idle time right after the page is ready,
-  // long before the user can reach the section. "live" only switches it to continuous rendering.
+  // The canvas is mounted (and its shaders/textures warmed) before the visitor can reach the section. High tier (desktop): in
+  // idle time right after the page is ready. Mid and low tier (phones): the build costs about 1.5 s of main-thread time on a
+  // phone, so it waits for the first sign of a visitor (scroll, touch, key, pointer) instead of competing with the page load.
+  // "live" only switches it to continuous rendering. `__eagerStory` is set by the test scripts (they never send input).
   const ready = useAppStore((s) => s.ready);
+  const tier = useAppStore((s) => s.profile?.tier);
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
-    if (!ready) return;
-    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (h: number) => void };
-    if (w.requestIdleCallback) {
-      const h = w.requestIdleCallback(() => setMounted(true), { timeout: 1200 });
-      return () => w.cancelIdleCallback?.(h);
+    if (!ready || !tier) return;
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (h: number) => void; __eagerStory?: boolean };
+    const cleanups: (() => void)[] = [];
+    const idle = () => {
+      if (w.requestIdleCallback) {
+        const h = w.requestIdleCallback(() => setMounted(true), { timeout: 1200 });
+        cleanups.push(() => w.cancelIdleCallback?.(h));
+      } else {
+        const h = window.setTimeout(() => setMounted(true), 300);
+        cleanups.push(() => window.clearTimeout(h));
+      }
+    };
+    if (tier === "high" || w.__eagerStory) idle();
+    else {
+      const events = ["scroll", "wheel", "touchstart", "pointerdown", "pointermove", "keydown"] as const;
+      const go = () => {
+        events.forEach((e) => window.removeEventListener(e, go));
+        idle();
+      };
+      events.forEach((e) => window.addEventListener(e, go, { passive: true, once: true }));
+      cleanups.push(() => events.forEach((e) => window.removeEventListener(e, go)));
     }
-    const h = window.setTimeout(() => setMounted(true), 300);
-    return () => window.clearTimeout(h);
-  }, [ready]);
+    return () => cleanups.forEach((fn) => fn());
+  }, [ready, tier]);
   const live = useInView({ rootMargin: "0px" });
   const setRefs = useCallback(
     (node: HTMLElement | null) => {

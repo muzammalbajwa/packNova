@@ -7,7 +7,7 @@ import { launch, sleep } from "./lib/cdp.mjs";
 
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://127.0.0.1:8080");
-const TEMPLATES = arg("templates", "editorial,cinematic,industrial,eco").split(",");
+const TEMPLATES = arg("templates", "eco").split(",");
 const MODES = arg("modes", "desktop,mobile").split(",");
 const OUT = arg("out", "docs/screenshots/plane-v2");
 const POINTS = arg("points", "0.06,0.25,0.45,0.58,0.7,0.8,0.9,0.99").split(",").map(Number);
@@ -16,7 +16,7 @@ const FROM = Number(arg("from", 0.77)), TO = Number(arg("to", 0.835));
 for (const template of TEMPLATES) {
   for (const mode of MODES) {
     const c = await launch(mode === "mobile" ? { width: 412, height: 915, dpr: 2, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
-    await c.send("Page.navigate", { url: `${BASE}/t/${template}/?preview=0${mode === "mobile" ? "" : "&tier=mid"}` });
+    await c.send("Page.navigate", { url: `${BASE}/?preview=0${mode === "mobile" ? "" : "&tier=mid"}` });
     await c.waitFor("window.__r3f && !document.querySelector('[role=status]') && window.__makingSet", 120000);
     await sleep(1500);
     await c.waitFor("document.getElementById('making') && document.getElementById('making').offsetHeight > window.innerHeight * 3", 60000);

@@ -10,7 +10,7 @@ import { launch, sleep } from "./lib/cdp.mjs";
 
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://localhost:8080");
-const TEMPLATE = arg("template", "editorial");
+const TEMPLATE = arg("template", "eco");
 const CPU = Number(arg("cpu", 1));
 const SECONDS = Number(arg("seconds", 24));
 const MOBILE = process.argv.includes("--mobile");
@@ -23,7 +23,7 @@ if (load0 > 4 && !process.argv.includes("--force")) {
 
 const c = await launch(MOBILE ? { width: 412, height: 915, dpr: 2, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
 await c.send("Network.enable");
-await c.send("Page.navigate", { url: `${BASE}/t/${TEMPLATE}/?${TIER ? `tier=${TIER}` : ""}` });
+await c.send("Page.navigate", { url: `${BASE}/?${TIER ? `tier=${TIER}` : ""}` });
 await c.waitFor("window.__r3f && !document.querySelector('[role=status]') && document.querySelector('canvas')", 90000);
 await sleep(1500);
 
