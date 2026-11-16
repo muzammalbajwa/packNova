@@ -1,0 +1,51 @@
+{
+ "load0": 3.2421875,
+ "load1": 5.79345703125,
+ "rows": [
+  {
+   "path": "/industry/jewelry-boxes/",
+   "mode": "mobile",
+   "cpu": 4,
+   "frames": 595,
+   "fps": 59.6,
+   "p99ms": 16.8,
+   "maxms": 49.9,
+   "over33": 2,
+   "filmDraws": 595,
+   "drawAvgMs": 1.26,
+   "drawP99Ms": 3.9,
+   "calls": 20,
+   "tris": 168
+  },
+  {
+   "path": "/material/corrugated-boxes/",
+   "mode": "mobile",
+   "cpu": 4,
+   "frames": 598,
+   "fps": 59.9,
+   "p99ms": 16.8,
+   "maxms": 33.3,
+   "over33": 0,
+   "filmDraws": 598,
+   "drawAvgMs": 1.45,
+   "drawP99Ms": 2.8,
+   "calls": 41,
+   "tris": 228
+  },
+  {
+   "path": "/shape-and-style/pillow-boxes/",
+   "mode": "mobile",
+   "cpu": 4,
+   "frames": 577,
+   "fps": 57.8,
+   "p99ms": 33.3,
+   "maxms": 99.9,
+   "over33": 4,
+   "filmDraws": 577,
+   "drawAvgMs": 1.65,
+   "drawP99Ms": 5.2,
+   "calls": 3,
+   "tris": 9200
+  }
+ ]
+}
