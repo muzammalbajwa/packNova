@@ -32,6 +32,8 @@ export interface Skin {
   handle: boolean;
   foil: boolean;
   props: PropKind[];
+  /** label-tag recipe: a hang tag with a string, or a sticker on a backing. */
+  card?: CardLook;
 }
 
 export interface ProcessStep {
@@ -205,6 +207,15 @@ function stepsFor(recipe: RecipeId, skin: Skin, noun: string, notes: Record<stri
     let { title, caption } = s;
     if (recipe === "folding-carton" && s.action === "close") [title, caption] = CLOSE_TEXT[skin.lid];
     if (recipe === "folding-carton" && s.action === "die-cut" && skin.window) caption = "A steel die cuts the outline and the window opening, and presses the fold lines in one stroke.";
+    if (recipe === "pouch" && s.action === "zipper" && skin.ratio[1] < 0.15) {
+      title = "Peel-and-seal strip";
+      caption = "A peel-off adhesive strip goes along the flap, so the bag seals once and shows if it was opened.";
+    }
+    if (recipe === "label-tag" && skin.card === "sticker") {
+      if (s.action === "string-or-peel") { title = "Cut on a backing"; caption = "Each sticker is cut through the face only, so it lifts off the backing and sticks cleanly."; }
+      if (s.action === "apply") title = "Peeled and stuck on";
+    }
+    if (recipe === "label-tag" && skin.card === "tag" && s.action === "string-or-peel") title = "Punched and strung";
     if (recipe === "rigid-box" && s.action === "add-closure") {
       title = skin.lid === "magnet" ? "Magnet closure" : skin.props.includes("ribbon") ? "Ribbon added" : "Closure added";
     }
@@ -461,7 +472,7 @@ const ENTRIES: Entry[] = [
     short: "Printed tags with a hole and string, for clothing and gifts.",
     what: "A printed card with a punched hole and a string or a ribbon. Hang tags carry the brand, the care notes or a short story.",
     recipe: "label-tag",
-    skin: sk({ material: "kraft", base: KRAFT_LIGHT, accent: INK, second: FOREST, print: "wordmark", ratio: [0.5, 0.02, 1] }),
+    skin: sk({ material: "kraft", base: KRAFT_LIGHT, accent: INK, second: FOREST, print: "wordmark", card: "tag", ratio: [0.5, 0.02, 1] }),
     materials: "Card stock, kraft or white, 300 to 400 gsm class",
     uses: ["Clothing", "Candles and soaps", "Handmade goods", "Gift wrap"],
     finishes: ["Matte or gloss coating", "Foil", "Rounded corners", "String or ribbon"],
@@ -540,7 +551,7 @@ const ENTRIES: Entry[] = [
     short: "Printed labels and stickers on sheets or rolls, in any shape.",
     what: "Labels and stickers printed to any shape, on sheets or rolls. Useful for sealing a box, labelling a jar or branding a plain bag.",
     recipe: "label-tag",
-    skin: sk({ material: "white", base: "#f4f0e6", accent: "#a2583f", second: FOREST, print: "wordmark", ratio: [1, 0.01, 1] }),
+    skin: sk({ material: "white", base: "#f4f0e6", accent: "#a2583f", second: FOREST, print: "wordmark", card: "sticker", ratio: [1, 0.01, 1] }),
     materials: "Paper or film sticker stock, matte or gloss",
     uses: ["Jars and bottles", "Sealing boxes", "Branding plain bags", "Shipping labels"],
     finishes: ["Matte or gloss", "Clear film", "Foil", "Kiss-cut or die-cut"],
@@ -614,6 +625,7 @@ const ENTRIES: Entry[] = [
     uses: ["Treats and sweets", "Party favours", "Seasonal retail", "Event gifts"],
     finishes: ["Spot gloss", "Window", "Handle", "Printed inside"],
     extra: { q: "When should I order a seasonal range?", a: "Plan early. Seasonal runs share the same production queue as everything else; ask us about timing when you request a quote." },
+    notes: { "pack-flat": "Orange cartons are counted and packed. Bats and pumpkins are printed shapes: your own seasonal artwork goes in their place."  },
     related: ["/shape-and-style/gable-boxes/", "/event/thanksgiving/", "/event/christmas/"],
   },
   {
@@ -627,6 +639,7 @@ const ENTRIES: Entry[] = [
     uses: ["Chocolates and sweets", "Candles", "Corporate gifts", "Hampers"],
     finishes: ["Ribbon", "Foil", "Embossing", "Printed inside"],
     extra: { q: "Can I use my own design instead of red and green?", a: "Yes. The colors shown are only an example. We print your artwork." },
+    notes: { "fit-insert": "A cut insert holds the chocolates or the candle. The ribbon and the colors here are an example, not a fixed design."  },
     related: ["/industry/chocolate-boxes/", "/industry/candle-boxes/", "/event/new-year/"],
   },
   {
@@ -640,6 +653,7 @@ const ENTRIES: Entry[] = [
     uses: ["Customer gifts", "Partner gifts", "Launch events", "Limited editions"],
     finishes: ["Gold foil", "Embossed year", "Magnet closure", "Numbered insert card"],
     extra: { q: "Can each box carry a number?", a: "Numbering is possible with an extra print step. Ask us when you request a quote." },
+    notes: { "fit-insert": "A numbered card and a fitted insert go inside. The foil year and the star are replaced with your own mark."  },
     related: ["/industry/jewelry-boxes/", "/material/rigid-boxes/", "/event/new-year/"],
   },
   {
@@ -653,6 +667,7 @@ const ENTRIES: Entry[] = [
     uses: ["Pies and baked goods", "Food hampers", "Corporate gifts", "Delivery orders"],
     finishes: ["Natural kraft", "One or two color print", "Window", "Inserts"],
     extra: { q: "Is it strong enough to ship?", a: "Corrugated board is made for shipping. Tell us what goes inside so we can match the board." },
+    notes: { stack: "The boxes are stacked on the pallet with the autumn print facing out. Leaves are only decoration for this page."  },
     related: ["/event/halloween/", "/industry/bakery-and-cake/", "/material/kraft-boxes/"],
   },
   {
@@ -666,6 +681,7 @@ const ENTRIES: Entry[] = [
     uses: ["Corporate greetings", "Sweets and gifts", "Client thank-yous", "Event favours"],
     finishes: ["Gold foil", "Embossing", "Ribbon", "Printed inside"],
     extra: { q: "Can you print a year or a greeting?", a: "Yes. Send the text and we will place it on the lid." },
+    notes: { "fit-insert": "A fitted insert holds the gift. Gold foil, stars and confetti are an example of a seasonal print."  },
     related: ["/event/christmas/", "/event/brand-anniversary/", "/industry/chocolate-boxes/"],
   },
 ];

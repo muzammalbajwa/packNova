@@ -5,7 +5,8 @@
 import { launch, sleep } from "./lib/cdp.mjs";
 const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i < 0 ? d : process.argv[i + 1]; };
 const BASE = arg("base", "http://127.0.0.1:8080");
-const SEQ = ["/material/rigid-boxes/", "/material/corrugated-boxes/", "/shape-and-style/folding-cartons/", "/", "/material/rigid-boxes/", "/material/corrugated-boxes/", "/shape-and-style/folding-cartons/", "/", "/material/rigid-boxes/", "/material/corrugated-boxes/"];
+const DEFAULT_SEQ = ["/material/rigid-boxes/", "/material/corrugated-boxes/", "/shape-and-style/folding-cartons/", "/", "/material/rigid-boxes/", "/material/corrugated-boxes/", "/shape-and-style/folding-cartons/", "/", "/material/rigid-boxes/", "/material/corrugated-boxes/"];
+const SEQ = arg("seq", "") ? arg("seq", "").split(",") : DEFAULT_SEQ; // --seq /a/,/b/,/ ... to walk another set of pages
 const c = await launch({ width: 1440, height: 900, dpr: 1 });
 // track every WebGL context created by the page
 await c.send("Page.addScriptToEvaluateOnNewDocument", { source: `(()=>{ window.__ctxs=[]; const g=HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext=function(t,...a){ const r=g.call(this,t,...a); if(r && /webgl/.test(t) && !window.__ctxs.includes(r)) window.__ctxs.push(r); return r; }; })()` });

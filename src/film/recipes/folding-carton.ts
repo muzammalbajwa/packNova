@@ -3,6 +3,7 @@ import type { RecipeCtx, RecipeFactory } from "../types";
 import { Pool, PI2, blobShadow, fitDistance, lerp, lin, orbit, seg, sheetTexture, skinMats, steel } from "../kit";
 import { buildChain, chainLayout, type ChainSpec } from "../chain";
 import { createPillow } from "./pillow";
+import { createProps } from "../props";
 
 const N = 6; // print, die-cut, fold lines, glue, close, pack
 const ROOF = (30 * Math.PI) / 180; // gable roof slope
@@ -98,6 +99,8 @@ const create: RecipeFactory = (ctx: RecipeCtx) => {
   const OX = [-1, 1, -1, 0, 1];
   const OZ = [0, 0, -1, -1, -1];
 
+  const props = createProps(pool, skin, { halfX: L * 1.5, zFront: D / 2 + 0.45, floor: 0, top: H });
+  if (props) root.add(props.root);
   const shadow = blobShadow(pool);
   shadow.scale.set(L * 1.8, D * 1.8, 1);
   root.add(shadow);
@@ -202,6 +205,10 @@ const create: RecipeFactory = (ctx: RecipeCtx) => {
     }
     others.instanceMatrix.needsUpdate = true;
     others.visible = p >= 5 / N + 0.01;
+    if (props) {
+      props.root.position.y = c.root.position.y;
+      props.update(seg(t5, 0.55, 1), p);
+    }
 
     // camera: the flat sheet face-on, then round to a three-quarter view, then back for the pack
     const dFlat = fitDistance(cam, layout.SW, layout.SH, 1.08);

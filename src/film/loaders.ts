@@ -9,6 +9,10 @@ export const RECIPE_LOADERS: Partial<Record<RecipeId, () => Promise<{ default: R
   "rigid-box": () => import("./recipes/rigid-box"),
   "corrugated-box": () => import("./recipes/corrugated-box"),
   "folding-carton": () => import("./recipes/folding-carton"),
+  "paper-bag": () => import("./recipes/paper-bag"),
+  pouch: () => import("./recipes/pouch"),
+  "label-tag": () => import("./recipes/label-tag"),
+  "tray-sleeve": () => import("./recipes/tray-sleeve"),
 };
 
 export const hasFilm = (r: RecipeId) => r in RECIPE_LOADERS;

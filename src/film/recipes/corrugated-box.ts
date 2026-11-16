@@ -2,6 +2,7 @@ import * as THREE from "three";
 import type { RecipeCtx, RecipeFactory } from "../types";
 import { Pool, PI2, blobShadow, fitDistance, fluteTexture, lerp, lin, orbit, seg, sheetTexture, skinMats, steel } from "../kit";
 import { buildChain, chainLayout, type ChainSpec } from "../chain";
+import { createProps } from "../props";
 
 const N = 7; // sheet, die-cut, crease, fold, glue flap, tape, stack
 const tmpM = new THREE.Matrix4();
@@ -64,6 +65,8 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
   const pallet = new THREE.Mesh(pool.add(new THREE.BoxGeometry(L * 2.25, 0.12, D * 2.25)), pool.add(new THREE.MeshStandardMaterial({ color: "#8a6a43", roughness: 0.9 })));
   stage.add(pallet);
 
+  const props = createProps(pool, skin, { halfX: L * 1.3, zFront: D * 1.35 + 0.3, floor: -H / 2 - 0.14, top: -H / 2 + H * 3 });
+  if (props) root.add(props.root);
   const shadow = blobShadow(pool);
   root.add(shadow);
   const shadowMat = shadow.material as THREE.MeshBasicMaterial;
@@ -164,11 +167,12 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
     }
     others.instanceMatrix.needsUpdate = true;
     others.visible = t6 > 0.15;
+    props?.update(seg(t6, 0.7, 1), p);
 
     // camera: oblique to the sheet edge (to see the flutes), face-on for cutting, round the box, then back for the stack
     const dSheet = fitDistance(cam, layout.SW, layout.SH, 1.02);
     const dFold = fitDistance(cam, Math.max(L, D) * 1.7, H + (flat ? D : fl) * 1.05, 1.3);
-    const dStack = fitDistance(cam, L * 2.9, H * 3.2 + 0.3, 1.1);
+    const dStack = fitDistance(cam, L * 2.9, H * 3.2 + 0.3, props ? 1.55 : 1.2);
     const a = seg(p, 3 / N - 0.02, 4 / N);
     const face = 1 - seg(t1, 0, 0.35); // first step: oblique; the die press: face-on
     const yawSheet = p < 1 / N ? lerp(0.9, 0.05, seg(lin(p, 0, 1 / N), 0.25, 0.95)) : 0.05;
@@ -178,7 +182,7 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
     const dist = lerp(lerp(dSheet * (p < 1 / N ? lerp(0.85, 1, seg(lin(p, 0, 1 / N), 0.3, 1)) : 1), dFold, a), dStack, toStack);
     const yaw = lerp(yawSheet, 0.55, a) + lerp(0, -0.6, seg(t5, 0, 1)) + t6 * 0.45;
     const pitch = lerp(pitchSheet, 0.3, a) + 0.18 * seg(t5, 0.3, 0.8) - 0.1 * seg(t6, 0.2, 1);
-    orbit(cam, 0, lerp(0, H * 0.9, toStack), 0, dist, yaw, pitch);
+    orbit(cam, 0, lerp(0, props ? H * 0.2 : H * 0.9, toStack), 0, dist, yaw, pitch);
   };
 
   return { root, update, dispose() { pool.dispose(); others.dispose(); } };

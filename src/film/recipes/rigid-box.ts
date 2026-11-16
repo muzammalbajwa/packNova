@@ -2,6 +2,7 @@ import * as THREE from "three";
 import type { RecipeCtx, RecipeFactory } from "../types";
 import { Pool, PI2, blobShadow, fitDistance, lerp, lin, orbit, seg, sheetTexture, skinMats, steel } from "../kit";
 import { buildChain, chainLayout, type Chain, type ChainSpec } from "../chain";
+import { createProps } from "../props";
 
 const N = 6; // cut board, wrap paper, fold, lid, closure, insert
 
@@ -102,6 +103,8 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
   const product = new THREE.Mesh(pool.add(new THREE.BoxGeometry(Lb * 0.42, 0.1, Db * 0.34, 1, 1, 1)), pool.add(new THREE.MeshStandardMaterial({ color: skin.second, roughness: 0.35, metalness: 0.45 })));
   stage.add(insert, product);
 
+  const props = createProps(pool, skin, { halfX: L * 1.15, zFront: D / 2 + 0.4, floor: -H / 2, top: -H / 2 + H });
+  if (props) root.add(props.root);
   const shadow = blobShadow(pool);
   root.add(shadow);
   const shadowMat = shadow.material as THREE.MeshBasicMaterial;
@@ -181,6 +184,7 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
     const pr = seg(t5, 0.7, 0.95);
     product.visible = pr > 0.001;
     product.position.set(0, floor + t + 0.12 + 0.05 + (1 - pr) * 1.0, 0);
+    props?.update(seg(t5, 0.6, 1), p);
     shadow.position.set((aside * L * 1.45) / 2, floor - 0.02, 0);
     shadow.scale.set(L * (1.8 + aside * 1.9), D * 1.8, 1);
     shadowMat.opacity = fold;
