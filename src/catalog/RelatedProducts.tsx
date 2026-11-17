@@ -17,7 +17,7 @@ export default function RelatedProducts({ page }: { page: CatalogPage }) {
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
           <div>
-            <h2 id="rel-h" className="font-display text-3xl font-medium leading-[1.1] md:text-4xl">{PAGE_END.relatedTitle}</h2>
+            <h2 id="rel-h" className="font-display text-balance text-3xl font-medium leading-[1.1] md:text-4xl">{PAGE_END.relatedTitle}</h2>
             <p className="mt-2 max-w-xl text-lg text-[var(--muted)]">{PAGE_END.relatedLine}</p>
           </div>
           <Link href={g.href} className="rel-viewall font-semibold text-[var(--accent)] underline-offset-4 hover:underline">

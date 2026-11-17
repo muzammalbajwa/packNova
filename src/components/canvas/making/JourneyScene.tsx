@@ -569,7 +569,10 @@ function apply(j: Journey, P: number, state: { camera: THREE.Camera; size: { wid
       }
       j.cloudMesh.instanceMatrix.needsUpdate = true;
     }
-    (j.cloudMat as THREE.MeshStandardMaterial | THREE.MeshBasicMaterial).color.copy(c.cloudDay).lerp(c.cloudDusk, dusk);
+    const cm = j.cloudMat as THREE.MeshStandardMaterial | THREE.MeshBasicMaterial;
+    cm.color.copy(c.cloudDay).lerp(c.cloudDusk, dusk);
+    // self-lit (a third of the cloud colour) so the puffs read light and warm instead of grey under the dark scene's lights
+    if ((cm as THREE.MeshStandardMaterial).isMeshStandardMaterial) (cm as THREE.MeshStandardMaterial).emissive.copy(cm.color).multiplyScalar(0.38);
   }
 
   /* ---- village + van ---- */

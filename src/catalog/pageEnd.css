@@ -80,7 +80,7 @@
 .band-tape { fill: color-mix(in srgb, var(--accent) 70%, var(--sage)); stroke: none !important; opacity: 0.9; }
 .band-ground { fill: rgba(0, 0, 0, 0.22); }
 .band-flap { animation: band-open 9s ease-in-out infinite; animation-play-state: paused; }
-.band-art[data-on] .band-flap { animation-play-state: running; }
+.band-art[data-on]:not([data-paused]) .band-flap { animation-play-state: running; }
 @keyframes band-open {
   0%, 14% { transform: none; }
   40%, 62% { transform: var(--open); }
@@ -88,4 +88,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .band-flap { animation: none; }
+  .band-pause { display: none; }
 }

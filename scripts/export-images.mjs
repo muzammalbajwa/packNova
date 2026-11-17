@@ -10,7 +10,8 @@ const BASE = arg("base", "http://localhost:8080");
 const TEMPLATE = arg("template", "eco");
 const FLAT = TEMPLATE === "eco"; // eco: plain social image (no glow, sentence-case label, the page's own headline, wrapped)
 
-const c = await launch({ width: 1440, height: 900, dpr: 1 });
+const PHONE = process.argv.includes("--phone"); // --phone: write the phone poster (hero-poster-<template>-m.webp) from a 390 px viewport
+const c = await launch(PHONE ? { width: 390, height: 844, dpr: 1, mobile: true, cores: 4 } : { width: 1440, height: 900, dpr: 1 });
 await c.send("Page.navigate", { url: `${BASE}/?tier=high` });
 await c.waitFor("window.__r3f && !document.querySelector('[role=status]') && document.querySelector('canvas')");
 await sleep(2500);
@@ -25,6 +26,18 @@ const result = JSON.parse(await c.ev(`(async () => {
   const root = scene.children.find((c) => c.type === "Group");
   const shadow = scene.children.find((c) => c.type === "Mesh");
   const [w0, h0, pr] = [size.width, size.height, gl.getPixelRatio()];
+  // The poster is a crop of the LIVE canvas at the rectangle the poster <img> occupies, so the swap from poster to 3D lines up exactly
+  // (same camera, same scale, same position). The box is at its rest pose (the idle bob and sway are a few pixels).
+  const posterImg = document.querySelector("#top img");
+  const pr0 = posterImg.getBoundingClientRect();
+  const k = 800 / pr0.width;
+  gl.setPixelRatio(k); gl.setSize(size.width, size.height, false);
+  gl.render(scene, camera);
+  const full = new Image();
+  await new Promise((r) => { full.onload = r; full.src = gl.domElement.toDataURL("image/png"); });
+  const crop = document.createElement("canvas"); crop.width = crop.height = 800;
+  crop.getContext("2d").drawImage(full, pr0.left * k, pr0.top * k, 800, 800, 0, 0, 800, 800);
+  const posterLive = crop.toDataURL("image/webp", 0.9);
   gl.setPixelRatio(1); gl.setSize(1000, 1000, false);
   camera.aspect = 1; camera.zoom = 1.25; camera.updateProjectionMatrix();
   root.position.set(0, -0.62 * 0.82 + 0.18, 0); root.rotation.set(0.18, 0.55, 0); root.scale.setScalar(0.82);
@@ -37,7 +50,7 @@ const result = JSON.parse(await c.ev(`(async () => {
   // 800x800 poster
   const p = document.createElement("canvas"); p.width = p.height = 800;
   p.getContext("2d").drawImage(box, 0, 0, 800, 800);
-  const poster = p.toDataURL("image/webp", 0.9);
+  const poster = posterLive;
 
   // 1200x630 social image from the live theme variables
   const css = getComputedStyle(document.documentElement);
@@ -85,7 +98,7 @@ const result = JSON.parse(await c.ev(`(async () => {
 })()`));
 
 const save = (file, url) => { writeFileSync(file, Buffer.from(url.split(",")[1], "base64")); console.log("wrote", file); };
-save(`public/textures/hero-poster-${TEMPLATE}.webp`, result.poster);
-save(`public/og-${TEMPLATE}.png`, result.og);
+save(`public/textures/hero-poster-${TEMPLATE}${PHONE ? "-m" : ""}.webp`, result.poster);
+if (!PHONE) save(`public/og-${TEMPLATE}.png`, result.og);
 c.kill();
 process.exit(0);

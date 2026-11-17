@@ -175,3 +175,46 @@ export function contactShadowTexture() {
   t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
+
+/**
+ * The printed brand panel of the hero carton (and the carton in the film uses the same look): a forest block with the mark, the wordmark and
+ * one line under a thin rule. Transparent around the block, so the kraft shows as a margin. `repaint()` draws it again (call it once the page
+ * fonts have loaded, so the wordmark uses the display face).
+ */
+export function brandPanelTexture(name: string, tagline: string, ink: string, paper: string, fontFamily: () => string) {
+  const [c, g] = makeCanvas(1024, 640);
+  const t = finish(c, true, false);
+  const repaint = () => {
+    const font = fontFamily();
+    g.clearRect(0, 0, 1024, 640);
+    g.fillStyle = ink;
+    g.beginPath();
+    g.roundRect(24, 24, 976, 592, 14);
+    g.fill();
+    // the mark: a small folded box, same three faces as the logo
+    const mx = 150, my = 255, k = 4.3;
+    const poly = (pts: number[][], fill: string) => {
+      g.beginPath();
+      pts.forEach(([x, y], i) => (i ? g.lineTo(mx + x * k, my + y * k) : g.moveTo(mx + x * k, my + y * k)));
+      g.closePath();
+      g.fillStyle = fill;
+      g.fill();
+    };
+    poly([[-12, -6], [0, 0], [0, 11], [-12, 5]], "#b8803f");
+    poly([[12, -6], [0, 0], [0, 11], [12, 5]], "#8a5f2e");
+    poly([[0, -13], [12, -7], [0, -1], [-12, -7]], paper);
+    g.fillStyle = paper;
+    g.textBaseline = "alphabetic";
+    g.font = `600 170px ${font}`;
+    g.fillText(name, 250, 308);
+    g.fillRect(100, 380, 824, 3);
+    g.font = `400 52px ${font}`;
+    g.globalAlpha = 0.9;
+    g.fillText(tagline, 100, 470);
+    g.globalAlpha = 1;
+    t.needsUpdate = true;
+  };
+  repaint();
+  t.userData.repaint = repaint;
+  return t;
+}

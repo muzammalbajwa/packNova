@@ -16,7 +16,7 @@ export default function Products() {
     <section id="products" className="relative z-10 bg-[var(--bg)] px-6 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-4 md:grid-cols-[1fr_1.6fr] md:gap-16">
-          <h2 data-reveal="subtle" className="font-display text-4xl font-medium leading-[1.1] md:text-5xl">{c.heading}</h2>
+          <h2 data-reveal="subtle" className="font-display text-balance text-4xl font-medium leading-[1.1] md:text-5xl">{c.heading}</h2>
           <p data-reveal="subtle" className="max-w-md text-lg text-[var(--muted)] md:pt-3">{c.lead}</p>
         </div>
         <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

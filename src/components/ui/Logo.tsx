@@ -20,7 +20,7 @@ export default function Logo({ className = "", size = 28 }: { className?: string
   const head = split > 0 ? name.slice(0, split) : name;
   const tail = split > 0 ? name.slice(split) : "";
   return (
-    <span className={`inline-flex items-center gap-2 font-display font-bold tracking-tight ${className}`}>
+    <span translate="no" className={`inline-flex items-center gap-2 font-display font-bold tracking-tight ${className}`}>
       <LogoMark size={size} />
       <span>
         {head}

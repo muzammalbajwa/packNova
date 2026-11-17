@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { site } from "@/content/site";
 import QuoteForm from "@/components/sections/QuoteForm";
 import TrackedA from "@/components/ui/TrackedA";
@@ -13,7 +14,10 @@ export default function QuoteSection() {
         <div data-reveal="subtle">
           <h2 className="font-display text-4xl font-medium leading-[1.12] md:text-5xl">{copy.quote.heading}</h2>
           <p className="mt-4 max-w-md text-lg opacity-90">{copy.quote.lead}</p>
-          <TrackedA event="quote_section_whatsapp" href={c.whatsappHref} className="mt-8 inline-flex rounded-[var(--r-btn)] border border-[var(--on-accent)] px-6 py-3 text-base font-semibold hover:bg-[var(--on-accent)] hover:text-[var(--accent)]">
+          <p className="mt-8 font-display text-2xl font-medium">{copy.configurator.heading}</p>
+          <p className="mt-1 max-w-md opacity-90">{copy.configurator.body}</p>
+          <Link href="/configurator/" className="mt-4 inline-flex rounded-[var(--r-btn)] bg-[var(--on-accent)] px-6 py-3 text-base font-semibold text-[var(--accent)] hover:bg-white">{copy.configurator.cta}</Link>
+          <TrackedA event="quote_section_whatsapp" href={c.whatsappHref} className="mt-10 inline-flex rounded-[var(--r-btn)] border border-[var(--on-accent)] px-6 py-3 text-base font-semibold hover:bg-[var(--on-accent)] hover:text-[var(--accent)]">
             {q.whatsappCta}: {c.whatsapp}
           </TrackedA>
           <ul className="mt-6 space-y-1 text-base">

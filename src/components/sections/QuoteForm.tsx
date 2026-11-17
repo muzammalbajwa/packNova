@@ -62,17 +62,17 @@ export default function QuoteForm() {
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <label>
-          <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.name}</span>
+          <span className="mb-1.5 block text-sm text-[var(--muted)]">{f.name}</span>
           <input name="name" required autoComplete="name" defaultValue={vals.name ?? ""} className={field} />
         </label>
         <label>
-          <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.phone}</span>
+          <span className="mb-1.5 block text-sm text-[var(--muted)]">{f.phone}</span>
           <input name="phone" type="tel" required autoComplete="tel" inputMode="tel" defaultValue={vals.phone ?? ""} className={field} />
         </label>
       </div>
       <div className="grid gap-4 sm:grid-cols-[1.4fr_1fr]">
         <label>
-          <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.product}</span>
+          <span className="mb-1.5 block text-sm text-[var(--muted)]">{f.product}</span>
           <select name="product" required defaultValue={product} className={field}>
             <option value="" disabled>
               {f.productPlaceholder}
@@ -85,14 +85,18 @@ export default function QuoteForm() {
           </select>
         </label>
         <label>
-          <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.quantity}</span>
-          <input name="quantity" type="number" min={1} inputMode="numeric" required defaultValue={vals.quantity ?? qty} className={field} />
+          <span className="mb-1.5 block text-sm text-[var(--muted)]">{f.quantity}</span>
+          <input name="quantity" type="number" min={1} inputMode="numeric" autoComplete="off" required defaultValue={vals.quantity ?? qty} className={field} />
         </label>
       </div>
-      <label>
-        <span className="mb-1.5 block text-xs text-[var(--muted)]">{f.message}</span>
-        <textarea name="message" rows={2} defaultValue={message} className={field} />
-      </label>
+      {/* the note stays one tap away instead of a fifth open field (still sent with the form, open when a page prefilled it) */}
+      <details open={message.length > 0} className="group">
+        <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--accent)] underline-offset-4 hover:underline [&::-webkit-details-marker]:hidden">
+          <span className="group-open:hidden">+ {f.message}</span>
+          <span className="hidden group-open:inline">{f.message}</span>
+        </summary>
+        <textarea name="message" rows={3} aria-label={f.message} defaultValue={message} className={`${field} mt-2`} />
+      </details>
       <button
         type="submit"
         className="mt-1 inline-flex items-center justify-center rounded-[var(--r-btn)] bg-[var(--accent)] px-8 py-4 text-base font-medium text-[var(--on-accent)] transition-colors duration-300 hover:bg-[var(--fg)]"

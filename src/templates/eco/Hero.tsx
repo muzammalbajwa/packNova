@@ -9,8 +9,9 @@ export default function Hero({ base }: { base: string }) {
   return (
     <HeroStage
       posterSrc="/textures/hero-poster-eco.webp"
+      posterSrcMobile="/textures/hero-poster-eco-m.webp"
       posterAlt={hero.posterAlt}
-      posterClassName="w-[min(78vw,520px)] max-md:left-1/2 max-md:top-[30%] max-md:-translate-x-1/2 max-md:-translate-y-1/2 md:right-[6vw] md:top-1/2 md:-translate-y-1/2"
+      posterClassName="max-md:w-[min(78vw,520px)] max-md:left-1/2 max-md:top-[30%] max-md:-translate-x-1/2 max-md:-translate-y-1/2 md:left-[70%] md:top-[56%] md:w-[min(89dvh,62vw)] md:-translate-x-1/2 md:-translate-y-1/2"
     >
       <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-28 pt-32 md:justify-center md:pb-0">
         <p className="text-base font-semibold text-[var(--kraft-ink)]" data-og-eyebrow>{hero.kicker}</p>

@@ -7,7 +7,8 @@ import { useAppStore } from "@/lib/store";
 import { rbox } from "@/lib/geometry";
 import { THEMES, type Theme } from "@/lib/palette";
 import { seg } from "@/lib/making";
-import { setKraftBase, kraftTexture, kraftNormal, contactShadowTexture } from "@/lib/textures";
+import { setKraftBase, kraftTexture, kraftNormal, contactShadowTexture, brandPanelTexture } from "@/lib/textures";
+import { brand } from "@/content/siteCore";
 
 /* ---------- dimensions (world units) ---------- */
 const W = 1.6; // width  (x)
@@ -58,16 +59,20 @@ function buildAssets(detail: 0 | 1 | 2, theme: Theme) {
     depthWrite: false,
   });
   const shadowMat = new THREE.MeshBasicMaterial({ map: shadowMap, transparent: true, depthWrite: false });
+  // printed brand panel on the front and the right wall (the carton in the film carries the same print)
+  const brandMap = brandPanelTexture(brand.name, "Custom packaging, made to order", theme.printBlock ?? "#1e4d3a", theme.fg, () => getComputedStyle(document.querySelector("h1") ?? document.body).fontFamily);
+  const brandMat = new THREE.MeshStandardMaterial({ map: brandMap, transparent: true, roughness: 0.82, metalness: 0, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
 
   const disposables: { dispose(): void }[] = [
     flapFB, flapLR, bottom, wallFB, wallLR, tape, plane,
     kraftMap, shadowMap, ...(normalMap ? [normalMap] : []),
-    board, tapeMat, glowMat, shadowMat,
+    board, tapeMat, glowMat, shadowMat, brandMap, brandMat,
   ];
 
   return {
     g: { flapFB, flapLR, bottom, wallFB, wallLR, tape, plane },
-    m: { board, tapeMat, glowMat, shadowMat },
+    m: { board, tapeMat, glowMat, shadowMat, brandMat },
+    brandMap,
     accent,
     look: theme.scene,
     disposables,
@@ -195,8 +200,19 @@ export default function Box3D({ detail, reducedMotion }: Props) {
     updateFrame(state, delta, assets, anim.current, parts, detail, reducedMotion);
   });
 
-  // The box leans toward the pointer (fine pointers only: touch screens have none). Listener is passive and writes two numbers.
   const invalidate = useThree((s) => s.invalidate);
+  // the wordmark is painted with the display face: draw it again once the page fonts are in
+  useEffect(() => {
+    let live = true;
+    document.fonts?.ready.then(() => {
+      if (!live) return;
+      (assets.brandMap.userData.repaint as () => void)();
+      invalidate();
+    });
+    return () => { live = false; };
+  }, [assets, invalidate]);
+
+  // The box leans toward the pointer (fine pointers only: touch screens have none). Listener is passive and writes two numbers.
   useEffect(() => {
     if (reducedMotion || detail === 0 || !window.matchMedia("(pointer: fine)").matches) return;
     const p = anim.current.ptr;
@@ -242,6 +258,11 @@ export default function Box3D({ detail, reducedMotion }: Props) {
             <mesh geometry={g.flapLR} material={m.board} />
           </group>
         </group>
+
+        {/* ---- printed brand panel: front wall, and both side walls a little smaller ---- */}
+        <mesh geometry={g.plane} material={m.brandMat} position={[0, H * 0.45, D / 2 + 0.003]} scale={[1.0, 0.625, 1]} />
+        <mesh geometry={g.plane} material={m.brandMat} position={[W / 2 + 0.003, H * 0.45, 0]} rotation={[0, Math.PI / 2, 0]} scale={[0.8, 0.5, 1]} />
+        <mesh geometry={g.plane} material={m.brandMat} position={[-W / 2 - 0.003, H * 0.45, 0]} rotation={[0, -Math.PI / 2, 0]} scale={[0.8, 0.5, 1]} />
 
         {/* ---- seam tape and interior glow ---- */}
         <mesh ref={tapeRef} geometry={g.tape} material={m.tapeMat} position={[0, H + T + 0.004, 0]} />

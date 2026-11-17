@@ -25,7 +25,7 @@ function Cta({ links }: { links: StoryApi["links"] }) {
   );
 }
 
-/** Dark frame; the 3D box in a thin-bordered panel; caption on the left; a rule-based step list along the bottom. */
+/** Dark frame; the 3D stage with feathered edges (no border, no card); caption on the left; a rule-based step list along the bottom. */
 function Overlay(api: StoryApi) {
   const { stage, chapter, chapters, cta, stages, goTo, links, showQuote } = api;
   const last = stage === stages.length - 1;
@@ -140,7 +140,7 @@ export default function Story({ base }: { base: string }) {
     <StoryEngine
       base={base}
       stickyClassName="tone-dark"
-      canvasClassName="absolute inset-x-3 top-16 h-[42%] overflow-hidden rounded-[var(--r-card)] border border-[var(--line)] bg-[var(--surface)] md:inset-x-auto md:bottom-24 md:right-6 md:top-20 md:h-auto md:w-[56%]"
+      canvasClassName="story-stage absolute inset-x-3 top-16 h-[42%] overflow-hidden md:inset-x-auto md:bottom-24 md:right-6 md:top-20 md:h-auto md:w-[56%]"
       overlay={Overlay}
       fallback={<Fallback base={base} />}
     />

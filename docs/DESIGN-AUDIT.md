@@ -27,6 +27,12 @@ The site already has a strong core: a live 3D hero, a 12-stage manufacturing fil
 | 3 | P2 | Hero | Static after load. The most "3D" first screen did not respond to the visitor. | The box leans toward the pointer (damped, fine pointers only). Off under reduced motion, off on touch, no per-frame allocation. |
 | 4 | P2 | Film captions | Titles at 30 / 48 px and step buttons at 14 px beside a very large stage. | Titles 36 / 60 px, counter 24 px, line 20 px, step buttons 16 px. |
 | 5 | P3 | Tooling | ESLint scanned the installed skills' scripts (112 warnings). | `.claude/**` ignored. |
+| 6 | P2 | Hero | The hero box was an anonymous kraft carton. | A forest-green printed panel (mark, wordmark in the display face, one line) on the front and both side walls, the same print the film's carton carries. The poster is now cropped from the live canvas at the exact rectangle the poster image occupies, plus a separate phone poster, so the swap lines up (about 2.5% of pixels differ, which is the idle sway). The old poster slot was also smaller than the live box on desktop. |
+| 7 | P2 | Film stage | The stage was a framed rectangle (border and card background). | No border or card: the edges feather into the dark section. The camera framing is untouched, so the 12 stages are framed exactly as before (both sweeps: zero empty frames, 300 progress values clean). |
+| 9 | P2 | Homepage ending | Two heavy blocks (configurator teaser, then quote band and a five-field form). | One band: the short form (the note is one tap away), and the configurator hand-off in the left column. |
+| 10 | P3 | Delivery stage | Grey-beige flat clouds. | Self-lit (emissive a third of the cloud colour), so they read light and warm. |
+| 13 | P2 | Band loop | The page-end box animation is a loop longer than 5 s (WCAG 2.2.2). | Pause/Play button; still stops under reduced motion. |
+| 14 | P3 | Guideline audit | No `touch-action`, brand not marked `translate="no"`, headings could widow, quantity field autofilled, theme-color one digit off the page colour. | All fixed. |
 
 Fixed earlier in this session: empty first screens on all film pages, no-gap Step 1, page ends (related cards, quote band, footer), hub grids with empty cells, quote page layout, configurator preview first on phones.
 
@@ -34,11 +40,7 @@ Fixed earlier in this session: empty first screens on all film pages, no-gap Ste
 
 | # | Sev | Where | Flaw | Suggested fix | Cost |
 |---|---|---|---|---|---|
-| 6 | P2 | Hero | The hero box is a plain kraft carton: it says "box", not "PackNova". The printed green carton only appears in the film. | Print the brand on the hero box and re-export the poster (`scripts/export-images.mjs`) so the swap still matches. | Medium |
-| 7 | P2 | Film stage | The stage is a framed rectangle on the dark green, which makes the film feel like an embedded widget. | Full-bleed stage with soft edges; needs the camera framing in `eco/config.ts` retuned and re-swept. | Medium |
 | 8 | P2 | Look | Cream page + high-contrast serif + warm accent is, by the `frontend-design` skill's own calibration, a common generated look. The palette was pinned by you, so it stays. | Differentiate through type (a more characterful display face), one bold forest/kraft section break, and real photography when it exists. | Medium |
-| 9 | P2 | Homepage ending | The quote band plus form is a heavy block after a light "Try your size in 3D". | Merge the configurator teaser into the quote band, or shorten the form to three fields. | Small |
-| 10 | P3 | Delivery stage | The low-poly clouds are grey-beige and flat next to the saturated print stages. | Warmer, lighter cloud material at dusk. | Small |
 | 11 | P1 (business) | Whole site | Placeholder brand, contact, no logo, no photos, no proof. | Owner content: see `CONTENT-TODO.md`. Never invent. | Owner |
 | 12 | P3 | Performance | Mobile LCP about 3.0 s (simulated), TBT 600 to 800 ms. | Hero canvas first render and 3D chunk evaluation are the remaining long tasks. | Medium |
 

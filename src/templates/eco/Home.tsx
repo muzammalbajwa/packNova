@@ -3,7 +3,6 @@ import Reviews from "@/components/sections/Reviews";
 import TemplateFrame from "@/shared/TemplateFrame";
 import { config } from "./config";
 import { fontClass } from "./fonts";
-import ConfiguratorTeaser from "./ConfiguratorTeaser";
 import Footer from "./Footer";
 import { FactoryPhoto, ProductPhotos } from "./Photos";
 import Hero from "./Hero";
@@ -28,7 +27,6 @@ export default function Home() {
         <Process />
         <FactoryPhoto />
         <Reviews />
-        <ConfiguratorTeaser base={BASE} />
         <QuoteSection />
       </main>
       <Footer base={BASE} />
