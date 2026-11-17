@@ -38,9 +38,9 @@ function Overlay(api: StoryApi) {
             <Cta links={links} />
           ) : (
             <>
-              <p className="font-display text-xl text-[var(--kraft-ink)]">{num(stage)} <span className="text-[var(--muted)]">/ {stages.length}</span></p>
-              <h2 className="font-display mt-2 text-3xl font-medium leading-[1.1] md:text-5xl">{stages[stage].title}</h2>
-              <p className="mt-3 max-w-sm text-lg text-[var(--muted)]">{stages[stage].line}</p>
+              <p className="font-display text-2xl text-[var(--kraft-ink)]">{num(stage)} <span className="text-[var(--muted)]">/ {stages.length}</span></p>
+              <h2 className="font-display mt-2 text-balance text-4xl font-medium leading-[1.05] md:text-6xl">{stages[stage].title}</h2>
+              <p className="mt-4 max-w-sm text-lg text-[var(--muted)] md:text-xl">{stages[stage].line}</p>
               {showQuote && (
                 <a href={links.quoteHref} onClick={() => links.onQuote(STAGE_IDS[stage])} className="pointer-events-auto mt-4 inline-flex rounded-[var(--r-btn)] border border-[var(--line-strong)] px-4 py-2 text-base font-semibold text-[var(--fg)] transition-colors hover:border-[var(--fg)]">
                   {M.quoteButton} →
@@ -71,7 +71,7 @@ function Overlay(api: StoryApi) {
                           aria-current={i === stage ? "step" : undefined}
                           aria-label={`${i + 1}. ${s.step}`}
                           onClick={() => goTo(i)}
-                          className={`rounded-[var(--r-btn)] px-3 py-2 text-sm font-semibold transition-colors ${
+                          className={`rounded-[var(--r-btn)] px-3 py-2 text-base font-semibold transition-colors ${
                             i === stage ? "bg-[var(--accent)] text-[var(--on-accent)]" : i < stage ? "text-[var(--fg)] hover:bg-[var(--wash)]" : "text-[var(--muted)] hover:bg-[var(--wash)]"
                           }`}
                         >

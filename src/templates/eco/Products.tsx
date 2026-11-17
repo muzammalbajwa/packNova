@@ -1,10 +1,14 @@
 import { site } from "@/content/site";
 import ProductIcon from "@/components/ui/ProductIcon";
 import PrefetchLink from "@/catalog/PrefetchLink";
+import "@/catalog/pageEnd.css";
 import { HOME_CATEGORY_HREF, PAGE_BY_HREF } from "@/content/catalog";
 import { copy } from "./copy";
 
-/** A wide list with 1px rules. Each row is one link to the quote form; the icon keeps its hover animation. */
+/**
+ * Six cards, one per product family. Each has a big animated drawing on the grid plate (it plays on hover, focus and tap), the name,
+ * one line, who it is for, and the action. Same card language as the related-products cards at the end of every product page.
+ */
 export default function Products() {
   const { items } = site.products;
   const c = copy.products;
@@ -15,23 +19,24 @@ export default function Products() {
           <h2 data-reveal="subtle" className="font-display text-4xl font-medium leading-[1.1] md:text-5xl">{c.heading}</h2>
           <p data-reveal="subtle" className="max-w-md text-lg text-[var(--muted)] md:pt-3">{c.lead}</p>
         </div>
-        <ul className="mt-12 border-t border-[var(--line-strong)]">
+        <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((p) => (
-            <li key={p.id} data-reveal="subtle" className="border-b border-[var(--line)]">
+            <li key={p.id} data-reveal="subtle">
               <PrefetchLink
                 href={HOME_CATEGORY_HREF[p.id]}
                 recipe={PAGE_BY_HREF[HOME_CATEGORY_HREF[p.id]]?.recipe}
-                className="group grid items-center gap-x-8 gap-y-3 py-6 transition-colors hover:bg-[var(--sand)] focus-visible:bg-[var(--sand)] md:grid-cols-[88px_1.3fr_1.4fr_auto] md:px-4"
+                className="rel-card group flex h-full flex-col overflow-hidden rounded-[var(--r-card)] border border-[var(--line-strong)]"
               >
-                <span className="block size-16 text-[var(--accent)] md:size-[72px]"><ProductIcon kind={p.icon} /></span>
-                <span>
-                  <span className="font-display block text-2xl font-medium leading-tight">{p.name}</span>
+                <span className="rel-plate block aspect-[16/10] w-full px-6 py-5 text-[var(--accent)]"><ProductIcon kind={p.icon} /></span>
+                <span className="flex flex-1 flex-col p-5">
+                  <span className="font-display text-2xl font-medium leading-tight">{p.name}</span>
+                  <span className="mt-1.5 text-[var(--muted)]">{p.description}</span>
+                  <span className="mt-3 text-sm text-[var(--muted)]"><span className="font-semibold text-[var(--kraft-ink)]">{c.bestFor}:</span> {p.bestFor.join(", ")}</span>
+                  <span className="mt-auto flex items-center gap-2 pt-5 font-semibold text-[var(--accent)]">
+                    {c.action}
+                    <span aria-hidden="true" className="rel-arrow inline-block">→</span>
+                  </span>
                 </span>
-                <span>
-                  <span className="block text-[var(--muted)]">{p.description}</span>
-                  <span className="mt-1 block text-sm text-[var(--muted)]"><span className="font-semibold text-[var(--kraft-ink)]">{c.bestFor}:</span> {p.bestFor.join(", ")}</span>
-                </span>
-                <span className="text-base font-semibold text-[var(--accent)] underline-offset-4 group-hover:underline">{c.action} →</span>
               </PrefetchLink>
             </li>
           ))}

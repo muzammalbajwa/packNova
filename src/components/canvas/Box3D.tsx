@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { useFrame, type RootState } from "@react-three/fiber";
+import { useFrame, useThree, type RootState } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAppStore } from "@/lib/store";
 import { rbox } from "@/lib/geometry";
@@ -76,9 +76,14 @@ function buildAssets(detail: 0 | 1 | 2, theme: Theme) {
 
 type Assets = ReturnType<typeof buildAssets>;
 
+/** Hero scroll track is 240vh (HeroStage): pinned until the progress where one viewport of it is left. */
+const HERO_PIN_END = 1 - 1 / 2.4;
+
 interface Anim {
   pose: Pose;
   cur: Pose;
+  /** Pointer position in -1..1 (target, and the damped value the box actually leans by). */
+  ptr: { tx: number; ty: number; x: number; y: number };
 }
 
 interface Parts {
@@ -113,21 +118,28 @@ function updateFrame(
 
   // In frameloop="demand" a single frame is rendered per invalidate(); keep
   // requesting frames until the damped values have caught up with the scroll.
-  if (Math.abs(cur.open - pose.open) + Math.abs(cur.rotY - pose.rotY) > 0.002) state.invalidate();
+  const ptr = anim.ptr;
+  ptr.x = d(ptr.x, ptr.tx, 3.2, delta);
+  ptr.y = d(ptr.y, ptr.ty, 3.2, delta);
+  if (Math.abs(cur.open - pose.open) + Math.abs(cur.rotY - pose.rotY) + Math.abs(ptr.x - ptr.tx) + Math.abs(ptr.y - ptr.ty) > 0.002) state.invalidate();
 
   /* layout: box sits beside the text on wide screens, above it on narrow ones */
   const cfg = useAppStore.getState().story3d;
   const vw = state.viewport.width;
   const vh = state.viewport.height;
   const wide = vw > 4.6;
-  const fit = Math.min(0.82, vw / 3.9) * cfg.hero.scale;
+  // on a phone the opened box (tall flaps) would cover the headline below it: it shrinks and lifts as it opens (closed = unchanged, so the poster still matches)
+  const fit = Math.min(0.82, vw / 3.9) * cfg.hero.scale * (wide ? 1 : 1 - 0.2 * cur.open);
   const bob = reducedMotion || detail === 0 ? 0 : Math.sin(state.clock.elapsedTime * 1.1) * 0.06;
   r.scale.setScalar(fit);
+  // The hero stays pinned for the first (HERO_TRACK - 1) / HERO_TRACK of its scroll track, then scrolls away with its text.
+  // The canvas is fixed, so after the pin ends the box rides up with the page (one viewport height over the rest of the track).
+  const carry = Math.max(0, (useAppStore.getState().heroProgress - HERO_PIN_END) / (1 - HERO_PIN_END)) * vh;
   r.position.x = wide ? vw * cfg.hero.offsetX : 0;
   // Group origin is the box floor; lift by half the (flaps-open) height to centre it.
-  r.position.y = (wide ? vh * cfg.hero.offsetY : vh * cfg.hero.narrowOffsetY) + bob - 0.62 * fit;
-  r.rotation.y = cur.rotY + (reducedMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.5) * 0.04);
-  r.rotation.x = 0.18;
+  r.position.y = (wide ? vh * cfg.hero.offsetY : vh * (cfg.hero.narrowOffsetY + 0.14 * cur.open)) + bob - 0.62 * fit + carry;
+  r.rotation.y = cur.rotY + (reducedMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.5) * 0.04) + ptr.x * 0.3;
+  r.rotation.x = 0.18 + ptr.y * 0.12;
 
   /* flaps: front/back lead, sides follow */
   const eFB = seg(cur.open, 0, 0.75);
@@ -170,7 +182,7 @@ export default function Box3D({ detail, reducedMotion }: Props) {
   useEffect(() => () => assets.disposables.forEach((d) => d.dispose()), [assets]);
 
   /* refs mutated every frame (never React state) */
-  const anim = useRef<Anim>({ pose: { open: 0, rotY: 0.55 }, cur: { open: 0, rotY: 0.55 } });
+  const anim = useRef<Anim>({ pose: { open: 0, rotY: 0.55 }, cur: { open: 0, rotY: 0.55 }, ptr: { tx: 0, ty: 0, x: 0, y: 0 } });
   const root = useRef<THREE.Group>(null);
   const flaps = useRef<(THREE.Group | null)[]>([null, null, null, null]); // front, back, right, left
   const tapeRef = useRef<THREE.Mesh>(null);
@@ -182,6 +194,20 @@ export default function Box3D({ detail, reducedMotion }: Props) {
   useFrame((state, delta) => {
     updateFrame(state, delta, assets, anim.current, parts, detail, reducedMotion);
   });
+
+  // The box leans toward the pointer (fine pointers only: touch screens have none). Listener is passive and writes two numbers.
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    if (reducedMotion || detail === 0 || !window.matchMedia("(pointer: fine)").matches) return;
+    const p = anim.current.ptr;
+    const move = (e: PointerEvent) => {
+      p.tx = (e.clientX / window.innerWidth) * 2 - 1;
+      p.ty = (e.clientY / window.innerHeight) * 2 - 1;
+      invalidate();
+    };
+    window.addEventListener("pointermove", move, { passive: true });
+    return () => window.removeEventListener("pointermove", move);
+  }, [reducedMotion, detail, invalidate]);
 
   const { g, m } = assets;
 
