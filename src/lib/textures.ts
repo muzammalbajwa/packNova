@@ -205,7 +205,13 @@ export function brandPanelTexture(name: string, tagline: string, ink: string, pa
     poly([[0, -13], [12, -7], [0, -1], [-12, -7]], paper);
     g.fillStyle = paper;
     g.textBaseline = "alphabetic";
-    g.font = `600 170px ${font}`;
+    // the wordmark is fitted to the space right of the mark (panel edge minus a margin), so no letter can run off the panel
+    let size = 170;
+    g.font = `600 ${size}px ${font}`;
+    while (g.measureText(name).width > 1000 - 250 - 60 && size > 60) {
+      size -= 4;
+      g.font = `600 ${size}px ${font}`;
+    }
     g.fillText(name, 250, 308);
     g.fillRect(100, 380, 824, 3);
     g.font = `400 52px ${font}`;

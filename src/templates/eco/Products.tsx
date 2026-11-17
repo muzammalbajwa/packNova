@@ -27,7 +27,7 @@ export default function Products() {
                 recipe={PAGE_BY_HREF[HOME_CATEGORY_HREF[p.id]]?.recipe}
                 className="rel-card group flex h-full flex-col overflow-hidden rounded-[var(--r-card)] border border-[var(--line-strong)]"
               >
-                <span className="rel-plate block aspect-[16/10] w-full px-6 py-5 text-[var(--accent)]"><ProductIcon kind={p.icon} /></span>
+                <span className="rel-plate block aspect-[2/1] w-full px-10 py-5 text-[var(--accent)]"><ProductIcon kind={p.icon} /></span>
                 <span className="flex flex-1 flex-col p-5">
                   <span className="font-display text-2xl font-medium leading-tight">{p.name}</span>
                   <span className="mt-1.5 text-[var(--muted)]">{p.description}</span>
