@@ -2,6 +2,7 @@ import Link from "next/link";
 import PrefetchLink from "./PrefetchLink";
 import { GROUP_BY_ID, pagesIn, quoteHref, type GroupId } from "@/content/catalog";
 import Crumbs from "./Crumbs";
+import QuoteBand from "./QuoteBand";
 import Shell from "./Shell";
 
 /** One group of the nav (/industry/ ...): a grid of cards, one per page. */
@@ -38,6 +39,7 @@ export default function HubPage({ group }: { group: GroupId }) {
           </ul>
         </div>
       </section>
+      <QuoteBand />
     </Shell>
   );
 }

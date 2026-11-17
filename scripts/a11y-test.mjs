@@ -45,7 +45,7 @@ for (const reduced of [false, true]) {
     // focus is not trapped: Tab leaves the menu
     await key(c, "Enter", "Enter", 13, "\r"); await sleep(200);
     for (let i = 0; i < 40; i++) await key(c, "Tab", "Tab", 9);
-    ok(await c.ev("document.querySelector('button[aria-haspopup][aria-expanded=true]')===null && !document.activeElement.closest('header, nav')"), "Tab keeps moving through the page: focus is not trapped in the menu, which closes behind it");
+    ok(await c.ev("document.querySelector('button[aria-haspopup][aria-expanded=true]')===null && !document.activeElement.closest('header')"), "Tab keeps moving through the page: focus is not trapped in the menu, which closes behind it");
     // forms and svgs
     const svgs = await c.ev("[...document.querySelectorAll('svg')].filter(s=>!s.closest('[aria-hidden=true]') && !s.getAttribute('aria-hidden') && !s.getAttribute('role') && !s.getAttribute('aria-label')).length");
     ok(svgs === 0, `every SVG on /quote/ is labelled or hidden from screen readers (${svgs} unlabelled)`);

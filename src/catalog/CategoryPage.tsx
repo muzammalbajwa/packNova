@@ -4,6 +4,8 @@ import Crumbs from "./Crumbs";
 import PrefetchLink from "./PrefetchLink";
 import ProductFilm from "./ProductFilm";
 import ProductPoster from "./ProductPoster";
+import QuoteBand from "./QuoteBand";
+import RelatedProducts from "./RelatedProducts";
 import Shell from "./Shell";
 
 const h2 = "font-display text-3xl font-medium leading-[1.1] md:text-4xl";
@@ -96,34 +98,8 @@ export default function CategoryPage({ page }: { page: CatalogPage }) {
         </div>
       </section>
 
-      <section className="bg-[var(--accent)] px-6 py-16 text-[var(--on-accent)] md:py-20">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="font-display text-3xl font-medium md:text-4xl">Want {page.title}?</h2>
-            <p className="mt-2 max-w-md text-lg opacity-90">Tell us the size and the quantity. We reply with a quote.</p>
-          </div>
-          <Link href={qHref} className="inline-flex items-center justify-center rounded-[var(--r-btn)] bg-[var(--on-accent)] px-7 py-3.5 text-base font-semibold text-[var(--accent)]">Get a quote for {page.title}</Link>
-        </div>
-      </section>
-
-      <section aria-labelledby="rel-h" className="px-6 py-16 md:py-20">
-        <div className="mx-auto max-w-6xl">
-          <h2 id="rel-h" className="font-display text-2xl font-medium">Related products</h2>
-          <ul className="mt-5 grid gap-px border border-[var(--line)] bg-[var(--line)] sm:grid-cols-3">
-            {page.related.map((href) => {
-              const r = PAGE_BY_HREF[href];
-              return r ? (
-                <li key={href} className="bg-[var(--bg)]">
-                  <PrefetchLink recipe={r.recipe} href={href} className="block h-full p-5 hover:bg-[var(--sand)]">
-                    <span className="font-display text-xl font-medium">{r.title}</span>
-                    <span className="mt-1 block text-[var(--muted)]">{r.short}</span>
-                  </PrefetchLink>
-                </li>
-              ) : null;
-            })}
-          </ul>
-        </div>
-      </section>
+      <RelatedProducts page={page} />
+      <QuoteBand product={page.title} note={page.quote.note} />
     </Shell>
   );
 }

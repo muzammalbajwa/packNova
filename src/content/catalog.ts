@@ -749,6 +749,39 @@ export const PAGE_BY_HREF = Object.fromEntries(PAGES.map((p) => [p.href, p])) as
 export const pagesIn = (g: GroupId) => PAGES.filter((p) => p.group === g);
 export const getPage = (group: string, slug: string) => PAGES.find((p) => p.group === group && p.slug === slug);
 
+/** Copy for the end of every product page (related products and the quote band). Edit here. */
+export const PAGE_END = {
+  relatedTitle: "More from the same family",
+  relatedLine: "Boxes and bags made the same way, or made for the same kind of product.",
+  relatedLink: "See it",
+  viewAll: (group: string) => `View all in ${group}`,
+  quoteTitle: (product: string) => `Ready to get ${product} made?`,
+  quoteLine: "Send us the size and how many you need. We check the details with you and confirm the price before anything is made.",
+  quotePrimary: (product: string) => `Get a quote for ${product}`,
+  quoteSecondary: "Design your box",
+  /** The band on hub pages (no single product). */
+  hubTitle: "Tell us what you are packing",
+  hubLine: "Tell us what you are packing. We suggest a style and check the details with you before anything is made.",
+  hubPrimary: "Get a quote",
+};
+
+/**
+ * Pages related to `page`, by relevance: the same process recipe first (same group first within it), then the same group, then the
+ * hand-picked `related` list. Never the page itself, never a duplicate. Up to `max`.
+ */
+export function relatedFor(page: CatalogPage, max = 4): CatalogPage[] {
+  const sameRecipe = PAGES.filter((p) => p.recipe === page.recipe && p.href !== page.href);
+  const out: CatalogPage[] = [];
+  const add = (p: CatalogPage | undefined) => {
+    if (p && p.href !== page.href && !out.some((o) => o.href === p.href)) out.push(p);
+  };
+  sameRecipe.filter((p) => p.group === page.group).forEach(add);
+  sameRecipe.forEach(add);
+  PAGES.filter((p) => p.group === page.group).forEach(add);
+  page.related.forEach((h) => add(PAGE_BY_HREF[h]));
+  return out.slice(0, max);
+}
+
 /* ------------------------------------------------------------------ nav + shared links */
 
 export interface NavItem {

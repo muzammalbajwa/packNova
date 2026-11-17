@@ -198,3 +198,7 @@ Outcome: This file, written from the codebase, README/DEPLOY/CONTENT-TODO/PHONE-
 - On mid and low tier the story canvas is created on the visitor's first input (scroll, wheel, touch, pointer, key), not right after load (`StoryEngine.tsx`). High tier (desktop) still mounts in idle time. Test scripts get `window.__eagerStory = true` from `scripts/lib/cdp.mjs` (pass `eager: false` to behave like a visitor; `scripts/visitor-story.mjs` does).
 - Tools: `scripts/home-profile.mjs` (long tasks and the functions inside them, 4x CPU phone profile), `scripts/story-compare.mjs` (pixel compare of the story between two builds).
 
+
+### Page end (2026-11-17)
+- Product pages end with `RelatedProducts` (4 cards, picked by `relatedFor()` in `content/catalog.ts`: same recipe, then same group, then the hand-picked list; drawings in `catalog/ProductIllustration.tsx`, one per style, tinted by the product's skin), then `QuoteBand` (kraft box that opens and closes while on screen, `InViewPlay` is the only client code), then the 4-column `templates/eco/Footer.tsx`. Hubs get the band too. Copy: `PAGE_END` in `catalog.ts`. Styles and hover moves (CSS only, off under reduced motion): `catalog/pageEnd.css`.
+- Checks: `scripts/page-end-test.mjs` (hover, focus ring, reduced motion, in-view pause, no self/duplicate links), `scripts/page-end-shots.mjs --tag before|after` (screenshots in `docs/screenshots/pages-v1/page-end/`).
