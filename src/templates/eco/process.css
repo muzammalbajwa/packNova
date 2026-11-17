@@ -1,0 +1,57 @@
+/*
+ * "How an order works": the heading column is pinned with position: sticky (CSS only) from 1024 px, the steps scroll past it.
+ * The active step (the one at the middle of the screen) gets forest-green number and title and a growing kraft line; the others drop to
+ * 70% opacity (55% fails AA contrast for the grey body text; the dimmed body text also switches to the darker text colour); a thin line along the left edge of the list fills as the steps pass. Opacity, colour and transform only: no layout shift.
+ */
+.process-pin { align-self: start; }
+@media (min-width: 1024px) {
+  .process-pin {
+    position: sticky;
+    top: calc(var(--header-h, 6.25rem) + 2rem);
+  }
+  .process-step { min-height: 48svh; align-content: center; }
+}
+.process-list::before,
+.process-list::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+}
+.process-list::before { background: var(--line); }
+.process-list::after {
+  background: var(--accent);
+  transform-origin: top;
+  transform: scaleY(0);
+}
+.process-list[data-js]::after {
+  transform: scaleY(var(--fill, 0));
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.process-step { position: relative; }
+.process-step .step-no, .process-step .step-title { transition: color 0.3s; }
+.process-step::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 3px;
+  width: 4.5rem;
+  background: var(--kraft);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.process-list[data-js] .process-step { opacity: 0.7; transition: opacity 0.4s; }
+.process-list[data-js] .process-step:not([data-state="active"]) .step-body { color: var(--fg); }
+.process-list[data-js] .process-step[data-state="active"] { opacity: 1; }
+.process-list[data-js] .process-step[data-state="active"] .step-no,
+.process-list[data-js] .process-step[data-state="active"] .step-title { color: var(--accent); }
+.process-list[data-js] .process-step[data-state="active"]::after { transform: scaleX(1); transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@media (prefers-reduced-motion: reduce) {
+  .process-list[data-js] .process-step { opacity: 1; transition: none; }
+  .process-list[data-js] .process-step[data-state="active"]::after { transition: none; }
+  .process-list[data-js]::after { transition: none; }
+  .process-step .step-no, .process-step .step-title { transition: none; }
+}

@@ -24,6 +24,8 @@ div[data-template="eco"] {
   --line-strong: color-mix(in srgb, var(--fg) 40%, transparent);
   --wash: color-mix(in srgb, var(--fg) 5%, transparent);
   --field: var(--surface);
+  /* fixed header: top bar + nav (the pinned heading column sits below it) */
+  --header-h: 6.25rem;
 }
 
 /* Body text: 17px with a 1.6 line height. Set on the template root only, so rem units stay at 16px. */
