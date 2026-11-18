@@ -1,6 +1,6 @@
 # CLAUDE.md: PackNova (packaging3D)
 
-Project memory for Claude Code. Read this first, then `AGENTS.md` (Next.js 16 has breaking changes: read the matching guide in `node_modules/next/dist/docs/` before writing Next-specific code) and `README.md`.
+Project memory for Claude Code. **Full documentation is in `docs/README.md` (read it for the current picture); this file is the short memory.** Read this first, then `AGENTS.md` (Next.js 16 has breaking changes: read the matching guide in `node_modules/next/dist/docs/` before writing Next-specific code) and `README.md`.
 
 PackNova is a scroll-driven, 3D marketing site for a custom-packaging manufacturer (cartons, folding cartons, rigid boxes, pouches, courier bags, paper bags). "PackNova" and all contact details are **dummy placeholders** (see `CONTENT-TODO.md`). It ships as a **static export** (no server) to Cloudflare Pages.
 
@@ -202,3 +202,9 @@ Outcome: This file, written from the codebase, README/DEPLOY/CONTENT-TODO/PHONE-
 ### Page end (2026-11-17)
 - Product pages end with `RelatedProducts` (4 cards, picked by `relatedFor()` in `content/catalog.ts`: same recipe, then same group, then the hand-picked list; drawings in `catalog/ProductIllustration.tsx`, one per style, tinted by the product's skin), then `QuoteBand` (kraft box that opens and closes while on screen, `InViewPlay` is the only client code), then the 4-column `templates/eco/Footer.tsx`. Hubs get the band too. Copy: `PAGE_END` in `catalog.ts`. Styles and hover moves (CSS only, off under reduced motion): `catalog/pageEnd.css`.
 - Checks: `scripts/page-end-test.mjs` (hover, focus ring, reduced motion, in-view pause, no self/duplicate links), `scripts/page-end-shots.mjs --tag before|after` (screenshots in `docs/screenshots/pages-v1/page-end/`).
+
+### Documentation rule (2026-11-18)
+- `docs/` is the documentation set: main file `docs/README.md`, topic files beside it, session notes in `docs/sessions/`.
+- At the end of every working session create `docs/sessions/YYYY-MM-DD-topic.md` from `docs/sessions/_TEMPLATE.md`, add one line to `docs/sessions/README.md`, and update any topic file whose facts changed (in the same commit as the change).
+- Facts in docs come from the repository (package.json, config, workflows, source, git history) or from measurements with the date and load noted. Do not write numbers that were not measured.
+

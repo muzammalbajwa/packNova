@@ -1,5 +1,7 @@
 # PackNova: cinematic 3D packaging site
 
+> **Full documentation lives in [`docs/`](docs/README.md)**: tech stack, local setup, architecture, design system, pages and features, 3D, performance and testing, deployment, content guide, and one note per working session. Parts of this file are older than that folder; when they disagree, trust `docs/`.
+
 Scroll-driven 3D marketing site. Brand name and contact details live in `src/content/siteCore.ts`, the rest of the copy in `src/content/site.ts` and `catalog.ts` (dummy values: see `CONTENT-TODO.md`). Next.js static export, deployable on Cloudflare Pages.
 
 ## Start here (for the owner, no programming needed for most things)
