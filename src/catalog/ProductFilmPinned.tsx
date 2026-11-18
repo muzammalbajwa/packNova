@@ -48,7 +48,7 @@ export default function Pinned({ page, hero, poster }: { page: CatalogPage; hero
       const [{ getEngine }, mod] = await Promise.all([loadEngine(), RECIPE_LOADERS[page.recipe]!(), waitForOtherContexts()]);
       if (dead || !hostRef.current) return;
       const eng = getEngine();
-      eng.attach(hostRef.current, profile.dpr[1]);
+      eng.attach(hostRef.current, profile.dpr[1], profile.tier === "high" ? "high" : profile.tier === "low" ? "low" : "mid");
       eng.firstFrame = () => setReady(true);
       eng.onLost = () => setReady(false); // the poster comes back while the context is gone
       eng.onRestored = () => { eng.firstFrame = () => setReady(true); };

@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { makeEnvironment } from "./env";
+import { setKitQuality } from "./kit";
 import { watchContext } from "@/lib/contextLoss";
 import type { RecipeInstance } from "./types";
 
@@ -42,6 +44,10 @@ class Engine {
    */
   idleAmp = 0;
   idleFade = 1;
+  /** Look of the lighting: 0 = low tier (flat three-point light, no tone mapping), 1 = mid, 2 = high (adds the environment reflections). */
+  private quality = -1;
+  private env: THREE.Texture | null = null;
+  private lights: { hemi: THREE.HemisphereLight; key: THREE.DirectionalLight; rim: THREE.DirectionalLight; fill: THREE.DirectionalLight; bounce: THREE.DirectionalLight } | null = null;
   idleLow = false;
   private onScreen = true;
   private io: IntersectionObserver | null = null;
@@ -78,12 +84,48 @@ class Engine {
     rim.position.set(-4, 3, -3);
     const fill = new THREE.DirectionalLight("#ffffff", 0.55);
     fill.position.set(0, 1, 5);
-    this.scene.add(hemi, key, rim, fill);
+    // a low warm bounce from the ground side (kraft floor): lifts the shaded undersides so forms keep their volume
+    const bounce = new THREE.DirectionalLight("#e8c79a", 0);
+    bounce.position.set(1.5, -3, 2.5);
+    this.lights = { hemi, key, rim, fill, bounce };
+    this.scene.add(hemi, key, rim, fill, bounce);
     window.__film = { renderer: r, scene: this.scene, camera: this.camera, set: (p) => this.setProgress(p), visible: () => this.anyVisible() };
   }
 
-  attach(host: HTMLElement, maxDpr: number) {
+  /**
+   * The look of the light for a tier. Low keeps the original flat three-point light. Mid and high use a stronger key with a softer fill and a
+   * stronger rim (more form shading), and a warm ground bounce under the shaded sides; high also gets the small studio environment for
+   * gentle reflections (foil, gloss, film). The environment is built once, on first use.
+   */
+  private setQuality(q: 0 | 1 | 2) {
+    if (q === this.quality || !this.lights) return;
+    this.quality = q;
+    setKitQuality(q);
+    const { hemi, key, rim, fill, bounce } = this.lights;
+    const r = this.renderer;
+    if (q === 0) {
+      r.toneMapping = THREE.NoToneMapping;
+      this.scene.environment = null;
+      hemi.intensity = 1.25; key.intensity = 2.3; rim.intensity = 0.9; fill.intensity = 0.55; bounce.intensity = 0;
+    } else {
+      r.toneMapping = THREE.NoToneMapping; // tone mapping was tried and made the kraft too golden; depth comes from the light balance instead
+      hemi.intensity = 0.95; key.intensity = 2.6; rim.intensity = 1.3; fill.intensity = 0.3; bounce.intensity = 0.38;
+      if (q === 2) {
+        this.env ??= makeEnvironment(r);
+        this.scene.environment = this.env;
+        this.scene.environmentIntensity = 0.3;
+      } else this.scene.environment = null;
+    }
+    // materials compiled under the other settings are rebuilt on the next draw
+    this.scene.traverse((o) => {
+      const m = (o as THREE.Mesh).material as THREE.Material | THREE.Material[] | undefined;
+      for (const mat of Array.isArray(m) ? m : m ? [m] : []) mat.needsUpdate = true;
+    });
+  }
+
+  attach(host: HTMLElement, maxDpr: number, tier: "low" | "mid" | "high" = "mid") {
     window.clearTimeout(this.destroyTimer);
+    this.setQuality(tier === "high" ? 2 : tier === "mid" ? 1 : 0);
     this.host = host;
     this.maxDpr = maxDpr;
     host.appendChild(this.renderer.domElement);

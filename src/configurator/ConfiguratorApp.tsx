@@ -94,7 +94,7 @@ export default function ConfiguratorApp() {
       const [{ getEngine }, mod] = await Promise.all([loadEngine(), import("@/film/configurator"), waitForOtherContexts()]);
       if (dead || !hostRef.current) return;
       const eng = getEngine();
-      eng.attach(hostRef.current, prof.dpr[1]);
+      eng.attach(hostRef.current, prof.dpr[1], prof.tier === "high" ? "high" : prof.tier === "low" ? "low" : "mid");
       eng.firstFrame = () => setReady(true);
       eng.onLost = () => setReady(false);
       eng.onRestored = () => { eng.firstFrame = () => setReady(true); };

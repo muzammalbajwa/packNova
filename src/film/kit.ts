@@ -217,6 +217,10 @@ export interface Mats {
   packed?: boolean;
 }
 
+/** Quality tier of the current session (set by the engine before a recipe is built): 0 = low, 1 = mid, 2 = high. Extras like relief skip tier 0. */
+let kitQuality = 1;
+export const setKitQuality = (q: number) => { kitQuality = q; };
+
 const ROUGH: Record<Skin["material"], number> = { kraft: 0.92, white: 0.82, black: 0.4, color: 0.72, film: 0.3 };
 
 /** Materials of one skin. `printTex` / `blankTex` come from sheetTexture(); the outer face wipes between them. */
@@ -230,6 +234,10 @@ export function skinMats(pool: Pool, skin: Skin, printTex: THREE.Texture, blankT
   if (skin.finish?.emboss) {
     outer.bumpMap = printTex;
     outer.bumpScale = 1.6;
+  } else if (kitQuality > 0 && (skin.material === "kraft" || skin.material === "white" || skin.material === "color")) {
+    // relief from the sheet's own grain and flute lines (no extra texture): board and paper catch the light instead of reading as flat colour
+    outer.bumpMap = printTex;
+    outer.bumpScale = skin.material === "kraft" ? 2.2 : 1.2;
   }
   outer.onBeforeCompile = (sh) => {
     sh.uniforms.uBlankMap = uBlank;
@@ -317,9 +325,12 @@ export function shadowTexture() {
   const c = document.createElement("canvas");
   c.width = c.height = 128;
   const g = c.getContext("2d")!;
+  // two layers in one texture: a tight dark core (the contact) inside a wide soft penumbra
   const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-  gr.addColorStop(0, "rgba(20,14,6,0.55)");
-  gr.addColorStop(1, "rgba(20,14,6,0)");
+  gr.addColorStop(0, "rgba(24,16,6,0.78)");
+  gr.addColorStop(0.22, "rgba(24,16,6,0.5)");
+  gr.addColorStop(0.55, "rgba(24,16,6,0.16)");
+  gr.addColorStop(1, "rgba(24,16,6,0)");
   g.fillStyle = gr;
   g.fillRect(0, 0, 128, 128);
   shadowTex = new THREE.CanvasTexture(c);

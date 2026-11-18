@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { settle } from "./ease";
 import { Pool, rectGeo, steel, PI2, type Mats, type Rect, type SheetArt } from "./kit";
 
 /**
@@ -227,11 +228,11 @@ export function buildChain(pool: Pool, s: ChainSpec, L: ChainLayout, mats: Mats)
 
   const chain: Chain = {
     root, walls, glue, top, bottom, tuckT, tuckB, waste, knife, creasesV, creasesH, vLines, layout: L, spec: s, cx: 0, cz: 0,
-    setWall(i, f) { walls[i].rotation.y = f * PI2; fold[i] = f; },
-    setGlue(f) { glue.rotation.y = f * PI2; },
+    setWall(i, f) { walls[i].rotation.y = settle(f) * PI2; fold[i] = f; },
+    setGlue(f) { glue.rotation.y = settle(f, 0.02) * PI2; },
     setTop(i, f) { const g = top[i]; if (g) { g.rotation.x = -f * PI2; g.position.y = H + s.topLayer[i] * t * f; } },
     setBottom(i, f) { const g = bottom[i]; if (g) { g.rotation.x = f * PI2; g.position.y = -s.bottomLayer[i] * t * f; } },
-    setTuckTop(i, f) { const g = tuckT[i]; if (g) g.rotation.x = -f * PI2; },
+    setTuckTop(i, f) { const g = tuckT[i]; if (g) g.rotation.x = -settle(f, 0.03) * PI2; },
     setTuckBottom(i, f) { const g = tuckB[i]; if (g) g.rotation.x = f * PI2; },
     center() {
       let x = 0, z = 0, th = 0;
