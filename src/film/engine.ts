@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { makeEnvironment } from "./env";
 import { setKitQuality } from "./kit";
+import { drift } from "./ease";
 import { watchContext } from "@/lib/contextLoss";
 import type { RecipeInstance } from "./types";
 
@@ -264,7 +265,17 @@ class Engine {
     this.lastDraw = now;
     const t0 = window.__perfOn ? performance.now() : 0; // ?perf=1 only: record the CPU time of this draw
     this.recipe.update(this.p, this.camera);
-    this.recipe.root.rotation.y = this.idleAmp > 0 ? Math.sin(now * 0.00075) * this.idleAmp * this.idleFade : 0;
+    // slow parallax: the product turns a few degrees and the lens pushes in and out a little as the film plays (a pure function of progress,
+    // never constant, never fast); the first screen idles on its own sway instead. Mid and high tier only.
+    const dr = this.quality > 0 ? 1 - Math.min(1, this.idleFade * (this.idleAmp > 0 ? 1 : 0)) : 0;
+    this.recipe.root.rotation.y = (this.idleAmp > 0 ? Math.sin(now * 0.00075) * this.idleAmp * this.idleFade : 0) + drift(this.p) * 0.05 * dr;
+    if (this.quality > 0) {
+      const z = 1 + drift(this.p, 1.7) * 0.03 * dr;
+      if (z !== this.camera.zoom) {
+        this.camera.zoom = z;
+        this.camera.updateProjectionMatrix();
+      }
+    }
     this.renderer.render(this.scene, this.camera);
     if (t0) {
       const m = window.__filmMs;

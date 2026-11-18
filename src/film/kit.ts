@@ -174,7 +174,7 @@ export function sheetTexture(pool: Pool, skin: Skin, art: SheetArt, blank: boole
   }
   const t = pool.add(new THREE.CanvasTexture(c));
   t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 4;
+  t.anisotropy = kitQuality > 0 ? 8 : 4; // sharper at a slant: thin lines (die lines, foil strips, print edges) shimmer less
   return t;
 }
 

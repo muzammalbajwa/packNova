@@ -11,6 +11,9 @@ import { detectDevice } from "@/lib/deviceTier";
 import { trackProgress } from "@/lib/scroll";
 import { FILM_LAYOUT, HERO_COL, STAGE_BOX } from "./filmLayout";
 
+/** Share of a step (0..1) after which its caption replaces the previous one. */
+const CAPTION_LAG = 0.12;
+
 /** The page detail that sits next to a step (what it is, materials, sizes, finishes, uses, order, a question). */
 function detailFor(page: CatalogPage, i: number, n: number): { label: string; body: string } {
   const spec = (l: string) => page.specs.find((s) => s.label === l)?.value ?? "";
@@ -87,7 +90,9 @@ export default function Pinned({ page, hero, poster }: { page: CatalogPage; hero
       pRef.current = P;
       stickyRef.current?.style.setProperty("--p", P.toFixed(4));
       setProgressRef.current?.(P);
-      const idx = P < I ? -1 : Math.min(n - 1, Math.floor(((P - I) / (1 - I)) * n));
+      // the caption of a step arrives a little after the step starts (the key action is under way) and the previous one stays until then
+      const raw = ((P - I) / (1 - I)) * n;
+      const idx = P < I ? -1 : raw < 1 ? 0 : Math.min(n - 1, Math.floor(raw - CAPTION_LAG));
       if (idx !== cur) {
         cur = idx;
         setStep(idx);

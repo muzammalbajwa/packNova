@@ -370,8 +370,8 @@ function* buildSteps(theme: Theme, low: boolean) {
 
   const colors = {
     // day: a calm sky from the template's own page colours; dusk: a warm glow low down, a deep top
-    horizonDay: dark ? mixC(theme.bg, theme.fg, 0.4) : mixC(theme.bg, theme.surface, 0.6),
-    zenithDay: dark ? mixC(theme.bg, theme.fg, 0.16) : mixC(theme.bg, theme.accent, 0.46),
+    horizonDay: dark ? mixC(theme.accent, theme.fg, 0.42) : mixC(theme.bg, theme.surface, 0.6), // dark theme: a soft sage-to-cream horizon (was a flat grey)
+    zenithDay: dark ? mixC(theme.bg, theme.accent, 0.5) : mixC(theme.bg, theme.accent, 0.46),
     horizonDusk: dark ? mixC(theme.accent, theme.bg, 0.55) : mixC(theme.kraft, theme.accent, 0.3),
     zenithDusk: dark ? mixC(theme.bg, "#000000", 0.3) : mixC(theme.bg, theme.fg, 0.6),
     groundDay: new THREE.Color(groundMat.color),

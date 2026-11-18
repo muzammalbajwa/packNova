@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import type { RecipeCtx, RecipeFactory } from "../types";
 import { Pool, PI2, blobShadow, fitDistance, lerp, lin, orbit, seg, sheetTexture, skinMats, steel } from "../kit";
+import { glide } from "../ease";
 import { buildChain, chainLayout, type Chain, type ChainSpec } from "../chain";
 import { createProps } from "../props";
 
@@ -151,14 +152,14 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
 
     lid.waste.visible = lid.knife.visible = lid.creasesV.visible = lid.creasesH.visible = false; // the warm-up shows everything once
     // 3: the lid comes down over the base
-    const lidIn = seg(t3, 0.05, 0.85);
+    const lidIn = glide(t3, 0.05, 0.85); // decelerating: the lid slows into place instead of stopping dead
     lidG.visible = p >= 3 / N;
     // 4: closing detail; 5: lid lifts off and moves aside
     const lift = (ribbon ? 0 : seg(t4, 0.08, 0.34) * (1 - seg(t4, 0.62, 0.9))) * 0.9;
     const aside = seg(t5, 0.18, 0.55);
     const up = seg(t5, 0, 0.2) * (1 - seg(t5, 0.58, 0.82));
     const lx = aside * L * 1.45;
-    const ly = lidY0 + (1 - lidIn) * 2.6 + lift + up * (H * 1.3) - seg(t5, 0.58, 0.82) * (lidY0 - floor);
+    const ly = lidY0 + (1 - lidIn) * 1.45 + lift + up * (H * 1.3) - seg(t5, 0.58, 0.82) * (lidY0 - floor);
     lidG.position.set(lx, ly, 0);
     magnets.visible = magnet && p >= 4 / N && p < 5 / N;
     const ms = seg(t4, 0.28, 0.5) * (1 - seg(t4, 0.66, 0.84));

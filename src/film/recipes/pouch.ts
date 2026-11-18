@@ -94,7 +94,7 @@ const create: RecipeFactory = ({ skin, low }: RecipeCtx) => {
   const barMat = steel(pool, "#6c7378");
   const barV = new THREE.Mesh(pool.add(new THREE.BoxGeometry(L * SM * 1.6, H, 0.1)), barMat);
   const barH = new THREE.Mesh(pool.add(new THREE.BoxGeometry(L, 0.1, 0.1)), barMat);
-  const sealMat = pool.add(new THREE.MeshStandardMaterial({ color: new THREE.Color(skin.base).lerp(new THREE.Color("#ffffff"), 0.35), roughness: 0.5, transparent: true, opacity: 0.55, depthWrite: false }));
+  const sealMat = pool.add(new THREE.MeshStandardMaterial({ color: new THREE.Color(skin.base).lerp(new THREE.Color("#ffffff"), 0.35), roughness: 0.42, metalness: 0.3, transparent: true, opacity: 0.92, depthWrite: false })); // satin crimped seal; it read as grey glass at 0.55
   const sealV = pool.add(new THREE.BoxGeometry(L * SM, H * 0.985, 0.004));
   const sealL = new THREE.Mesh(sealV, sealMat);
   const sealR = new THREE.Mesh(sealV, sealMat);

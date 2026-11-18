@@ -15,5 +15,6 @@ The first five notes are **reconstructed from the git history** (commit messages
 | 2026-11-16 | [lifecycle, first screen, speed](2026-11-16-lifecycle-first-screen-speed.md) | `801e954`, `bbce755`, `4bf4db0`, `67150fc` | Two-cartons bug, film first screen, template removal, mobile speed |
 | 2026-11-17 | [page end and design passes](2026-11-17-page-end-and-design-passes.md) | `1a06df7` to `aca3fe0` | Related cards, quote band, footer, design audit, branded hero, sticky order steps |
 | 2026-11-18 | [configurator, hubs and docs](2026-11-18-configurator-hubs-and-docs.md) | `69acefd`, `1d56023`, docs commit | Configurator layout fix, hub redesign, this documentation |
+| 2026-11-19 | [animation quality](2026-11-19-animation-quality.md) | `d6f7c47` and the next | Film lighting, shadows, relief, fold settle, drift, caption timing, audit |
 
 Back to the [main documentation](../README.md).

@@ -41,6 +41,45 @@ Quality is judged on the whole set at once, so the engine-level fixes come first
 
 Everything stays a pure function of progress, with no allocations per frame; extras are lazy in the 3D chunks and skipped on the low tier.
 
-## Result
+## Outcome (after the work)
 
-The results, per item, are recorded at the end of this file after the work (see "Outcome").
+Before and after contact sheets and transition frame sequences for the homepage, all seven recipes, an event page and the configurator, at 1440 and 390 px: `docs/screenshots/pages-v1/animation-quality/before/` and `.../after/`. **Honest summary: the films are clearly better shaded and move a little more naturally, but this is a first pass, not a transformation. Half of the 15 items are only partly fixed or not touched.**
+
+| # | Status | What was done, or why not |
+|---|---|---|
+| 1 Flat lighting | **Partly fixed** | Mid and high tier: stronger key and rim, softer fill, a warm ground bounce under shaded sides (`film/engine.ts`). Faces now separate more clearly. The stage plate was not changed, so kraft on cream is still low-contrast in places. |
+| 2 No environment / tone | **Partly fixed** | A tiny procedural studio environment (64 px PMREM, built once) on the high tier only (`film/env.ts`). Neutral tone mapping was tried and **rejected**: it turned the kraft golden and muddy. |
+| 3 Flat sheets, no thickness cue | **Not fixed** | Only helped indirectly by the board relief and shading. Real chamfered edges need new geometry in the shared chain; not done. |
+| 4 Weak contact shadows | **Partly fixed** | Two-layer shadow texture (tight core plus soft penumbra) for every blob (`kit.ts`). No new per-object shadows were added, so some floating pieces still lack their own. |
+| 5 Missing material grain | **Partly fixed** | Board relief from the sheet's own grain and flute lines on kraft, white and colour skins (mid and high tier; no new texture). Paper, foil and film have no new detail. |
+| 6 Pouch reads as glass | **Partly fixed** | The side seals are now satin and nearly opaque. The flat seal frame around the swollen pouch, film wrinkles and foil crinkle are **not** done. |
+| 7 Pieces cut by the stage edge | **Partly fixed** | Fixed for the rigid-box lid (it enters inside the frame and slows into place, `ease.ts` `glide`). The other recipes were not changed. |
+| 8 Mechanical folds | **Fixed for folds** | Every wall, glue flap and tuck flap overshoots by a few degrees and settles back (`ease.ts` `settle`, used in `chain.ts`). The other helpers in `ease.ts` (cut, press, rise) exist but only the lid uses one. |
+| 9 Static camera | **Fixed** | A slow parallax: a few degrees of yaw and a 3% push in and out as a pure function of progress (`ease.ts` `drift`, mid and high tier). Per-step camera choreography was **not** redone. |
+| 10 Pops at hand-offs (home 8 to 10) | **Not fixed** | Left as is. |
+| 11 Caption sync | **Fixed for film pages** | A step's caption now arrives 12% into the step, when its key action is under way, and the previous caption stays until then. The homepage film captions were not changed. |
+| 12 Flat shipping backdrops | **Partly fixed** | The day sky is a soft sage-to-cream gradient tied to the palette (was flat grey); clouds were lightened in an earlier commit. The sky is still a feathered rectangle. |
+| 13 Configurator flaps | **Not fixed** | Same fold behaviour as before (flaps stay up, then close late). |
+| 14 Hero idle and hover easing | **Not fixed** | Not touched. |
+| 15 Shimmer on thin lines | **Partly fixed** | Anisotropy raised from 4 to 8 on sheet textures (mid and high tier). Not measured against shimmer. |
+
+Everything is still a pure function of progress and allocation-free per frame; the low tier keeps the original look (original lights, no relief, no environment, no drift, anisotropy 4).
+
+### Numbers
+
+| Budget | Result |
+|---|---|
+| Initial JS | unchanged: product page 144.3 kB (was 144.4), configurator 155.2 kB, homepage 216.1 kB |
+| Film page lazy JS | 316.3 → 323.4 kB gzip in total (+7.1 kB). Shared 3D chunk 100.2 kB (no change), engine chunk 20.8 → 20.9 kB, a folding-carton recipe chunk 37.7 → 38.0 kB. Under the 15 kB cap. |
+| Texture memory | no new canvas textures; one extra 64 px PMREM environment texture on the high tier (under 1 MB). Leak test texture counts unchanged (8, 6, 5, 4, 4, 4, 3, 8, 5). |
+| Draw calls | unchanged: 3 to 33 on film pages (sweeps at 1440 and 390 px) |
+| Empty frames | none (film sweeps, both sizes; story sweep: zero empty pinned frames, 300 progress values clean) |
+| Frame time, 1440 px | all 7 recipes 60 fps, p99 16.8 ms (load 3.4 at the start of the run) |
+| Frame time, 390 px with 4x throttle | **Not verified on a quiet machine.** The machine load was 10 to 30 (VS Code language servers), far above 4. An alternating A/B of the previous and the current build under that same load showed no difference: both swung between 55 and 60 fps and p99 17 to 50 ms and converged to 60 fps and 16.8 ms as the load fell. Re-run on a quiet machine to confirm. |
+| 20-navigation leak test, scene object counts | passes (geometries, textures, programs, scene objects and heap stable; homepage scenes identical on every visit) |
+| Home to other page to home round trips (10 rounds) and film Back/Forward | pass |
+| Fast scroll through steps | the story and film sweeps jump and sweep progress quickly: pass; a human flick on a real trackpad was not tested |
+
+### Still weak (be honest)
+
+Flat sheets still look thin; materials other than kraft are not much richer; stage-edge entrances in most recipes; homepage hand-offs and captions; the configurator flaps; hero and hover easing; the shipping chapter is still low-poly matte; no real-device, Safari or Firefox testing.

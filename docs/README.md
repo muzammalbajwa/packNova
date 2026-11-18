@@ -22,6 +22,7 @@ Last updated: 2026-11-18 (after commit `1d56023`).
 | 10 | [content-guide.md](content-guide.md) | How to edit copy, add a product page, what is still placeholder |
 | 11 | [sessions/README.md](sessions/README.md) | One note per working session, newest last, with a template |
 | 12 | [DESIGN-AUDIT.md](DESIGN-AUDIT.md) | The design audit (scores, fixed and open findings) |
+| 13 | [ANIMATION-AUDIT.md](ANIMATION-AUDIT.md) | The 3D and animation quality audit: 15 ranked problems, what was fixed, what was not |
 
 Other files in `docs/`: `screenshots/` (before/after images per task), `lighthouse/` and `perf/` (raw measurements), `server/htaccess.txt` (server config to paste), `final-verification.txt` (the phase 6 verification record), `compare/` and `baseline-story-sweep.txt` (regression baselines), `content-notes-earlier.md` (older content notes).
 
