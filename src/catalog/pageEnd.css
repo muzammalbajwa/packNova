@@ -90,3 +90,36 @@
   .band-flap { animation: none; }
   .band-pause { display: none; }
 }
+
+/* ---------- hub pages ---------- */
+/* chips stay invisible (space reserved) until the filter script has run, so a visitor without script never sees dead buttons and nothing shifts */
+.hub-filter:not([data-js]) .hub-chips { visibility: hidden; }
+.hub-chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+/* the feature card: the first card, two columns wide, picture left and text right (from 1024 px; only while no filter is on) */
+.hub-plate { aspect-ratio: 3 / 2; }
+@media (min-width: 1024px) {
+  .hub-card[data-wide] { grid-column: span 2; }
+  .hub-card[data-wide] .hub-link { flex-direction: row; }
+  .hub-card[data-wide] .hub-plate { aspect-ratio: auto; width: 48%; border-bottom: 0; border-right: 1px solid var(--line-strong); display: grid; place-items: center; }
+  .hub-card[data-wide] .hub-name { font-size: 2.25rem; line-height: 1.1; }
+  .hub-card[data-wide] .hub-plate { padding: 1.25rem 1.5rem; }
+  .hub-card[data-wide] .hub-extra { display: block; }
+}
+/* the grid fills holes left by hidden cards */
+.hub-grid { grid-auto-flow: dense; }
+/* the line of the "how it is made" strip draws as the strip scrolls into view (fully drawn without scroll-driven animation support) */
+@keyframes hub-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes hub-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hub-line path { animation: hub-draw linear both; animation-timeline: view(); animation-range: entry 10% cover 55%; }
+    /* cards ease in as they enter, one column after the next */
+    .hub-card { animation: hub-in linear both; animation-timeline: view(); animation-range: entry calc(2% + var(--c, 0) * 5%) entry calc(30% + var(--c, 0) * 5%); }
+  }
+}
+/* phones: each card is a row (picture left, text right), so a list of 12 is short and the drawings are not oversized */
+@media (max-width: 639px) {
+  .hub-link { flex-direction: row; }
+  .hub-plate { aspect-ratio: auto !important; width: 38%; flex: none; padding: 0.75rem !important; border-bottom: 0 !important; border-right: 1px solid var(--line-strong); display: grid; place-items: center; }
+  .hub-plate svg { max-height: 8.5rem; }
+}

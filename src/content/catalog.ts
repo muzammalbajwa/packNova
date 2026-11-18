@@ -15,6 +15,10 @@ export type PrintStyle = "none" | "wordmark" | "band" | "stripes" | "dots" | "fu
 export type LidKind = "tuck" | "lid-base" | "magnet" | "shoulder" | "gable" | "pillow" | "flap" | "none";
 export type PropKind = "pumpkin" | "bat" | "ribbon" | "bow" | "snowflake" | "star" | "leaf" | "confetti";
 export type CardLook = "tag" | "sticker" | "";
+/** Which line drawing a page gets on cards (components in catalog/ProductIllustration.tsx). Edit per page in ENTRIES (`art`). */
+export type IllustrationKind =
+  | "rigid" | "mailer" | "shipper" | "tuck" | "folding" | "window" | "takeaway" | "gable" | "pillow" | "bag" | "pouch" | "courier"
+  | "tag" | "sticker" | "tray" | "insert" | "jewelry" | "display" | "pizza" | "candle" | "bottle" | "medicine" | "device" | "retail";
 
 export interface Skin {
   material: MaterialLook;
@@ -81,6 +85,8 @@ export interface CatalogPage {
   faq: Faq[];
   seo: { title: string; description: string };
   recipe: RecipeId;
+  art: IllustrationKind;
+  tags: string[];
   skin: Skin;
   steps: ProcessStep[];
   /** hrefs of related pages. */
@@ -263,6 +269,10 @@ interface Entry {
   short: string;
   what: string;
   recipe: RecipeId;
+  /** Line drawing on cards. */
+  art: IllustrationKind;
+  /** Filter chips on the hub pages: first the product family, then material and features. Edit freely. */
+  tags: string[];
   skin: Skin;
   materials: string;
   uses: string[];
@@ -281,6 +291,7 @@ const ENTRIES: Entry[] = [
     short: "Flat mailers and shirt boxes for clothing and textiles.",
     what: "Low, wide boxes that hold folded shirts, scarves and sets flat. They ship well, open easily and can carry your print inside and out.",
     recipe: "corrugated-box",
+    art: "mailer", tags: ["Boxes", "Kraft", "Mailer"],
     skin: sk({ material: "kraft", base: KRAFT_LIGHT, accent: INK, print: "wordmark", ratio: [3, 2.2, 0.7] }),
     materials: "Corrugated mailer board, kraft or white outside",
     uses: ["Shirts and tops", "Scarves and accessories", "Online clothing orders", "Gift sets"],
@@ -295,6 +306,7 @@ const ENTRIES: Entry[] = [
     short: "Window boxes for cakes, pastries and cookies.",
     what: "Food-safe cartons with a clear window so the product shows. Built for cakes, pastries and cookie assortments that have to survive the trip home.",
     recipe: "folding-carton",
+    art: "window", tags: ["Boxes", "Window", "Food"],
     skin: sk({ material: "white", base: "#f3ede2", accent: "#a2583f", second: KRAFT, print: "stripes", lid: "flap", window: true, ratio: [1.1, 1.1, 0.75] }),
     materials: "Food-safe paperboard with a clear window film",
     uses: ["Whole cakes", "Pastry assortments", "Cookies and brownies", "Takeaway orders"],
@@ -309,6 +321,7 @@ const ENTRIES: Entry[] = [
     short: "Stand-up foil pouches with a zipper, printed to your design.",
     what: "Stand-up pouches made from layered film that blocks air, light and moisture. A good fit for dry foods, tea, coffee and supplements.",
     recipe: "pouch",
+    art: "pouch", tags: ["Pouches", "Film", "Resealable"],
     skin: sk({ material: "film", base: "#2a2f2c", accent: "#d8c9a0", second: FOREST, print: "band", ratio: [1, 0.45, 1.5] }),
     materials: "Laminated film, matte or gloss, with a foil layer",
     uses: ["Coffee and tea", "Spices and snacks", "Supplements", "Dry goods"],
@@ -322,6 +335,7 @@ const ENTRIES: Entry[] = [
     short: "Rigid boxes with cut inserts for chocolates and confectionery.",
     what: "Rigid lid-and-base boxes with a cut insert that gives each piece its own place. A strong choice for gifting and for seasonal ranges.",
     recipe: "rigid-box",
+    art: "insert", tags: ["Boxes", "Rigid", "Insert"],
     skin: sk({ material: "color", base: "#4a2c1d", accent: "#d6b36a", second: "#d6b36a", print: "wordmark", lid: "lid-base", foil: true, props: ["ribbon"], ratio: [1.4, 1, 0.5] }),
     materials: "Rigid greyboard wrapped in coated or textured paper",
     uses: ["Gift assortments", "Seasonal ranges", "Wedding favours", "Corporate gifting"],
@@ -335,6 +349,7 @@ const ENTRIES: Entry[] = [
     short: "Printed cartons for supplements, medicines and personal care.",
     what: "Folding cartons with a clean layout and room for the text your product needs. They protect the contents and keep the label easy to read.",
     recipe: "folding-carton",
+    art: "medicine", tags: ["Cartons", "Printed", "White board"],
     skin: sk({ material: "white", base: "#f4f2ec", accent: "#2f7a5a", second: "#9db8a0", print: "band", lid: "tuck", ratio: [0.6, 0.35, 1.5] }),
     materials: "White paperboard, coated for sharp print",
     uses: ["Supplements and vitamins", "Over-the-counter products", "Personal care", "Test kits"],
@@ -348,6 +363,7 @@ const ENTRIES: Entry[] = [
     short: "Compact rigid boxes with a magnetic lid and a soft insert.",
     what: "Small rigid boxes with a snug lid and an insert that holds rings, earrings or a necklace. Made to feel good in the hand.",
     recipe: "rigid-box",
+    art: "jewelry", tags: ["Boxes", "Rigid", "Magnetic lid"],
     skin: sk({ material: "black", base: "#1e1f1d", accent: "#c9a96a", second: "#c9a96a", print: "wordmark", lid: "magnet", foil: true, ratio: [1, 1, 0.55] }),
     materials: "Rigid greyboard wrapped in soft-touch or textured paper",
     uses: ["Rings and earrings", "Necklaces and bracelets", "Watches", "Gift sets"],
@@ -361,6 +377,7 @@ const ENTRIES: Entry[] = [
     short: "Kraft and printed cartons for ready meals, snacks and gifts.",
     what: "Folding cartons for meals, snacks and hampers. They hold their shape, carry your print and can have a window so the food shows.",
     recipe: "folding-carton",
+    art: "takeaway", tags: ["Boxes", "Kraft", "Food"],
     skin: sk({ material: "kraft", base: KRAFT, accent: "#f1ebde", second: "#a2583f", print: "stripes", lid: "tuck", window: true, ratio: [1.2, 0.8, 0.6] }),
     materials: "Kraft or white food-safe paperboard",
     uses: ["Ready meals", "Snacks and sweets", "Hampers", "Delivery orders"],
@@ -374,6 +391,7 @@ const ENTRIES: Entry[] = [
     short: "Counter and shelf display boxes that hold several products.",
     what: "Boxes that open into a display so the products can sit on the counter. Useful for small items sold side by side.",
     recipe: "corrugated-box",
+    art: "display", tags: ["Boxes", "Corrugated", "Counter"],
     skin: sk({ material: "white", base: "#efeadf", accent: FOREST, second: KRAFT, print: "band", ratio: [2, 1.2, 0.9] }),
     materials: "Corrugated or folding board, printed",
     uses: ["Counter displays", "Shelf-ready packs", "Candy and small items", "Product trays"],
@@ -388,6 +406,7 @@ const ENTRIES: Entry[] = [
     short: "Flat corrugated boxes in common pizza sizes, printed with your logo.",
     what: "Flat corrugated boxes with a vented lid, made to carry pizza and keep it warm. They fold from flat and arrive in stacks.",
     recipe: "corrugated-box",
+    art: "pizza", tags: ["Boxes", "Corrugated", "Flat"],
     skin: sk({ material: "kraft", base: "#c4955a", accent: "#7a2a1d", print: "wordmark", ratio: [2, 2, 0.16] }),
     materials: "Corrugated board, kraft or white",
     uses: ["Pizza restaurants", "Delivery brands", "Pastry and flatbread", "Party orders"],
@@ -402,6 +421,7 @@ const ENTRIES: Entry[] = [
     short: "Snug cartons for jar candles, tins and gift sets.",
     what: "Tall, snug cartons that hold a candle or a set safely. Soft colors and quiet print suit a candle brand well.",
     recipe: "folding-carton",
+    art: "candle", tags: ["Cartons", "Printed", "Gift"],
     skin: sk({ material: "color", base: "#d9d2bf", accent: "#5b6b4e", second: "#b8803f", print: "wordmark", lid: "tuck", ratio: [0.9, 0.9, 1.0] }),
     materials: "Textured paperboard, cut insert for jars",
     uses: ["Jar candles", "Candle sets", "Wax melts", "Gift boxes"],
@@ -415,6 +435,7 @@ const ENTRIES: Entry[] = [
     short: "Fine-print cartons for skincare, makeup and fragrance.",
     what: "Cartons with sharp print and quiet finishes for skincare and makeup. Often chosen with foil or spot gloss on the logo.",
     recipe: "folding-carton",
+    art: "bottle", tags: ["Cartons", "Printed", "Retail"],
     skin: sk({ material: "color", base: "#e3c9bd", accent: "#4a2c27", second: "#c9a96a", print: "wordmark", lid: "tuck", foil: true, ratio: [0.45, 0.45, 1.3] }),
     materials: "Smooth paperboard, fine-print coated",
     uses: ["Skincare", "Makeup", "Fragrance", "Sample sets"],
@@ -428,6 +449,7 @@ const ENTRIES: Entry[] = [
     short: "Rigid and corrugated boxes with fitted inserts for devices.",
     what: "Boxes with an insert cut to the device, accessories and cables. The lid fits snugly so the product arrives undamaged and well presented.",
     recipe: "rigid-box",
+    art: "device", tags: ["Boxes", "Rigid", "Insert"],
     skin: sk({ material: "white", base: "#e9e8e3", accent: "#2b3a33", second: FOREST, print: "wordmark", lid: "shoulder", ratio: [1.5, 1, 0.55] }),
     materials: "Rigid greyboard, cut EVA or card insert",
     uses: ["Phones and tablets", "Headphones", "Chargers and cables", "Smart devices"],
@@ -443,6 +465,7 @@ const ENTRIES: Entry[] = [
     short: "Cartons with a clear window cut into the front.",
     what: "A carton with a cut-out and a clear film behind it. Customers see the product, and the box still carries your print.",
     recipe: "folding-carton",
+    art: "window", tags: ["Cartons", "Window", "Retail"],
     skin: sk({ material: "white", base: "#f1ebde", accent: FOREST, second: KRAFT, print: "band", lid: "tuck", window: true, ratio: [1, 0.6, 1] }),
     materials: "Paperboard with clear PET or biodegradable window film",
     uses: ["Food and sweets", "Toys", "Cosmetics", "Small gifts"],
@@ -456,6 +479,7 @@ const ENTRIES: Entry[] = [
     short: "Folding cartons that close with a tuck-in flap.",
     what: "The most common folding carton: a top flap tucks into the front panel. It needs no glue to close, ships flat and is cost-effective for most products.",
     recipe: "folding-carton",
+    art: "tuck", tags: ["Cartons", "Tuck top", "Retail"],
     skin: sk({ material: "white", base: "#efe8d8", accent: "#a2583f", second: FOREST, print: "stripes", lid: "tuck", ratio: [0.8, 0.5, 1.2] }),
     materials: "Paperboard or kraft board, 1 to 4 color print",
     uses: ["Cosmetics", "Supplements", "Small electronics", "Retail products"],
@@ -469,6 +493,7 @@ const ENTRIES: Entry[] = [
     short: "Roof-topped cartons you can carry by the top.",
     what: "A carton with a gabled roof and a carry handle. Popular for party favours, treats and small gifts, and a quick, friendly way to give a product.",
     recipe: "folding-carton",
+    art: "gable", tags: ["Cartons", "Handle", "Gift"],
     skin: sk({ material: "color", base: "#e4d9c1", accent: "#a2583f", second: FOREST, print: "dots", lid: "gable", handle: true, ratio: [0.9, 0.7, 1.0] }),
     materials: "Paperboard or kraft board",
     uses: ["Party favours", "Treat boxes", "Take-home gifts", "Small food gifts"],
@@ -482,6 +507,7 @@ const ENTRIES: Entry[] = [
     short: "Printed tags with a hole and string, for clothing and gifts.",
     what: "A printed card with a punched hole and a string or a ribbon. Hang tags carry the brand, the care notes or a short story.",
     recipe: "label-tag",
+    art: "tag", tags: ["Tags", "Kraft", "Retail"],
     skin: sk({ material: "kraft", base: KRAFT_LIGHT, accent: INK, second: FOREST, print: "wordmark", card: "tag", ratio: [0.5, 0.02, 1] }),
     materials: "Card stock, kraft or white, 300 to 400 gsm class",
     uses: ["Clothing", "Candles and soaps", "Handmade goods", "Gift wrap"],
@@ -495,6 +521,7 @@ const ENTRIES: Entry[] = [
     short: "An open tray and a printed sleeve that holds it.",
     what: "A tray holds the product and a printed sleeve wraps around it. It is quick to pack, easy to open and shows the product when the tray slides out.",
     recipe: "tray-sleeve",
+    art: "tray", tags: ["Boxes", "Sleeve", "Gift"],
     skin: sk({ material: "white", base: "#eee8d9", accent: FOREST, second: KRAFT, print: "band", ratio: [1.3, 0.9, 0.35] }),
     materials: "Paperboard or kraft board for the tray, printed sleeve",
     uses: ["Soap and bath products", "Food and snacks", "Stationery", "Gift sets"],
@@ -508,6 +535,7 @@ const ENTRIES: Entry[] = [
     short: "Printed cartons that ship flat and fold up on your line.",
     what: "The folding carton is the everyday retail box: printed on one flat sheet, cut and creased, then folded and glued. It ships flat, so it stores and travels cheaply. The style you pick (tuck, window, pillow or gable) changes how it closes and how it looks.",
     recipe: "folding-carton",
+    art: "folding", tags: ["Cartons", "Printed", "Retail"],
     skin: sk({ material: "white", base: "#efe8d8", accent: FOREST, second: KRAFT, print: "band", lid: "tuck", ratio: [0.9, 0.6, 1.3] }),
     materials: "Paperboard or kraft board, coated or uncoated",
     uses: ["Cosmetics and health", "Food and gifts", "Small electronics", "Retail products"],
@@ -522,6 +550,7 @@ const ENTRIES: Entry[] = [
     short: "Printed poly mailers and tamper-evident courier bags.",
     what: "Thin, strong bags for clothing and soft goods that are posted rather than shelved. They are light, waterproof and seal shut with a peel-off strip, so the parcel shows if it was opened on the way.",
     recipe: "pouch",
+    art: "courier", tags: ["Bags", "Poly", "Shipping"],
     skin: sk({ material: "film", base: "#dfe5e1", accent: FOREST, second: KRAFT, print: "wordmark", ratio: [1.1, 0.04, 1.4] }),
     materials: "Poly film, matte or gloss, single or co-extruded layers",
     uses: ["Clothing and textiles", "Online stores", "Couriers and returns", "Soft goods"],
@@ -536,6 +565,7 @@ const ENTRIES: Entry[] = [
     short: "Curved-end cartons for favours, jewelry and small gifts.",
     what: "A small carton whose ends curve and meet like a pillow. It is light, flat when shipped and pretty enough to need no wrapping.",
     recipe: "folding-carton",
+    art: "pillow", tags: ["Cartons", "Pillow", "Gift"],
     skin: sk({ material: "color", base: "#e9e0cf", accent: "#1e4d3a", second: KRAFT, print: "dots", lid: "pillow", ratio: [1, 0.6, 0.3] }),
     materials: "Paperboard or kraft board",
     uses: ["Wedding and party favours", "Jewelry", "Small gifts", "Sample products"],
@@ -549,6 +579,7 @@ const ENTRIES: Entry[] = [
     short: "Kraft and printed paper bags with twisted or flat handles.",
     what: "Paper carrier bags for shops and takeaways, printed with your logo. Strong enough to be reused and recycled with paper.",
     recipe: "paper-bag",
+    art: "bag", tags: ["Bags", "Paper", "Retail"],
     skin: sk({ material: "kraft", base: KRAFT, accent: "#f1ebde", print: "wordmark", handle: true, ratio: [1, 0.5, 1.25] }),
     materials: "Kraft or coated paper, twisted paper or cord handle",
     uses: ["Retail shopping", "Takeaway food", "Gift bags", "Events"],
@@ -562,6 +593,7 @@ const ENTRIES: Entry[] = [
     short: "Printed labels and stickers on sheets or rolls, in any shape.",
     what: "Labels and stickers printed to any shape, on sheets or rolls. Useful for sealing a box, labelling a jar or branding a plain bag.",
     recipe: "label-tag",
+    art: "sticker", tags: ["Labels", "Adhesive", "Retail"],
     skin: sk({ material: "white", base: "#f4f0e6", accent: "#a2583f", second: FOREST, print: "wordmark", card: "sticker", ratio: [1, 0.01, 1] }),
     materials: "Paper or film sticker stock, matte or gloss",
     uses: ["Jars and bottles", "Sealing boxes", "Branding plain bags", "Shipping labels"],
@@ -577,6 +609,7 @@ const ENTRIES: Entry[] = [
     short: "Thick, wrapped boxes for premium products and gifts.",
     what: "Boxes made from thick greyboard wrapped in printed paper. They do not fold flat, hold their shape for years and give a product a premium feel.",
     recipe: "rigid-box",
+    art: "rigid", tags: ["Boxes", "Rigid"],
     skin: sk({ material: "color", base: "#264d3d", accent: "#d6b36a", second: "#d6b36a", print: "wordmark", lid: "lid-base", foil: true, ratio: [1.4, 1, 0.6] }),
     materials: "Greyboard, 1.5 to 3 mm class, wrapped in printed or textured paper",
     uses: ["Premium gifts", "Cosmetics and fragrance", "Electronics", "Subscription boxes"],
@@ -590,6 +623,7 @@ const ENTRIES: Entry[] = [
     short: "Shipping and mailer boxes made from fluted board.",
     what: "Boxes made from board with a fluted layer between two flat sheets. Light and strong, they are the standard for shipping and for protecting products in transit.",
     recipe: "corrugated-box",
+    art: "shipper", tags: ["Boxes", "Corrugated", "Shipping"],
     skin: sk({ material: "kraft", base: "#c59a5d", accent: INK, print: "wordmark", ratio: [1.5, 1.1, 1] }),
     materials: "Single-wall or double-wall corrugated board, kraft or white",
     uses: ["E-commerce shipping", "Export cartons", "Mailers", "Bulk packing"],
@@ -603,6 +637,7 @@ const ENTRIES: Entry[] = [
     short: "Unbleached kraft cartons and mailers with a natural look.",
     what: "Boxes made from natural kraft paper. They look honest, print well in one or two colors and are easy to recycle with paper.",
     recipe: "folding-carton",
+    art: "folding", tags: ["Cartons", "Kraft"],
     skin: sk({ material: "kraft", base: KRAFT, accent: "#f1ebde", second: FOREST, print: "wordmark", lid: "tuck", ratio: [1, 0.7, 0.9] }),
     materials: "Kraft paperboard or corrugated kraft",
     uses: ["Eco-minded brands", "Food and bakery", "Soap and candles", "E-commerce"],
@@ -616,6 +651,7 @@ const ENTRIES: Entry[] = [
     short: "Printed folding cartons for products sold in shops.",
     what: "Printed cartons for products sold in shops. They are designed to be read from a distance, stack on a shelf and survive handling.",
     recipe: "folding-carton",
+    art: "retail", tags: ["Cartons", "Printed", "Retail"],
     skin: sk({ material: "white", base: "#f0ebe0", accent: "#a2583f", second: FOREST, print: "full", lid: "tuck", ratio: [0.8, 0.5, 1.3] }),
     materials: "Coated paperboard, full-color print",
     uses: ["Consumer goods", "Cosmetics and health", "Electronics accessories", "Gifts"],
@@ -631,6 +667,7 @@ const ENTRIES: Entry[] = [
     short: "Treat boxes and bags in orange and black, with bats and pumpkins.",
     what: "Folding cartons for treats and party favours, in autumn colors and simple Halloween shapes. We can print your own design for a seasonal range.",
     recipe: "folding-carton",
+    art: "gable", tags: ["Cartons", "Seasonal", "Handle"],
     skin: sk({ material: "color", base: "#d9741f", accent: "#1c1a18", second: "#f1ebde", print: "dots", lid: "gable", handle: true, props: ["pumpkin", "bat"], ratio: [0.9, 0.7, 1.0] }),
     materials: "Paperboard, printed in orange and black",
     uses: ["Treats and sweets", "Party favours", "Seasonal retail", "Event gifts"],
@@ -645,6 +682,7 @@ const ENTRIES: Entry[] = [
     short: "Gift boxes in red and green, with ribbon and simple stars.",
     what: "Gift boxes with a ribbon and a festive print, for chocolates, candles and hampers. The same rigid boxes we make all year, dressed for the season.",
     recipe: "rigid-box",
+    art: "rigid", tags: ["Boxes", "Seasonal", "Rigid"],
     skin: sk({ material: "color", base: "#9c2b27", accent: "#f1ebde", second: "#1e4d3a", print: "stripes", lid: "lid-base", props: ["ribbon", "snowflake", "bow"], ratio: [1.3, 1, 0.55] }),
     materials: "Rigid greyboard wrapped in printed paper, ribbon",
     uses: ["Chocolates and sweets", "Candles", "Corporate gifts", "Hampers"],
@@ -659,6 +697,7 @@ const ENTRIES: Entry[] = [
     short: "Limited-edition boxes with foil and a commemorative print.",
     what: "A limited run that marks your brand's milestone: a special color, foil and a printed message. Often given to customers, partners or staff.",
     recipe: "rigid-box",
+    art: "jewelry", tags: ["Boxes", "Rigid", "Foil"],
     skin: sk({ material: "black", base: "#20201e", accent: "#d6b36a", second: "#d6b36a", print: "wordmark", lid: "magnet", foil: true, props: ["star"], ratio: [1.2, 1, 0.5] }),
     materials: "Rigid greyboard, foil and embossing on a dark wrap",
     uses: ["Customer gifts", "Partner gifts", "Launch events", "Limited editions"],
@@ -673,6 +712,7 @@ const ENTRIES: Entry[] = [
     short: "Kraft cartons with a warm print and autumn leaves.",
     what: "Sturdy kraft boxes with a warm autumn print, for pies, baked goods and gift hampers that travel to someone's table.",
     recipe: "corrugated-box",
+    art: "shipper", tags: ["Boxes", "Seasonal", "Kraft"],
     skin: sk({ material: "kraft", base: "#c08a4a", accent: "#7a2a1d", second: "#d9741f", print: "dots", props: ["leaf"], ratio: [1.4, 1.2, 0.8] }),
     materials: "Kraft corrugated board, one or two colors",
     uses: ["Pies and baked goods", "Food hampers", "Corporate gifts", "Delivery orders"],
@@ -687,6 +727,7 @@ const ENTRIES: Entry[] = [
     short: "Dark boxes with gold foil and a scatter of confetti print.",
     what: "Gift boxes for the turn of the year: a dark wrap, gold foil and a lively print. Suits gifts, sweets and corporate greetings.",
     recipe: "rigid-box",
+    art: "rigid", tags: ["Boxes", "Seasonal", "Rigid"],
     skin: sk({ material: "black", base: "#171b2a", accent: "#e0c27a", second: "#e0c27a", print: "dots", lid: "lid-base", foil: true, props: ["confetti", "star"], ratio: [1.3, 1, 0.5] }),
     materials: "Rigid greyboard, foil and printed paper",
     uses: ["Corporate greetings", "Sweets and gifts", "Client thank-yous", "Event favours"],
@@ -738,6 +779,8 @@ export const PAGES: readonly CatalogPage[] = ENTRIES.map((e): CatalogPage => ({
     description: `${e.short} ${e.what}`.slice(0, 200),
   },
   recipe: e.recipe,
+  art: e.art,
+  tags: e.tags,
   skin: e.skin,
   steps: stepsFor(e.recipe, e.skin, e.noun, e.notes ?? {}),
   related: e.related,
@@ -760,10 +803,41 @@ export const PAGE_END = {
   quotePrimary: (product: string) => `Get a quote for ${product}`,
   quoteSecondary: "Design your box",
   /** The band on hub pages (no single product). */
-  hubTitle: "Tell us what you are packing",
+  hubTitle: "Not sure which one fits?",
   hubLine: "Tell us what you are packing. We suggest a style and check the details with you before anything is made.",
   hubPrimary: "Get a quote",
 };
+
+/** Copy for the hub pages (Industry, Shape & style, Material, Event). Edit here. */
+export const HUB = {
+  /** [singular, plural] of what the hub lists, for the count line ("12 industries"). */
+  count: { industry: ["industry", "industries"], "shape-and-style": ["style", "styles"], material: ["material", "materials"], event: ["event", "events"] } as Record<GroupId, [string, string]>,
+  filterLabel: "Filter by",
+  all: "All",
+  cardAction: "See how it is made",
+  teaser: {
+    title: "Every one is made the same way",
+    lead: "Whichever you choose, it goes through the same three steps.",
+    steps: [
+      { title: "Cut", line: "The board is cut to the flat shape that comes from your size." },
+      { title: "Fold", line: "The creases are pressed and the panels fold up into the box." },
+      { title: "Finish", line: "Print, coating and glue make it ready to pack and ship." },
+    ],
+    cta: "Set up your own in 3D",
+  },
+};
+
+/** Filter chips for a hub: the tags that split its pages (used by at least 2 pages and not by all), most common first. */
+export function hubChips(group: GroupId, max = 7): { tag: string; count: number }[] {
+  const pages = PAGES.filter((p) => p.group === group);
+  const counts = new Map<string, number>();
+  pages.forEach((p) => p.tags.forEach((t) => counts.set(t, (counts.get(t) ?? 0) + 1)));
+  return [...counts]
+    .filter(([, n]) => n >= 2 && n < pages.length)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, max)
+    .map(([tag, count]) => ({ tag, count }));
+}
 
 /**
  * Pages related to `page`, by relevance: the same process recipe first (same group first within it), then the same group, then the
