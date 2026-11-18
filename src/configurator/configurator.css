@@ -1,0 +1,25 @@
+/*
+ * Configurator layout. The preview is sticky inside the options row only (the row ends before the dieline), so it is released there.
+ * Pure CSS: position: sticky, no scroll code. --header-h is the fixed header (eco tokens).
+ */
+.cfg-preview { position: sticky; top: var(--header-h, 6.25rem); z-index: 20; background: var(--bg); padding: 0.5rem 0; }
+/* under 1024 px: a compact bar (about a third of the screen) that stays while the options scroll under it */
+.cfg-stage { height: calc(34dvh - 4.2rem); min-height: 8rem; }
+@media (min-width: 1024px) {
+  .cfg-preview { top: calc(var(--header-h, 6.25rem) + 1rem); background: none; padding: 0; align-self: start; }
+  /* the box is never cut by the header and the panel never taller than the space under it */
+  .cfg-stage { height: auto; min-height: 0; aspect-ratio: 5 / 4; max-height: calc(100dvh - var(--header-h, 6.25rem) - 2rem - 8rem); }
+}
+/* blueprint plate behind the dieline: the same faint grid as the product stage */
+.cfg-blueprint {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-card);
+  background-color: color-mix(in srgb, var(--sand) 70%, var(--surface));
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--kraft-ink) 12%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--kraft-ink) 12%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
+}
+/* spec sheet: a kraft bar on top */
+.cfg-spec { border-top: 4px solid var(--kraft); }

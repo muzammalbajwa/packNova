@@ -14,8 +14,9 @@ import {
 } from "@/lib/box";
 import { detectDevice } from "@/lib/deviceTier";
 import { useDebouncedValue } from "@/lib/useDebounced";
+import "./configurator.css";
 
-const Dieline = dynamic(() => import("./DielineView"), { ssr: false, loading: () => <p className="text-[var(--muted)]">Drawing the dieline…</p> });
+const Dieline = dynamic(() => import("./DielineView"), { ssr: false, loading: () => <div className="cfg-blueprint min-h-[26rem]" aria-busy="true"><p className="p-6 text-[var(--muted)]">Drawing the dieline…</p></div> });
 
 const MAX_LOGO_BYTES = 2 * 1024 * 1024;
 const field = "w-full rounded-[var(--r-field)] border border-[var(--line)] bg-[var(--field)] px-3 py-2.5 text-base text-[var(--fg)] outline-none focus:border-[var(--accent)]";
@@ -338,23 +339,34 @@ export default function ConfiguratorApp() {
           </fieldset>
   );
 
-  return (
-    <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-start">
-      <form className="grid gap-6" onSubmit={(e) => e.preventDefault()} aria-label="Box options">
-        {productBlock}
-        {sizeBlock}
-        {materialBlock}
-        {colourBlock}
-        {printBlock}
-        {finishBlock}
-        {qtyBlock}
-      </form>
+  const downloadSvg = async () => {
+    const { dieline, dielineSvg } = await import("@/lib/boxDieline"); // loaded on click, so the configurator's first load stays small
+    const d = dieline(settled);
+    const url = URL.createObjectURL(new Blob([dielineSvg(d, `${TYPE_BY_ID[settled.type].label} dieline preview`)], { type: "image/svg+xml" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${settled.type}-dieline-preview.svg`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
 
-      {/* on a phone the stage comes first (right under the headline) and the summary after the form; from lg it is the sticky right column */}
-      <div className="contents lg:sticky lg:top-24 lg:grid lg:gap-6">
-        <section aria-label="Preview" className="order-first lg:order-none">
-          <div className="relative overflow-hidden rounded-[var(--r-card)] border border-[var(--line)] bg-[var(--surface)]">
-            <div className="relative aspect-[4/5] w-full max-h-[30rem] md:aspect-[5/4]">
+  return (
+    <div className="mx-auto max-w-6xl">
+      {/* Row 1: the options on the left, the sticky preview on the right. The row ends before the dieline, so the preview is released there. */}
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-start lg:gap-8">
+        <form className="grid gap-6" onSubmit={(e) => e.preventDefault()} aria-label="Box options">
+          {productBlock}
+          {sizeBlock}
+          {materialBlock}
+          {colourBlock}
+          {printBlock}
+          {finishBlock}
+          {qtyBlock}
+        </form>
+
+        <section aria-label="Preview" className="cfg-preview order-first lg:order-none">
+          <div className="cfg-panel relative overflow-hidden rounded-[var(--r-card)] border border-[var(--line)] bg-[var(--surface)]">
+            <div className="cfg-stage relative w-full">
               <div className="absolute inset-0 grid place-items-center p-6 transition-opacity duration-500" style={{ opacity: ready ? 0 : 1 }} aria-hidden>
                 {!ready && <ProductPoster page={posterPage} className="h-full max-h-72 w-full" />}
               </div>
@@ -372,44 +384,50 @@ export default function ConfiguratorApp() {
                 </span>
               ))}
             </div>
-            <div className="border-t border-[var(--line)] px-4 py-3">
+            <div className="border-t border-[var(--line)] px-4 py-3 max-lg:px-3 max-lg:py-2">
               {gl === false ? (
                 <p className="text-sm text-[var(--muted)]">The 3D preview is not available on this device. The dieline and the summary below still work.</p>
               ) : (
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                  <label htmlFor="fold" className="text-sm font-semibold">Flat sheet</label>
-                  <input id="fold" type="range" min={0} max={1} step={0.005} value={fold} onChange={(e) => onFold(Number(e.target.value))} aria-valuetext={fold > 0.95 ? "Folded" : fold < 0.05 ? "Flat" : `${Math.round(fold * 100)} percent folded`} className="min-w-[8rem] flex-1 accent-[var(--accent)]" />
-                  <span className="text-sm font-semibold">Folded</span>
-                  <button type="button" onClick={() => previewRef.current?.pv.resetView()} className="rounded-[var(--r-btn)] border border-[var(--line-strong)] px-3 py-1.5 text-sm font-semibold hover:border-[var(--fg)]">Reset view</button>
+                <div className="flex items-center gap-x-4 gap-y-2 max-lg:gap-x-2 lg:flex-wrap">
+                  <label htmlFor="fold" className="text-sm font-semibold max-lg:text-xs">Flat sheet</label>
+                  <input id="fold" type="range" min={0} max={1} step={0.005} value={fold} onChange={(e) => onFold(Number(e.target.value))} aria-valuetext={fold > 0.95 ? "Folded" : fold < 0.05 ? "Flat" : `${Math.round(fold * 100)} percent folded`} className="min-w-[4rem] flex-1 accent-[var(--accent)] lg:min-w-[8rem]" />
+                  <span className="text-sm font-semibold max-lg:text-xs">Folded</span>
+                  <button type="button" onClick={() => previewRef.current?.pv.resetView()} className="rounded-[var(--r-btn)] border border-[var(--line-strong)] px-3 py-1.5 text-sm font-semibold hover:border-[var(--fg)] max-lg:shrink-0 max-lg:px-2 max-lg:text-xs">Reset view</button>
                 </div>
               )}
-              <p className="mt-2 text-xs text-[var(--muted)]">Drag to turn the box. Double tap to reset. A preview, not a final render.</p>
+              <p className="mt-2 text-xs text-[var(--muted)] max-lg:hidden">Drag to turn the box. Double tap to reset. A preview, not a final render.</p>
             </div>
           </div>
         </section>
+      </div>
 
-        <section aria-labelledby="sum-h" className="rounded-[var(--r-card)] border border-[var(--line)] bg-[var(--surface)] p-5">
-          <h2 id="sum-h" className="font-display text-xl font-medium">Your summary</h2>
-          <table className="mt-3 w-full text-left text-[0.95rem]" aria-live="polite">
+      {/* Row 2: full width. The dieline on a blueprint plate, and the summary as a spec sheet beside it. */}
+      <div className="mt-14 grid gap-8 lg:mt-20 lg:grid-cols-[1.45fr_1fr] lg:gap-10">
+        <section aria-labelledby="die-h" className="min-w-0">
+          <h2 id="die-h" className="font-display mb-4 text-2xl font-medium md:text-3xl">Dieline, {fmt(settled.l, settled.unit)} x {fmt(settled.w, settled.unit)} x {fmt(settled.h, settled.unit)} {settled.unit}</h2>
+          <Dieline cfg={settled} />
+        </section>
+
+        <section aria-labelledby="sum-h" className="cfg-spec self-start rounded-[var(--r-card)] border border-[var(--line-strong)] bg-[var(--surface)] p-6 md:p-7">
+          <h2 id="sum-h" className="font-display text-2xl font-medium md:text-3xl">Your summary</h2>
+          <table className="mt-4 w-full text-left text-base" aria-live="polite">
             <tbody>
               {lines.map(([k, v]) => (
                 <tr key={k} className="border-t border-[var(--line)]">
-                  <th scope="row" className="w-2/5 py-2 pr-3 align-top font-semibold">{k}</th>
-                  <td className="py-2">{v}</td>
+                  <th scope="row" className="w-2/5 py-2.5 pr-3 align-top font-semibold text-[var(--kraft-ink)]">{k}</th>
+                  <td className="py-2.5">{v}</td>
                 </tr>
               ))}
-              {logo && <tr className="border-t border-[var(--line)]"><th scope="row" className="py-2 pr-3 align-top font-semibold">Logo</th><td className="py-2">{logo.name} (preview only)</td></tr>}
+              {logo && <tr className="border-t border-[var(--line)]"><th scope="row" className="py-2.5 pr-3 align-top font-semibold text-[var(--kraft-ink)]">Logo</th><td className="py-2.5">{logo.name} (preview only)</td></tr>}
             </tbody>
           </table>
-          <p className="mt-3 text-sm text-[var(--muted)]">{ARTWORK_NOTE}</p>
-          <Link href={`/quote/?${configToParams(cfg).toString()}`} className="mt-4 inline-flex w-full items-center justify-center rounded-[var(--r-btn)] bg-[var(--accent)] px-6 py-3.5 text-base font-semibold text-[var(--on-accent)] hover:bg-[var(--fg)] sm:w-auto">Send to quote</Link>
+          <p className="mt-4 text-sm text-[var(--muted)]">{ARTWORK_NOTE}</p>
+          <div className="mt-6 grid gap-3">
+            <Link href={`/quote/?${configToParams(cfg).toString()}`} className="inline-flex items-center justify-center rounded-[var(--r-btn)] bg-[var(--accent)] px-6 py-4 text-base font-semibold text-[var(--on-accent)] hover:bg-[var(--fg)]">Send to quote</Link>
+            <button type="button" onClick={downloadSvg} className="inline-flex items-center justify-center rounded-[var(--r-btn)] border border-[var(--line-strong)] px-6 py-3 text-base font-semibold hover:border-[var(--fg)]">Download SVG</button>
+          </div>
         </section>
       </div>
-
-      <section aria-labelledby="die-h" className="lg:col-span-2">
-        <h2 id="die-h" className="font-display mb-3 text-2xl font-medium">Dieline, {fmt(settled.l, settled.unit)} x {fmt(settled.w, settled.unit)} x {fmt(settled.h, settled.unit)} {settled.unit}</h2>
-        <Dieline cfg={settled} />
-      </section>
     </div>
   );
 }
